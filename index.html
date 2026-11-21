@@ -474,27 +474,56 @@
       margin-top: 2px;
     }
 
-    /* Big Host Action Buttons (Only visible to Host in Lobby!) */
+    /* Centered Host Lobby Dock (ONLY visible to Host in Lobby!) */
     #host-panel {
       position: absolute;
-      bottom: 22px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       display: none;
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       z-index: 24;
+      pointer-events: none;
     }
 
     #host-panel.visible {
       display: flex;
     }
 
+    #host-panel > * {
+      pointer-events: auto;
+    }
+
+    .host-code-pill {
+      background: rgba(251, 247, 238, 0.94);
+      border: 2px dashed var(--ink);
+      border-radius: 5px 9px 4px 8px;
+      padding: 2px 14px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.2);
+      transition: transform 0.12s ease;
+    }
+
+    .host-code-pill:hover {
+      transform: scale(1.04) rotate(-1deg);
+    }
+
     .big-host-btn {
-      font-size: 26px !important;
-      padding: 10px 26px !important;
+      font-size: 28px !important;
+      padding: 10px 30px !important;
       border-width: 3px !important;
       box-shadow: 4px 5px 0 rgba(35, 31, 32, 0.3) !important;
+    }
+
+    .big-host-btn.cancelling {
+      background: #231F20 !important;
+      color: #FBF7EE !important;
+      border-color: #E9C46A !important;
     }
 
     /* Host Settings Notebook Modal */
@@ -829,7 +858,8 @@
       </div>
 
       <div id="host-panel">
-        <button class="sketch-btn big-host-btn" id="hp-open-settings">⚙ Налаштування</button>
+        <button class="sketch-btn" id="hp-open-settings" style="font-size:22px; padding:6px 20px;">⚙ Налаштування</button>
+        <button class="host-code-pill" id="hp-code-copy" title="Натисни, щоб скопіювати лінк">КОД: ------ 📋</button>
         <button class="sketch-btn ink-red big-host-btn" id="hp-start-btn">▶ СТАРТ</button>
       </div>
 
@@ -890,7 +920,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.9.0</div>
+      <div id="version-tag">v0.9.1</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -990,6 +1020,15 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
           osc.start(now);
           osc.stop(now + 0.36);
+        } else if (type === 'cancel') {
+          playNoiseBurst(0.14, 1800, 0.12);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.16);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.start(now);
+          osc.stop(now + 0.19);
         } else if (type === 'vortex') {
           playNoiseBurst(0.28, 700, 0.15);
           osc.type = 'sawtooth';
@@ -1109,7 +1148,9 @@
       let roundIntroTimer = 0;   // 3.0 -> 0.0 countdown on level 1
       let roundIntroLastSec = 4;
       let goBannerTimer = 0;
-      const VORTEX_POS = { x: 480, y: 418 };
+      const VORTEX_POS = { x: 480, y: 290 };
+      let camZoom = 1.0;
+      let startBtnHover = false;
 
       function generateLobbyLevel() {
         return {
@@ -1976,6 +2017,8 @@
         } else if (data.type === 'start_match') {
           if (data.settings) Object.assign(roomSettings, data.settings);
           beginLaunchSequence(data.seed, false);
+        } else if (data.type === 'cancel_launch') {
+          cancelLaunchSequence(false);
         } else if (data.type === 'ping') {
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
@@ -2095,11 +2138,14 @@
               }
               publishMqtt({ type: 'hello', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore, role: netMode });
               if (netMode === 'host') {
-                lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита! Копіюй лінк і кидай другу.';
+                lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита!';
                 updateNetUI('Чекаю P2...', 'waiting');
+                document.getElementById('hp-code-copy').textContent = 'КОД: ' + code + ' 📋';
+                lobbyModal.classList.add('hidden');
                 enterLobbyRoom(false);
-                showToast('Кімната лобі ' + code + ' відкрита');
+                showToast('Кімната ' + code + ' створена! Клікни по коду щоб скопіювати лінк.');
               } else {
+                lobbyModal.classList.add('hidden');
                 enterLobbyRoom(false);
                 lobbyMsg.textContent = 'У кімнаті ' + code + '! Чекаю друга...';
                 updateNetUI('Пошук P1...', 'waiting');
@@ -2284,7 +2330,22 @@
 
       function syncHostPanelUI() {
         const hp = document.getElementById('host-panel');
-        hp.classList.toggle('visible', gamePhase === 'lobby' && netMode === 'host');
+        const showHost = (gamePhase === 'lobby' || gamePhase === 'launching') && netMode === 'host';
+        hp.classList.toggle('visible', showHost);
+        const startBtn = document.getElementById('hp-start-btn');
+        const openSetBtn = document.getElementById('hp-open-settings');
+        const codePill = document.getElementById('hp-code-copy');
+        if (gamePhase === 'launching') {
+          startBtn.textContent = '✕ ВІДМІНИТИ';
+          startBtn.classList.add('cancelling');
+          openSetBtn.style.display = 'none';
+          codePill.style.display = 'none';
+        } else {
+          startBtn.textContent = '▶ СТАРТ';
+          startBtn.classList.remove('cancelling');
+          openSetBtn.style.display = '';
+          codePill.style.display = '';
+        }
         document.getElementById('hp-rounds-val').textContent = roomSettings.infinite ? '∞' : String(roomSettings.rounds);
         document.getElementById('hp-rounds-inf').checked = !!roomSettings.infinite;
         document.getElementById('hp-speed-btn').textContent = SPEED_MODES[roomSettings.speedIdx].label;
@@ -2388,9 +2449,46 @@
         playSound('tick');
       }
 
-      document.getElementById('hp-start-btn').addEventListener('click', () => {
-        const startSeed = Math.floor(Math.random() * 900000) + 100000;
-        beginLaunchSequence(startSeed, true);
+      function cancelLaunchSequence(broadcast = false) {
+        if (gamePhase !== 'launching') return;
+        gamePhase = 'lobby';
+        launchTimer = 0;
+        blackoutAlpha = 0;
+        screenShake = 5;
+        // Snap players cleanly back upright onto lobby floor
+        const restorePl = (pl, x) => {
+          pl.x = x; pl.y = 420; pl.vx = 0; pl.vy = 0;
+          pl.rollTimer = 0; pl.rot = 0; pl.scaleX = 1; pl.scaleY = 1;
+        };
+        restorePl(localPlayer, netMode === 'host' ? 200 : 270);
+        if (netConnected) restorePl(remotePlayer, netMode === 'host' ? 270 : 200);
+        syncHostPanelUI();
+        playSound('cancel');
+        showToast('Запуск скасовано!');
+        if (broadcast && netConnected) {
+          sendGameMsg({ type: 'cancel_launch' });
+        }
+      }
+
+      document.getElementById('hp-code-copy').addEventListener('click', () => {
+        document.getElementById('btn-copy-link').click();
+      });
+
+      const hpStartBtnEl = document.getElementById('hp-start-btn');
+      hpStartBtnEl.addEventListener('mouseenter', () => {
+        startBtnHover = true;
+        if (gamePhase === 'lobby') playSound('tick');
+      });
+      hpStartBtnEl.addEventListener('mouseleave', () => {
+        startBtnHover = false;
+      });
+      hpStartBtnEl.addEventListener('click', () => {
+        if (gamePhase === 'launching') {
+          if (launchTimer > 0.55) cancelLaunchSequence(true);
+        } else {
+          const startSeed = Math.floor(Math.random() * 900000) + 100000;
+          beginLaunchSequence(startSeed, true);
+        }
       });
 
       function resetPlayerToSpawn(countDeath = false) {
@@ -3035,8 +3133,22 @@
         ctx.stroke();
         ctx.restore();
 
+        // Dynamic Camera Zoom: gently zooms in on START hover, intensely zooms during launch, snaps fast back on cancel!
+        let targetZoom = 1.0;
+        if (gamePhase === 'launching') {
+          const zProg = Math.min(1, (5.0 - launchTimer) / 4.2);
+          targetZoom = 1.08 + zProg * 0.44;
+        } else if (gamePhase === 'lobby' && netMode === 'host' && startBtnHover) {
+          targetZoom = 1.07;
+          screenShake = Math.max(screenShake, 1.4);
+        }
+        const zoomSpeed = targetZoom < camZoom ? 0.22 : 0.08;
+        camZoom += (targetZoom - camZoom) * zoomSpeed;
+
         ctx.save();
-        ctx.translate(-cam.x + sx, -cam.y + sy);
+        ctx.translate(w / 2, h / 2);
+        ctx.scale(camZoom, camZoom);
+        ctx.translate(-w / 2 - cam.x + sx, -h / 2 - cam.y + sy);
 
         // 2. Handwritten Page Number & Margin Sketch Notes
         ctx.fillStyle = 'rgba(35, 31, 32, 0.09)';
@@ -3083,45 +3195,48 @@
           ctx.restore();
         });
 
-        // 4b. Diegetic Settings Wall Board in Lobby Room (visible to BOTH Host & Friend!)
+        // 4b. Diegetic Settings Wall Board in Lobby Room (placed cleanly on right wall so center START never overlaps!)
         if (lvl.isLobby) {
-          drawInkedRect(295, 170, 370, 235, 555, '#FBF7EE', false);
+          const bx = netMode === 'host' ? 610 : 295;
+          const bw = 320;
+          const bcx = bx + bw / 2;
+          drawInkedRect(bx, 115, bw, 225, 555, '#FBF7EE', false);
           ctx.save();
           ctx.fillStyle = '#231F20';
           ctx.textAlign = 'center';
-          ctx.font = '700 28px "Caveat", cursive';
-          ctx.fillText('НАЛАШТУВАННЯ КІМНАТИ', 480, 206);
+          ctx.font = '700 26px "Caveat", cursive';
+          ctx.fillText('НАЛАШТУВАННЯ', bcx, 148);
           ctx.strokeStyle = 'rgba(35,31,32,0.35)';
           ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.moveTo(320, 218); ctx.lineTo(640, 218); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(bx + 20, 158); ctx.lineTo(bx + bw - 20, 158); ctx.stroke();
 
           ctx.textAlign = 'left';
-          ctx.font = '700 22px "Caveat", cursive';
+          ctx.font = '700 21px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
-          ctx.fillText('Раунди:', 328, 254);
-          ctx.fillText('Швидкість:', 328, 290);
-          ctx.fillText('Гравітація:', 328, 326);
-          ctx.fillText('Колізія гравців:', 328, 362);
+          ctx.fillText('Раунди:', bx + 22, 192);
+          ctx.fillText('Швидкість:', bx + 22, 226);
+          ctx.fillText('Гравітація:', bx + 22, 260);
+          ctx.fillText('Колізія:', bx + 22, 294);
 
           ctx.textAlign = 'right';
           ctx.fillStyle = '#C83E31';
-          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' раунд(ів)'), 632, 254);
+          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' р.'), bx + bw - 22, 192);
           ctx.fillStyle = '#2952A3';
-          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', 632, 290);
-          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', 632, 326);
+          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', bx + bw - 22, 226);
+          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', bx + bw - 22, 260);
           ctx.fillStyle = roomSettings.playerCollision ? '#2D7A46' : '#6A635A';
-          ctx.fillText(roomSettings.playerCollision ? 'Увімкнено' : 'Вимкнено', 632, 362);
+          ctx.fillText(roomSettings.playerCollision ? 'Увімкнено' : 'Вимкнено', bx + bw - 22, 294);
 
           ctx.textAlign = 'center';
-          ctx.font = '700 18px "Caveat", cursive';
+          ctx.font = '700 17px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
           const statusLine = lastMatchWinner
-            ? ('Останній переможець: ' + lastMatchWinner + ' ★')
-            : (netMode === 'host' ? 'Налаштуй внизу і тисни «Почати гру»' : 'Чекаємо, поки хост запустить матч...');
-          ctx.fillText(statusLine, 480, 392);
+            ? ('Переміг: ' + lastMatchWinner + ' ★')
+            : (netMode === 'host' ? 'Ти хост — обирай і тисни СТАРТ' : 'Чекаємо, поки хост запустить гру...');
+          ctx.fillText(statusLine, bcx, 326);
           ctx.restore();
 
-          // Physical Glowing START Portal Button on the Lobby Wall (opens during 3..2..1 tornado!)
+          // Physical Glowing Portal Vortex (ONLY opens during launch; guests NEVER see a start button!)
           ctx.save();
           const vx = VORTEX_POS.x;
           const vy = VORTEX_POS.y;
@@ -3161,12 +3276,6 @@
               ctx.lineWidth = 2.5;
               ctx.stroke();
             }
-          } else {
-            drawInkedRect(vx - 54, vy - 18, 108, 36, 560, '#F2D388', false);
-            ctx.fillStyle = '#231F20';
-            ctx.font = '700 22px "Caveat", cursive';
-            ctx.textAlign = 'center';
-            ctx.fillText('★ СТАРТ ★', vx, vy + 7);
           }
           ctx.restore();
         }
