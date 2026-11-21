@@ -1006,7 +1006,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.10.0</div>
+      <div id="version-tag">v0.11.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -1138,6 +1138,13 @@
           playNoiseBurst(0.11, 1700, 0.09);
           playPluck(ctx, 360, now, 0.08, 0.09);
           playPluck(ctx, 220, now + 0.05, 0.12, 0.09);
+        } else if (type === 'fanfare') {
+          const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+          const times = [0, 0.11, 0.22, 0.34, 0.52, 0.64];
+          const durs  = [0.16, 0.16, 0.18, 0.26, 0.16, 0.55];
+          notes.forEach((f, idx) => playPluck(ctx, f, now + times[idx], durs[idx], 0.11));
+          playPluck(ctx, 261.63, now + 0.34, 0.85, 0.08);
+          playPluck(ctx, 392.0, now + 0.64, 0.65, 0.08);
         } else if (type === 'win') {
           playPluck(ctx, 440, now, 0.22, 0.09);
           playPluck(ctx, 554.37, now + 0.07, 0.25, 0.09);
@@ -1490,21 +1497,25 @@
       let boilFrame = 0;
       let boilTimer = 0;
 
-      // Subtle paper fiber texture
-      const grainCanvas = document.createElement('canvas');
-      grainCanvas.width = 160;
-      grainCanvas.height = 160;
-      const gctx = grainCanvas.getContext('2d');
-      const imgData = gctx.createImageData(160, 160);
-      for (let i = 0; i < imgData.data.length; i += 4) {
-        const v = 220 + Math.floor(Math.random() * 32);
-        imgData.data[i] = v;
-        imgData.data[i + 1] = v - 6;
-        imgData.data[i + 2] = v - 14;
-        imgData.data[i + 3] = 26;
-      }
-      gctx.putImageData(imgData, 0, 0);
-      let paperPattern = null;
+      // Fast pre-baked diagonal ink hatch pattern (replaces expensive per-frame ctx.clip hatching!)
+      const hatchCanvas = document.createElement('canvas');
+      hatchCanvas.width = 18;
+      hatchCanvas.height = 18;
+      const hctx = hatchCanvas.getContext('2d');
+      hctx.fillStyle = '#EAE0CE';
+      hctx.fillRect(0, 0, 18, 18);
+      hctx.strokeStyle = 'rgba(35, 31, 32, 0.17)';
+      hctx.lineWidth = 1.2;
+      hctx.beginPath();
+      hctx.moveTo(-4, 14); hctx.lineTo(14, -4);
+      hctx.moveTo(4, 22); hctx.lineTo(22, 4);
+      hctx.stroke();
+      let hatchPattern = null;
+
+      // Podium celebration state in Lobby after a match ends
+      let podiumActive = false;
+      let podiumTimer = 0;
+      let podiumRanking = []; // [{ isLocal, nick, score, color }]
 
       function createPlayer(isRemote = false) {
         const sp = currentLevel ? currentLevel.spawn : { x: 80, y: 420 };
@@ -1554,7 +1565,9 @@
       }
 
       function spawnParticles(x, y, color, count = 8, speed = 170) {
+        const cap = window.innerWidth < 820 ? 32 : 55;
         for (let i = 0; i < count; i++) {
+          if (particles.length >= cap) particles.shift();
           const ang = Math.random() * Math.PI * 2;
           const spd = (0.35 + Math.random() * 0.65) * speed;
           particles.push({
@@ -2184,6 +2197,23 @@
           beginLaunchSequence(data.seed, false);
         } else if (data.type === 'cancel_launch') {
           cancelLaunchSequence(false);
+        } else if (data.type === 'round1_go_sync') {
+          if (gamePhase !== 'round_intro' && gamePhase !== 'playing') {
+            launchSeed = data.seed || launchSeed;
+            finishLaunchIntoRound1(false);
+          }
+        } else if (data.type === 'unlock_go') {
+          if (gamePhase === 'round_intro') {
+            unlockRoundGo(false);
+          }
+        } else if (data.type === 'podium_ceremony') {
+          if (typeof data.hostScore === 'number') {
+            if (netMode === 'host') { localScore = data.hostScore; remoteScore = data.clientScore; }
+            else { remoteScore = data.hostScore; localScore = data.clientScore; }
+          }
+          if (data.winner) lastMatchWinner = data.winner;
+          updateLeaderboardUI(null);
+          enterLobbyRoom(false, true);
         } else if (data.type === 'ping') {
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
@@ -2476,10 +2506,14 @@
         updateLevelScrap();
         resetPlayerToSpawn(false);
         const sp = currentLevel.spawn;
+        // Spawn stacked vertically (slightly higher) so players NEVER overlap inside each other!
+        const localIsTop = netConnected && netMode !== 'host';
+        localPlayer.x = sp.x;
+        localPlayer.y = localIsTop ? (sp.y - 78) : (sp.y - 30);
         remotePlayer.x = sp.x;
-        remotePlayer.y = sp.y;
-        remotePlayer.tx = sp.x;
-        remotePlayer.ty = sp.y;
+        remotePlayer.y = localIsTop ? (sp.y - 30) : (sp.y - 78);
+        remotePlayer.tx = remotePlayer.x;
+        remotePlayer.ty = remotePlayer.y;
         remoteSnapshots.length = 0;
         if (broadcast && netConnected) {
           sendGameMsg({
@@ -2522,20 +2556,74 @@
         }
       }
 
-      function enterLobbyRoom(broadcast = false) {
+      // Podium pedestal coordinates inside the 4-wall Lobby Room (2nd left, 1st center tall, 3rd right)
+      const PODIUM_SLOTS = [
+        { rank: 1, x: 260, y: 380, w: 72, h: 100, medal: '🥇', color: '#E9C46A' },
+        { rank: 2, x: 184, y: 412, w: 72, h: 68,  medal: '🥈', color: '#D1D5DB' },
+        { rank: 3, x: 336, y: 434, w: 72, h: 46,  medal: '🥉', color: '#D99B66' }
+      ];
+
+      function enterLobbyRoom(broadcast = false, withPodium = false) {
         gamePhase = 'lobby';
         currentLevel = generateLobbyLevel();
         doorLock = false;
-        document.getElementById('level-scrap').textContent = 'Лобі кімнати';
+        podiumActive = withPodium;
+        podiumTimer = withPodium ? 4.8 : 0;
+
+        document.getElementById('level-scrap').textContent = withPodium ? 'Пʼєдестал переможців!' : 'Лобі кімнати';
         resetPlayerToSpawn(false);
-        remotePlayer.x = 270;
-        remotePlayer.y = 420;
-        remotePlayer.tx = 270;
-        remotePlayer.ty = 420;
+
+        if (withPodium) {
+          // Build sorted leaderboard ranking for the podium
+          const list = [{ isLocal: true, nick: localNick, score: localScore, color: '#F29A8E' }];
+          if (netConnected) {
+            list.push({ isLocal: false, nick: remoteNick, score: remoteScore, color: '#8FB3E8' });
+          }
+          list.sort((a, b) => b.score - a.score);
+          podiumRanking = list;
+
+          // Place top 3 on pedestals; 4th+ freely on lobby floor below
+          list.forEach((entry, idx) => {
+            const target = entry.isLocal ? localPlayer : remotePlayer;
+            if (idx < 3) {
+              const slot = PODIUM_SLOTS[idx];
+              target.x = slot.x + slot.w / 2 - target.w / 2;
+              target.y = slot.y - target.h;
+              target.vx = 0;
+              target.vy = 0;
+              target.tx = target.x;
+              target.ty = target.y;
+            } else {
+              target.x = 520 + (idx - 3) * 44;
+              target.y = 440;
+            }
+          });
+          playSound('fanfare');
+          spawnParticles(PODIUM_SLOTS[0].x + 36, PODIUM_SLOTS[0].y - 30, '#E9C46A', 22, 240);
+        } else {
+          // Stacked non-overlapping lobby spawn
+          const localTop = netConnected && netMode !== 'host';
+          localPlayer.x = 200;
+          localPlayer.y = localTop ? 345 : 395;
+          remotePlayer.x = 200;
+          remotePlayer.y = localTop ? 395 : 345;
+          remotePlayer.tx = remotePlayer.x;
+          remotePlayer.ty = remotePlayer.y;
+        }
+
         remoteSnapshots.length = 0;
         syncHostPanelUI();
         if (broadcast && netConnected) {
-          sendGameMsg({ type: 'enter_lobby', settings: roomSettings, winner: lastMatchWinner });
+          if (withPodium) {
+            sendGameMsg({
+              type: 'podium_ceremony',
+              winner: lastMatchWinner,
+              hostScore: netMode === 'host' ? localScore : remoteScore,
+              clientScore: netMode === 'host' ? remoteScore : localScore
+            });
+          } else {
+            sendGameMsg({ type: 'enter_lobby', settings: roomSettings, winner: lastMatchWinner });
+          }
         }
       }
 
@@ -2595,21 +2683,37 @@
         }
       }
 
-      function finishLaunchIntoRound1() {
+      function finishLaunchIntoRound1(broadcast = true) {
+        podiumActive = false;
         gamePhase = 'round_intro';
         syncHostPanelUI();
         roundIntroTimer = 3.0;
         roundIntroLastSec = 4;
         goBannerTimer = 0;
         loadRound(launchSeed, 1, false);
-        // Place camera at Finish Door so it sweeps cinematically back to players!
         if (currentLevel && currentLevel.goal) {
           cam.x = currentLevel.goal.x - canvas.clientWidth * 0.5;
           cam.y = currentLevel.goal.y - canvas.clientHeight * 0.5;
         }
         spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 58);
-        spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 22, 260);
+        spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 16, 240);
         playSound('tick');
+        if (broadcast && netConnected && netMode === 'host') {
+          sendGameMsg({ type: 'round1_go_sync', seed: launchSeed });
+        }
+      }
+
+      function unlockRoundGo(broadcast = true) {
+        gamePhase = 'playing';
+        roundIntroTimer = 0;
+        goBannerTimer = 0.95;
+        playSound('go');
+        screenShake = 6;
+        spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 75);
+        spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 16, 220);
+        if (broadcast && netConnected && netMode === 'host') {
+          sendGameMsg({ type: 'unlock_go' });
+        }
       }
 
       function cancelLaunchSequence(broadcast = false) {
@@ -2703,7 +2807,7 @@
         const lvl = currentLevel;
         updateMovers(worldTime, dt);
         const movers = activeMovers;
-        const allSolids = lvl.platforms.concat(movers);
+        const allSolids = lvl.platforms.concat(movers).concat(lvl.isLobby && podiumActive ? PODIUM_SLOTS : []);
 
         if (p.ridingMoverIdx >= 0 && movers[p.ridingMoverIdx]) {
           const rm = movers[p.ridingMoverIdx];
@@ -3034,7 +3138,7 @@
           if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
             lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
             showToast('Матч завершено! Переміг: ' + lastMatchWinner);
-            enterLobbyRoom(true);
+            enterLobbyRoom(true, true);
           } else {
             const nextSeed = Math.floor(Math.random() * 900000) + 100000;
             loadRound(nextSeed, roundNumber + 1, true);
@@ -3049,7 +3153,8 @@
 
       function resizeCanvas() {
         const wrap = document.getElementById('stage-wrap');
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const isMobile = wrap.clientWidth < 820;
+        const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
         canvas.width = Math.floor(wrap.clientWidth * dpr);
         canvas.height = Math.floor(wrap.clientHeight * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -3081,36 +3186,17 @@
         ctx.quadraticCurveTo(x4 + boilOffset(seed + 12, f), (y4 + y1) / 2, x1, y1);
         ctx.closePath();
 
-        if (fill) {
+        if (hatch) {
+          if (!hatchPattern) hatchPattern = ctx.createPattern(hatchCanvas, 'repeat');
+          ctx.fillStyle = hatchPattern || fill || '#EAE0CE';
+          ctx.fill();
+        } else if (fill) {
           ctx.fillStyle = fill;
           ctx.fill();
         }
 
-        // Cross-hatching inside sketched platforms (preserve main path before clipping)
-        if (hatch) {
-          ctx.save();
-          ctx.clip();
-          ctx.strokeStyle = 'rgba(35, 31, 32, 0.18)';
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          for (let hx = x - h; hx < x + w + h; hx += 14) {
-            ctx.moveTo(hx, y);
-            ctx.lineTo(hx + h * 0.65, y + h);
-          }
-          ctx.stroke();
-          ctx.restore();
-        }
-
-        // Rebuild hand-drawn ink outline so it strokes cleanly around the block
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.quadraticCurveTo((x1 + x2) / 2, y1 + boilOffset(seed + 9, f), x2, y2);
-        ctx.quadraticCurveTo(x2 + boilOffset(seed + 10, f), (y2 + y3) / 2, x3, y3);
-        ctx.quadraticCurveTo((x3 + x4) / 2, y3 + boilOffset(seed + 11, f), x4, y4);
-        ctx.quadraticCurveTo(x4 + boilOffset(seed + 12, f), (y4 + y1) / 2, x1, y1);
-        ctx.closePath();
         ctx.strokeStyle = '#231F20';
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 2.4;
         ctx.lineJoin = 'round';
         ctx.stroke();
 
@@ -3339,11 +3425,38 @@
           ctx.fillText(n.sub, n.x, n.y + 20);
         }
 
-        // 3. Hand-drawn Cross-Hatched Platforms
+        // 3. Hand-drawn Cross-Hatched Platforms (with frustum culling for 60fps on phones & old PCs!)
+        const viewPad = 240;
+        const visLeft = cam.x - viewPad;
+        const visRight = cam.x + w / Math.max(0.5, finalZoom) + viewPad;
         const solids = lvl.platforms.concat(activeMovers);
-        solids.forEach((s, i) => {
+        for (let i = 0; i < solids.length; i++) {
+          const s = solids[i];
+          if (s.x + s.w < visLeft || s.x > visRight) continue;
           drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true);
-        });
+        }
+
+        // 3b. Winners Podium Pedestals & Medals in Lobby!
+        if (lvl.isLobby && podiumActive) {
+          PODIUM_SLOTS.forEach((slot, idx) => {
+            drawInkedRect(slot.x, slot.y, slot.w, slot.h, 610 + idx, slot.color, false);
+            ctx.save();
+            ctx.fillStyle = '#231F20';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '700 30px "Caveat", cursive';
+            ctx.fillText(String(slot.rank), slot.x + slot.w / 2, slot.y + 24);
+            ctx.font = '20px sans-serif';
+            ctx.fillText(slot.medal, slot.x + slot.w / 2, slot.y + slot.h - 16);
+            // Floating winner crown/medal above occupant
+            if (podiumRanking[idx]) {
+              const bob = Math.sin(worldTime * 5 + idx) * 4;
+              ctx.font = '700 18px "Caveat", cursive';
+              ctx.fillText(slot.medal + ' ' + podiumRanking[idx].nick, slot.x + slot.w / 2, slot.y - 54 + bob);
+            }
+            ctx.restore();
+          });
+        }
 
         // 4. Inked Spikes / Hazards
         lvl.hazards.forEach((hz, i) => {
@@ -3515,14 +3628,7 @@
 
         ctx.restore();
 
-        // 8. Paper Fiber Overlay
-        if (!paperPattern) paperPattern = ctx.createPattern(grainCanvas, 'repeat');
-        if (paperPattern) {
-          ctx.save();
-          ctx.fillStyle = paperPattern;
-          ctx.fillRect(0, 0, w, h);
-          ctx.restore();
-        }
+        // 8. Optimized clean paper surface (zero heavy per-frame full-screen overdraw)
 
         // 9. Diegetic Fatigue Vignette when Exhausted
         if (localPlayer.exhausted) {
@@ -3566,11 +3672,15 @@
           ctx.lineWidth = 3;
           ctx.stroke();
 
+          const numStr = String(sec);
           ctx.fillStyle = sec === 1 ? '#C83E31' : '#231F20';
           ctx.font = '700 92px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(String(sec), 0, 4);
+          ctx.textBaseline = 'alphabetic';
+          const m = ctx.measureText(numStr);
+          const ox = (m.actualBoundingBoxLeft - m.actualBoundingBoxRight) / 2;
+          const oy = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+          ctx.fillText(numStr, ox, oy);
           ctx.restore();
         }
 
@@ -3695,7 +3805,7 @@
               blackoutAlpha = Math.min(1, (0.65 - launchTimer) / 0.55);
             }
             if (launchTimer <= 0) {
-              finishLaunchIntoRound1();
+              finishLaunchIntoRound1(netMode === 'host');
             }
           }
         } else if (gamePhase === 'round_intro') {
@@ -3711,16 +3821,18 @@
           localPlayer.scaleX += (1 - localPlayer.scaleX) * Math.min(1, 10 * dt);
           localPlayer.scaleY += (1 - localPlayer.scaleY) * Math.min(1, 10 * dt);
           if (roundIntroTimer <= 0) {
-            gamePhase = 'playing';
-            goBannerTimer = 0.95;
-            playSound('go');
-            screenShake = 6;
-            spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 75);
-            spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 18, 240);
+            unlockRoundGo(netMode === 'host');
           }
         } else {
           blackoutAlpha = Math.max(0, blackoutAlpha - 2.5 * dt);
           if (goBannerTimer > 0) goBannerTimer = Math.max(0, goBannerTimer - dt);
+          if (podiumActive && podiumTimer > 0) {
+            podiumTimer = Math.max(0, podiumTimer - dt);
+            if (Math.random() < 0.25) {
+              const p1 = PODIUM_SLOTS[0];
+              spawnParticles(p1.x + p1.w / 2 + (Math.random() - 0.5) * 90, p1.y - 60, Math.random() < 0.5 ? '#E9C46A' : '#C83E31', 1, 90);
+            }
+          }
           updatePhysics(dt);
         }
 
