@@ -1635,6 +1635,12 @@
           </div>
           <div style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.14.2</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Кайфовий мувмент без стаміни:</b> прибрано обмеження стаміни та червону втому — деш і деш-джамп знову швидкі й вільні, при цьому кожен прийом має свою роль (стрибок — висота, деш-джамп — довгий плоский ривок, підкат — швидкість у тунелях і на льоді).</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.14.1</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Плавний зум камери:</b> коліщатком миші або клавішами <code>+</code> / <code>-</code> (скидання на <code>0</code>) на ПК, а також щипком двома пальцями або свайпом по екрану на телефоні.</li>
@@ -1675,7 +1681,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.14.1 · Changelog</button>
+      <button id="version-tag">v0.14.2 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2633,30 +2639,26 @@
         apexVelThreshold: 115,
         maxFallSpeed: 760,
         wallSlideSpeed: 135,
-        walkSpeed: 285,
-        sprintSpeed: 430,
-        accelGround: 2500,
-        turnAccelGround: 4100,
-        accelAir: 1700,
+        walkSpeed: 295,
+        sprintSpeed: 445,
+        accelGround: 2600,
+        turnAccelGround: 4200,
+        accelAir: 1750,
         jumpVel: 555,
-        doubleJumpVel: 490,
+        doubleJumpVel: 495,
         wallJumpVx: 295,
         wallJumpVy: 530,
         maxJumps: 2,
         coyoteTime: 0.13,
         jumpBuffer: 0.13,
-        rollSpeed: 620,
+        rollSpeed: 645,
         rollDuration: 0.20,
-        rollCooldown: 1.0,
-        rollStaminaCost: 35,
-        dashJumpVx: 585,
-        dashJumpVy: 385,
-        dashJumpStaminaCost: 45,
+        rollCooldown: 0.62,
+        dashJumpVx: 615,
+        dashJumpVy: 415,
         slideMinSpeed: 260,
-        slideBoost: 500,
-        slideFriction: 360,
-        staminaRegenGround: 52,
-        staminaRegenAir: 22,
+        slideBoost: 530,
+        slideFriction: 350,
         normalW: 28,
         normalH: 40,
         rollH: 22
@@ -2893,12 +2895,7 @@
         const p = localPlayer;
         if (p.rollTimer > 0 || p.rollCooldownTimer > 0) return;
         if (!p.grounded && p.airRollUsed) return;
-        if (p.stamina < CFG.rollStaminaCost) {
-          playSound('paper');
-          return;
-        }
 
-        p.stamina = Math.max(0, p.stamina - CFG.rollStaminaCost);
         p.rollTimer = CFG.rollDuration;
         p.rollCooldownTimer = CFG.rollCooldown;
         p.dashJumpWindow = 0.28;
@@ -2907,7 +2904,7 @@
 
         const dir = keys.left ? -1 : keys.right ? 1 : p.facing;
         p.facing = dir;
-        p.vx = dir * Math.max(CFG.rollSpeed * (p.grounded ? 1.0 : 1.06), Math.abs(p.vx) + 100);
+        p.vx = dir * Math.max(CFG.rollSpeed * (p.grounded ? 1.0 : 1.08), Math.abs(p.vx) + 115);
         p.vy = Math.min(p.vy, 30);
         p.scaleX = 1.45;
         p.scaleY = 0.62;
@@ -4682,12 +4679,9 @@
         const sprintHeld = keys.sprint || (isTouchActive && mobileCtrl.autoSprint);
         p.sprinting = sprintHeld && moveDir !== 0 && p.rollTimer <= 0;
 
-        // Chess-balanced Stamina regen (only consumed by Dash & Dash-Jump)
-        const regenRate = p.grounded ? CFG.staminaRegenGround : CFG.staminaRegenAir;
-        if (p.rollTimer <= 0) {
-          p.stamina = Math.min(100, p.stamina + regenRate * dt);
-        }
-        p.exhausted = p.stamina < CFG.rollStaminaCost;
+        // Pure flow movement — no stamina punishment or fatigue!
+        p.stamina = 100;
+        p.exhausted = false;
 
         // Mobile Auto-Crouch near low openings (and automatic release when exiting)
         let wantAutoCrouch = false;
@@ -4818,12 +4812,11 @@
         }
 
         if (p.jumpBufferTimer > 0) {
-          // Chess-balanced Dash-Jump: wide flat gap-crosser (costs stamina + remaining air jump + longer cooldown)
-          if (p.dashJumpWindow > 0 && p.stamina >= CFG.dashJumpStaminaCost && (p.coyoteTimer > 0 || p.jumpsLeft > 0)) {
-            p.stamina = Math.max(0, p.stamina - CFG.dashJumpStaminaCost);
+          // Fun & situational Dash-Jump: snappy low horizontal torpedo across wide gaps (no stamina lock!)
+          if (p.dashJumpWindow > 0 && (p.coyoteTimer > 0 || p.jumpsLeft > 0)) {
             p.rollTimer = 0;
             p.dashJumpWindow = 0;
-            p.rollCooldownTimer = 1.25;
+            p.rollCooldownTimer = 0.72;
             p.airRollUsed = true;
             p.sliding = false;
             p.vx = p.facing * CFG.dashJumpVx;
@@ -4831,7 +4824,7 @@
             p.grounded = false;
             p.coyoteTimer = 0;
             p.jumpBufferTimer = 0;
-            p.jumpsLeft = 0;
+            p.jumpsLeft = Math.max(0, p.jumpsLeft - 1);
             p.scaleX = 1.38;
             p.scaleY = 0.72;
             playSound('dashjump');
@@ -4844,7 +4837,7 @@
             // Normal Jump (or Slide-Jump preserving momentum!)
             const wasSliding = p.sliding;
             p.sliding = false;
-            p.vy = -(wasSliding ? 515 : CFG.jumpVel) * (surf === 'slime' ? 0.78 : 1.0);
+            p.vy = -(wasSliding ? 525 : CFG.jumpVel) * (surf === 'slime' ? 0.78 : 1.0);
             p.grounded = false;
             p.coyoteTimer = 0;
             p.jumpBufferTimer = 0;
