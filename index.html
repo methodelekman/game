@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Скетчбук // На двох</title>
+  <title>На полях — скетчбук-платформер</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
@@ -149,6 +149,11 @@
     .lb-rows {
       position: relative;
       height: 70px;
+      transition: height 0.2s ease;
+    }
+
+    #leaderboard.solo-compact .lb-rows {
+      height: 34px;
     }
 
     .lb-row {
@@ -230,9 +235,26 @@
       transform: translateY(-2px);
     }
 
+    .ico {
+      width: 17px;
+      height: 17px;
+      display: inline-block;
+      vertical-align: -3px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
     .sketch-btn {
       appearance: none;
       position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
       background: var(--sheet);
       color: var(--ink);
       border: 2px solid var(--ink);
@@ -1229,9 +1251,14 @@
       outline-offset: 1px;
     }
 
-    @media (max-width: 1120px) {
+    @media (max-width: 1180px) {
       #lobby-draw-bar {
-        top: 54px;
+        top: 56px;
+        left: auto;
+        right: 14px;
+        transform: none;
+        padding: 3px 8px;
+        gap: 5px;
       }
     }
 
@@ -1250,6 +1277,7 @@
       }
       .lb-head { font-size: 12px; margin-bottom: 3px; }
       .lb-rows { height: 58px; }
+      #leaderboard.solo-compact .lb-rows { height: 28px; }
       .lb-row { height: 26px; padding: 1px 4px; }
       .lb-name { font-size: 15px; max-width: 68px; }
       .lb-score { font-size: 16px; }
@@ -1311,7 +1339,10 @@
         z-index: 22;
       }
       #lobby-draw-bar {
-        top: 44px;
+        top: 74px;
+        left: auto;
+        right: 8px;
+        transform: none;
         padding: 2px 6px;
         gap: 4px;
       }
@@ -1348,9 +1379,9 @@
       </div>
 
       <div id="corner-tabs">
-        <button class="sketch-btn" id="btn-wardrobe" title="Косметика та образ">🎨 Образ</button>
-        <button class="sketch-btn mobile-only-btn" id="btn-taunt" title="Таунти">★</button>
-        <button class="sketch-btn" id="btn-game-settings" title="Налаштування гри">⚙</button>
+        <button class="sketch-btn" id="btn-wardrobe" title="Косметика та образ"><svg class="ico" viewBox="0 0 24 24"><path d="M18.3 2.7a2.1 2.1 0 0 1 3 3L11.5 15.5l-4 1 1-4L18.3 2.7z"/><path d="M7.5 16.5c-1.8 0-3 1.2-3 2.7 0 1.1-.8 1.8-1.5 2.1 1.7.7 4.2.5 5.4-.8.9-.9.8-2.4-.9-4z"/></svg><span>Образ</span></button>
+        <button class="sketch-btn mobile-only-btn" id="btn-taunt" title="Таунти"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.4 5.2L20 9l-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6L4 9l5.6-.8L12 3z"/></svg></button>
+        <button class="sketch-btn" id="btn-game-settings" title="Налаштування гри"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         <button class="sketch-btn net-pill" id="btn-lobby">
           <span class="status-dot" id="net-dot"></span>
           <span id="net-label">Соло</span>
@@ -1358,13 +1389,13 @@
       </div>
 
       <div id="lobby-draw-bar">
-        <button class="sketch-btn" id="btn-draw-toggle" style="font-size:15px; padding:2px 9px;">✏️ Малювати: Вимк</button>
+        <button class="sketch-btn" id="btn-draw-toggle" style="font-size:15px; padding:2px 9px;"><svg class="ico" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span id="draw-toggle-label">Малювати: Вимк</span></button>
         <button class="draw-swatch active" data-dcol="#231F20" style="background:#231F20;" title="Чорний"></button>
         <button class="draw-swatch" data-dcol="#C83E31" style="background:#C83E31;" title="Червоний"></button>
         <button class="draw-swatch" data-dcol="#2952A3" style="background:#2952A3;" title="Синій"></button>
         <button class="draw-swatch" data-dcol="#D49B27" style="background:#D49B27;" title="Золотий"></button>
         <button class="draw-swatch" data-dcol="#2D7A46" style="background:#2D7A46;" title="Зелений"></button>
-        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" title="Очистити малюнки">🧹</button>
+        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" title="Очистити малюнки"><svg class="ico" viewBox="0 0 24 24"><path d="M7 21h13M16.2 3.8a2.2 2.2 0 0 1 3.1 3.1L9.5 16.7a2.2 2.2 0 0 1-3.1 0L3.3 13.6a2.2 2.2 0 0 1 0-3.1l10.2-6.7z"/><path d="M6.5 10.5l7 7"/></svg></button>
       </div>
 
       <div id="touch-edit-bar">
@@ -1412,15 +1443,15 @@
 
           <div class="nb-header">
             <div>
-              <div class="nb-title">Скетчбук // На двох</div>
-              <div class="nb-sub">живий лайн, туш і кооп без затримок</div>
+              <div class="nb-title">На полях</div>
+              <div class="nb-sub">паркур олівцем — соло або з другом</div>
             </div>
             <button class="sketch-btn" id="btn-close-lobby">✕</button>
           </div>
 
           <div class="sketch-notes" id="lobby-key-notes">
             <div class="note-row"><span>Вліво / Вправо</span><span class="key-doodle" id="ln-lr">A / D</span></div>
-            <div class="note-row"><span>Стрибок (2 пера)</span><span class="key-doodle" id="ln-jump">SPACE</span></div>
+            <div class="note-row"><span>Стрибок (подвійний)</span><span class="key-doodle" id="ln-jump">SPACE</span></div>
             <div class="note-row"><span>Деш / Перекат</span><span class="key-doodle" id="ln-roll">CTRL</span></div>
             <div class="note-row"><span>Біг / Присідання</span><span class="key-doodle" id="ln-sp">SHIFT / S</span></div>
           </div>
@@ -1441,7 +1472,7 @@
             <button class="sketch-btn ink-red" id="btn-host">Створити (P1)</button>
             <button class="sketch-btn ink-blue" id="btn-join">Приєднатися (P2)</button>
             <button class="sketch-btn" id="btn-solo">Грати соло</button>
-            <button class="sketch-btn" id="btn-solo-lobby" style="flex:1 1 100%; font-size:17px;">✏️ Кімната лобі (малювати й налаштувати)</button>
+            <button class="sketch-btn" id="btn-solo-lobby" style="flex:1 1 100%; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Кімната лобі (малювати й налаштувати)</span></button>
           </div>
 
           <div class="lobby-status">
@@ -1453,7 +1484,7 @@
 
       <div id="host-panel">
         <div class="host-top-row" id="hp-top-row">
-          <button class="sketch-btn" id="hp-open-settings" style="font-size:20px; padding:4px 14px;">⚙ Налаштування</button>
+          <button class="sketch-btn" id="hp-open-settings" style="font-size:20px; padding:4px 14px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Налаштування</span></button>
           <button class="host-code-pill" id="hp-code-copy" title="Натисни, щоб скопіювати лінк">Код: ------</button>
         </div>
         <button class="sketch-btn ink-red big-host-btn" id="hp-start-btn">▶ СТАРТ</button>
@@ -1473,7 +1504,7 @@
           <div class="settings-grid" style="gap:9px; font-size:19px;">
             <div class="set-row">
               <span>Режим гри:</span>
-              <button class="sketch-btn ink-red" id="hp-mode-btn" style="padding:2px 12px;">🏁 Гонка (Двері)</button>
+              <button class="sketch-btn ink-red" id="hp-mode-btn" style="padding:2px 12px;">Гонка до дверей</button>
             </div>
             <div class="set-row">
               <span>Раунди:</span>
@@ -1500,7 +1531,7 @@
               <span>Сід рівня:</span>
               <div class="set-controls">
                 <input class="room-input" id="hp-seed-input" placeholder="Випадковий" maxlength="16" style="width:128px; font-size:17px; padding:1px 4px;" />
-                <button class="sketch-btn" id="hp-seed-rand" style="padding:2px 8px; font-size:16px;" title="Згенерувати випадковий сід">🎲</button>
+                <button class="sketch-btn" id="hp-seed-rand" style="padding:3px 8px; font-size:16px;" title="Згенерувати випадковий сід"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg></button>
                 <label class="hp-check" style="font-size:15px;"><input type="checkbox" id="hp-seed-lock" /> Фікс</label>
               </div>
             </div>
@@ -1524,7 +1555,7 @@
             </div>
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="sketch-btn" id="hp-regen-btn" style="flex:1; font-size:18px;">🔄 Новий рівень</button>
+            <button class="sketch-btn" id="hp-regen-btn" style="flex:1; font-size:18px;"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Новий рівень</span></button>
             <button class="sketch-btn ink-blue" id="hp-done-settings" style="flex:1; font-size:20px;">Готово</button>
           </div>
         </div>
@@ -1542,9 +1573,9 @@
             <button class="sketch-btn" id="btn-close-game-settings">✕</button>
           </div>
           <div class="gs-tabs">
-            <button class="sketch-btn gs-tab active" data-gstab="audio">🔊 Звук / Гра</button>
-            <button class="sketch-btn gs-tab" data-gstab="keys">⌨ Клавіші ПК</button>
-            <button class="sketch-btn gs-tab" data-gstab="mobile">📱 Мобільне</button>
+            <button class="sketch-btn gs-tab active" data-gstab="audio"><svg class="ico" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>Звук / Гра</span></button>
+            <button class="sketch-btn gs-tab" data-gstab="keys"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg><span>Клавіші ПК</span></button>
+            <button class="sketch-btn gs-tab" data-gstab="mobile"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg><span>Мобільне</span></button>
           </div>
 
           <div class="gs-panel active" id="gs-panel-audio">
@@ -1575,8 +1606,8 @@
               <button class="sketch-btn" id="btn-ghost-toggle" style="padding:3px 14px;">Увімкнено</button>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-              <button class="sketch-btn" id="gs-open-map-settings" style="flex:1; font-size:17px;">🗺 Генератор карти / Сід</button>
-              <button class="sketch-btn" id="gs-open-changelog" style="flex:1; font-size:17px;">📜 Changelog</button>
+              <button class="sketch-btn" id="gs-open-map-settings" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg><span>Генератор карти / Сід</span></button>
+              <button class="sketch-btn" id="gs-open-changelog" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg><span>Щоденник змін</span></button>
               <button class="sketch-btn ink-red" id="btn-restart" style="flex:1; font-size:17px;">↺ Респавн</button>
             </div>
           </div>
@@ -1626,7 +1657,7 @@
               <button class="sketch-btn" id="mob-force-btn" style="padding:2px 12px;">Ні</button>
             </div>
             <div style="display:flex; gap:8px; margin-top:4px;">
-              <button class="sketch-btn ink-blue" id="mob-reposition-btn" style="flex:1; font-size:17px;">✋ Пересунути кнопки</button>
+              <button class="sketch-btn ink-blue" id="mob-reposition-btn" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg><span>Пересунути кнопки</span></button>
               <button class="sketch-btn" id="mob-reset-btn" style="font-size:17px;">↺ Скинути</button>
             </div>
           </div>
@@ -1660,8 +1691,8 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Гардероб // Косметика</div>
-              <div class="nb-sub">16 кольорів · 6 форм · 15 лиць · 2 слоти · 8 паків партіклів</div>
+              <div class="nb-title">Гардероб</div>
+              <div class="nb-sub">колір, форма, обличчя, аксесуари й ефекти</div>
             </div>
             <button class="sketch-btn" id="btn-close-wardrobe">✕</button>
           </div>
@@ -1692,12 +1723,21 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Changelog // Оновлення</div>
-              <div class="nb-sub">історія змін по версіях</div>
+              <div class="nb-title">Щоденник змін</div>
+              <div class="nb-sub">історія оновлень по версіях</div>
             </div>
             <button class="sketch-btn" id="btn-close-changelog">✕</button>
           </div>
           <div style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
+            <div>
+              <b>v0.16.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Єдиний стиль зошита:</b> системні емоджі в HUD, на стікерах і на полотні замінено на чорнильні SVG-іконки та мальовані бейджі; переписано сухі «технічні» заголовки.</li>
+                <li><b>Фактура паперу й обʼємні блоки:</b> додано зерно зошитового паперу, мʼякі тіні під платформами, бурульки на льоду, бульбашки й краплі на слаймі, пружини на батутах і тріщини на ламких блоках.</li>
+                <li><b>Живий персонаж:</b> олівцеві ніжки з анімацією бігу/стрибка, контактна тінь на землі, сліди гальмування на папері, мікро паузи ударів (hit-stop) та жива варіація тону звуків із легкими кроками.</li>
+                <li><b>Баланс карти й HUD:</b> прибрано накладання платформ у кільцевому спавні, виправлено позицію заголовка рівня й нотаток, приховано порожній рядок «Друг» у соло.</li>
+              </ul>
+            </div>
             <div>
               <b>v0.15.0</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
@@ -1756,7 +1796,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.15.0 · Changelog</button>
+      <button id="version-tag">v0.16.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -1964,47 +2004,61 @@
         if (!ctx || muted || sfxVolume <= 0.005) return;
         const now = ctx.currentTime;
         const v = sfxVolume;
+        const pj = 0.92 + Math.random() * 0.16;
 
         if (type === 'paper') {
-          playNoiseBurst(0.055, 2400, 0.045);
+          playNoiseBurst(0.055, 2400 * pj, 0.045);
           return;
         }
         if (type === 'click') {
-          playNoiseBurst(0.03, 1500, 0.06);
-          playPluck(ctx, 290, now, 0.05, 0.06);
+          playNoiseBurst(0.03, 1500 * pj, 0.06);
+          playPluck(ctx, 290 * pj, now, 0.05, 0.06);
+          return;
+        }
+        if (type === 'step_solid' || type === 'step_crumble' || type === 'step_fragile' || type === 'step_bridge' || type === 'step_trampoline') {
+          playNoiseBurst(0.022, 760 * pj, 0.024);
+          playPluck(ctx, 132 * pj, now, 0.024, 0.018);
+          return;
+        }
+        if (type === 'step_ice') {
+          playNoiseBurst(0.024, 2450 * pj, 0.022);
+          return;
+        }
+        if (type === 'step_slime') {
+          playNoiseBurst(0.026, 520 * pj, 0.026);
           return;
         }
         if (type === 'jump') {
-          playNoiseBurst(0.04, 1200, 0.04);
+          playNoiseBurst(0.04, 1200 * pj, 0.04);
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(175, now);
-          osc.frequency.exponentialRampToValueAtTime(340, now + 0.085);
+          osc.frequency.setValueAtTime(175 * pj, now);
+          osc.frequency.exponentialRampToValueAtTime(340 * pj, now + 0.085);
           gain.gain.setValueAtTime(0.11 * v, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now); osc.stop(now + 0.11);
         } else if (type === 'roll') {
-          playNoiseBurst(0.13, 950, 0.11);
-          playPluck(ctx, 145, now, 0.09, 0.08);
+          playNoiseBurst(0.13, 950 * pj, 0.11);
+          playPluck(ctx, 145 * pj, now, 0.09, 0.08);
         } else if (type === 'dashjump') {
-          playNoiseBurst(0.14, 1600, 0.1);
-          playPluck(ctx, 330, now, 0.14, 0.1);
-          playPluck(ctx, 495, now + 0.035, 0.16, 0.08);
+          playNoiseBurst(0.14, 1600 * pj, 0.1);
+          playPluck(ctx, 330 * pj, now, 0.14, 0.1);
+          playPluck(ctx, 495 * pj, now + 0.035, 0.16, 0.08);
         } else if (type === 'mantle') {
-          playNoiseBurst(0.05, 1100, 0.07);
-          playPluck(ctx, 240, now, 0.07, 0.07);
+          playNoiseBurst(0.05, 1100 * pj, 0.07);
+          playPluck(ctx, 240 * pj, now, 0.07, 0.07);
         } else if (type === 'land') {
-          playNoiseBurst(0.045, 420, 0.085);
-          playPluck(ctx, 92, now, 0.06, 0.08);
+          playNoiseBurst(0.045, 420 * pj, 0.085);
+          playPluck(ctx, 92 * pj, now, 0.06, 0.08);
         } else if (type === 'jumppad') {
-          playNoiseBurst(0.08, 1750, 0.09);
+          playNoiseBurst(0.08, 1750 * pj, 0.09);
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(190, now);
-          osc.frequency.exponentialRampToValueAtTime(640, now + 0.16);
+          osc.frequency.setValueAtTime(190 * pj, now);
+          osc.frequency.exponentialRampToValueAtTime(640 * pj, now + 0.16);
           gain.gain.setValueAtTime(0.14 * v, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
           osc.connect(gain); gain.connect(ctx.destination);
@@ -2013,24 +2067,24 @@
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(220, now);
-          osc.frequency.exponentialRampToValueAtTime(520, now + 0.11);
-          osc.frequency.exponentialRampToValueAtTime(340, now + 0.18);
+          osc.frequency.setValueAtTime(220 * pj, now);
+          osc.frequency.exponentialRampToValueAtTime(520 * pj, now + 0.11);
+          osc.frequency.exponentialRampToValueAtTime(340 * pj, now + 0.18);
           gain.gain.setValueAtTime(0.14 * v, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now); osc.stop(now + 0.21);
         } else if (type === 'crack') {
-          playNoiseBurst(0.12, 820, 0.13);
-          playPluck(ctx, 130, now, 0.08, 0.1);
-          playPluck(ctx, 95, now + 0.03, 0.09, 0.09);
+          playNoiseBurst(0.12, 820 * pj, 0.13);
+          playPluck(ctx, 130 * pj, now, 0.08, 0.1);
+          playPluck(ctx, 95 * pj, now + 0.03, 0.09, 0.09);
         } else if (type === 'slime') {
-          playNoiseBurst(0.07, 650, 0.08);
+          playNoiseBurst(0.07, 650 * pj, 0.08);
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(240, now);
-          osc.frequency.exponentialRampToValueAtTime(125, now + 0.11);
+          osc.frequency.setValueAtTime(240 * pj, now);
+          osc.frequency.exponentialRampToValueAtTime(125 * pj, now + 0.11);
           gain.gain.setValueAtTime(0.1 * v, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
           osc.connect(gain); gain.connect(ctx.destination);
@@ -2094,15 +2148,15 @@
           playNoiseBurst(0.24, 1700, 0.11);
           playNoiseBurst(0.14, 3100, 0.06);
         } else if (type === 'switch') {
-          playNoiseBurst(0.04, 1500, 0.08);
-          playPluck(ctx, 340, now, 0.08, 0.1);
-          playPluck(ctx, 540, now + 0.045, 0.13, 0.1);
+          playNoiseBurst(0.04, 1500 * pj, 0.08);
+          playPluck(ctx, 340 * pj, now, 0.08, 0.1);
+          playPluck(ctx, 540 * pj, now + 0.045, 0.13, 0.1);
         } else if (type === 'tag') {
-          playNoiseBurst(0.08, 1300, 0.13);
-          playPluck(ctx, 587.33, now, 0.14, 0.12);
-          playPluck(ctx, 440.0, now + 0.06, 0.16, 0.1);
+          playNoiseBurst(0.08, 1300 * pj, 0.13);
+          playPluck(ctx, 587.33 * pj, now, 0.14, 0.12);
+          playPluck(ctx, 440.0 * pj, now + 0.06, 0.16, 0.1);
         } else if (type === 'erase') {
-          playNoiseBurst(0.09, 680, 0.05);
+          playNoiseBurst(0.09, 680 * pj, 0.05);
         }
       }
 
@@ -2256,8 +2310,8 @@
       }
 
       const SKETCH_TITLES = [
-        'Свіжий аркуш', 'Чорнильний ривок', 'Перегони на полях',
-        'Штрихований паркур', 'Кінетичний ескіз', 'Лабіринт туші'
+        'Чистий аркуш', 'На полях', 'Чорнильна пляма',
+        'Остання парта', 'Швидкий ескіз', 'Через клітинку'
       ];
 
       const SPEED_MODES = [
@@ -2292,9 +2346,9 @@
       }
 
       const GAME_MODES = [
-        { id: 'race',   label: '🏁 Гонка (Двері)' },
-        { id: 'eraser', label: '🧽 Тікай від гумки' },
-        { id: 'tag',    label: '🏃 Салочки (Квачик)' }
+        { id: 'race',   label: 'Гонка до дверей' },
+        { id: 'eraser', label: 'Тікай від гумки' },
+        { id: 'tag',    label: 'Салочки (Квачик)' }
       ];
 
       const SPAWN_RING_MODES = [
@@ -2419,14 +2473,14 @@
       } catch (_) {}
 
       const TAUNTS = [
-        { id: 'wave', name: 'Махає', emoji: '👋', dur: 2.0 },
-        { id: 'flip', name: 'Сальто', emoji: '🌀', dur: 1.1 },
-        { id: 'dance', name: 'Танець', emoji: '♪', dur: 2.6 },
-        { id: 'laugh', name: 'Сміх', emoji: '😆', dur: 2.0 },
-        { id: 'hype', name: 'Хайп', emoji: '⚡', dur: 2.0 },
-        { id: 'chill', name: 'Чіл', emoji: '☕', dur: 2.8 },
-        { id: 'salute', name: 'Респект', emoji: '★', dur: 1.8 },
-        { id: 'facepalm', name: 'Фейспалм', emoji: '🤦', dur: 2.0 }
+        { id: 'wave', name: 'Махає', callout: 'Хей!', dur: 2.0, svgPath: 'M8 14V7a1.5 1.5 0 0 1 3 0v4M11 11V5a1.5 1.5 0 0 1 3 0v6M14 11V6.5a1.5 1.5 0 0 1 3 0V14c0 3.5-2.5 6-6 6s-5-2-6-5l-1-3a1.5 1.5 0 0 1 2.7-1.2L8 14z' },
+        { id: 'flip', name: 'Сальто', callout: 'Фліп!', dur: 1.1, svgPath: 'M12 4a8 8 0 1 0 7.4 5M19 4v5h-5' },
+        { id: 'dance', name: 'Танець', callout: 'Йоу ♪', dur: 2.6, svgPath: 'M9 18V5l10-2v11M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm10-4a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z' },
+        { id: 'laugh', name: 'Сміх', callout: 'Ха-ха!', dur: 2.0, svgPath: 'M6 9l3 2-3 2M18 9l-3 2 3 2M7 16c2 2.5 8 2.5 10 0' },
+        { id: 'hype', name: 'Хайп', callout: 'Воу!', dur: 2.0, svgPath: 'M13 2L4 14h7l-1 8 10-12h-7z' },
+        { id: 'chill', name: 'Чіл', callout: 'Чіл~', dur: 2.8, svgPath: 'M5 10h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-6zM16 11h2a2 2 0 0 1 0 4h-2M8 6c0-1.5 2-1.5 2-3M12 6c0-1.5 2-1.5 2-3' },
+        { id: 'salute', name: 'Респект', callout: 'Респект!', dur: 1.8, svgPath: 'M12 3l2.2 5.4L20 9l-4.2 3.8 1.2 5.7-5-3-5 3 1.2-5.7L4 9l5.8-.6z' },
+        { id: 'facepalm', name: 'Фейспалм', callout: 'Ой...', dur: 2.0, svgPath: 'M5 5l14 14M19 5L5 19' }
       ];
 
       // Cinematic Launch & Round-Start Intro State
@@ -2521,7 +2575,7 @@
           spawn: { x: 180, y: 500 },
           spawn2: { x: 900, y: 500 },
           goal: null,
-          notes: [{ x: 400, y: 125, text: 'Салочки! Тікай або лови!', sub: 'Хто не «ВОДА» по таймеру — отримує +1 очко' }],
+          notes: [{ x: 560, y: 148, align: 'center', text: 'Салочки! Тікай або лови!', sub: 'Хто не «ВОДА» по таймеру — отримує +1 очко' }],
           platforms,
           movers: [],
           hazards: [],
@@ -2577,8 +2631,18 @@
           platforms.push(makePlatform(sx - 95, sy, 220, 44, 'solid'));
 
           if (roundNum === 1) {
-            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? '🧽 Тікай від гумки до Дверей ★!' : 'Кільцевий спавн! Шукай Двері ★', sub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути' });
+            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? 'Тікай від гумки до дверей!' : 'Кільцевий спавн — шукай двері', sub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути' });
           }
+
+          const overlapsPlats = (rx, ry, rw, rh, padX = 12, padY = 16) => {
+            for (const ep of platforms) {
+              if (rx - padX < ep.x + ep.w && rx + rw + padX > ep.x &&
+                  ry - padY < ep.y + ep.h && ry + rh + padY > ep.y) {
+                return true;
+              }
+            }
+            return false;
+          };
 
           // Build reachable intermediate waypoints around/across the ring toward goal
           const rawWaypoints = [];
@@ -2605,7 +2669,7 @@
             for (let s = 1; s <= subSteps; s++) {
               const st = s / subSteps;
               const nx = Math.round(cx + dxTotal * st + (s < subSteps ? (rng() - 0.5) * 45 : 0));
-              const ny = Math.round(cy + dyTotal * st);
+              let ny = Math.round(cy + dyTotal * st);
               const stepDy = ny - (s === 1 ? cy : Math.round(cy + dyTotal * ((s - 1) / subSteps)));
               const isFinalGoal = isLast && s === subSteps;
 
@@ -2620,8 +2684,32 @@
               }
 
               const pw = isFinalGoal ? 230 : (135 + Math.floor(rng() * 85));
-              const px = nx - Math.floor(pw / 2);
+              let px = nx - Math.floor(pw / 2);
               const ph = pType === 'fragile' ? 20 : 34;
+
+              if (isFinalGoal) {
+                // Keep final goal platform completely unobstructed by clearing overlapping secondary blocks
+                for (let pi = platforms.length - 1; pi >= 1; pi--) {
+                  const ep = platforms[pi];
+                  if (px - 12 < ep.x + ep.w && px + pw + 12 > ep.x &&
+                      ny - 76 < ep.y + ep.h && ny + ph + 16 > ep.y) {
+                    platforms.splice(pi, 1);
+                  }
+                }
+              } else if (overlapsPlats(px, ny, pw, ph, 12, 16)) {
+                const nudges = [[0, -56], [0, 56], [76, 0], [-76, 0], [0, -100], [0, 100]];
+                let resolved = false;
+                for (const [ox, oy] of nudges) {
+                  if (!overlapsPlats(px + ox, ny + oy, pw, ph, 12, 16)) {
+                    px += ox;
+                    ny += oy;
+                    resolved = true;
+                    break;
+                  }
+                }
+                if (!resolved) continue;
+              }
+
               platforms.push(makePlatform(px, ny, pw, ph, pType, isFinalGoal ? { isGoalPlat: true } : null));
 
               if (stepDy < -90 && !isFinalGoal) {
@@ -2632,9 +2720,11 @@
                 hazards.push({ x: px + Math.floor(pw * 0.45), y: ny - 14, w: 40, h: 14 });
               }
 
-              if (stepDy < -120 && rng() < 0.55) {
+              if (stepDy < -120 && !isFinalGoal && rng() < 0.55) {
                 const wallSide = rng() < 0.5 ? px - 36 : px + pw + 10;
-                platforms.push(makePlatform(wallSide, ny - 105, 26, 110, 'slime'));
+                if (!overlapsPlats(wallSide, ny - 105, 26, 110, 8, 8)) {
+                  platforms.push(makePlatform(wallSide, ny - 105, 26, 110, 'slime'));
+                }
               }
 
               if (isFinalGoal) {
@@ -2650,7 +2740,7 @@
           const maxY = Math.round(480 + vertSpan * 0.28);
           platforms.push(makePlatform(0, 480, 280, 140, 'solid'));
           if (roundNum === 1) {
-            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? '🧽 Тікай від гумки до Дверей ★!' : 'Хто перший у двері — +1 очко!', sub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути' });
+            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? 'Тікай від гумки до дверей!' : 'Хто перший у двері — +1 очко!', sub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути' });
           }
 
           let curX = 280;
@@ -2866,6 +2956,7 @@
       let worldTime = 0;
       let winBannerTimer = 0;
       let screenShake = 0;
+      let hitStopTimer = 0;
       let boilFrame = 0;
       let boilTimer = 0;
 
@@ -2883,6 +2974,33 @@
       hctx.moveTo(4, 22); hctx.lineTo(22, 4);
       hctx.stroke();
       let hatchPattern = null;
+
+      // Tactile 128x128 pre-baked cotton sketchbook paper fiber grain
+      const paperCanvas = document.createElement('canvas');
+      paperCanvas.width = 128;
+      paperCanvas.height = 128;
+      const pctx = paperCanvas.getContext('2d');
+      const paperRng = mulberry32(4242);
+      for (let i = 0; i < 380; i++) {
+        pctx.fillStyle = i % 3 === 0 ? 'rgba(255, 252, 244, 0.22)' : 'rgba(106, 99, 90, 0.05)';
+        const sx = Math.floor(paperRng() * 128);
+        const sy = Math.floor(paperRng() * 128);
+        const sz = paperRng() < 0.75 ? 1 : 2;
+        pctx.fillRect(sx, sy, sz, 1);
+      }
+      pctx.strokeStyle = 'rgba(106, 99, 90, 0.045)';
+      pctx.lineWidth = 1;
+      for (let i = 0; i < 16; i++) {
+        const fx = paperRng() * 120;
+        const fy = paperRng() * 120;
+        const ang = paperRng() * Math.PI;
+        const fl = 5 + paperRng() * 6;
+        pctx.beginPath();
+        pctx.moveTo(fx, fy);
+        pctx.lineTo(fx + Math.cos(ang) * fl, fy + Math.sin(ang) * fl);
+        pctx.stroke();
+      }
+      let paperPattern = null;
 
       // Podium celebration state in Lobby after a match ends
       let podiumActive = false;
@@ -2921,6 +3039,7 @@
           sliding: false,
           dashJumpWindow: 0,
           highSpeedTimer: 0,
+          stepTimer: 0,
           tauntId: '',
           tauntTimer: 0,
           idleTimer: 0,
@@ -2938,6 +3057,12 @@
       const remotePlayer = createPlayer(true);
       const particles = [];
       const shockwaves = [];
+      const scuffs = [];
+
+      function spawnScuff(x, y, w = 16, color = 'rgba(35, 31, 32, 0.3)') {
+        scuffs.push({ x, y, w, life: 5.0, maxLife: 5.0, color });
+        if (scuffs.length > 42) scuffs.shift();
+      }
 
       // Track PC cursor for dynamic eye/accessory tracking
       let mouseClientX = window.innerWidth * 0.5;
@@ -3189,6 +3314,7 @@
           const x4 = Math.cos(a1) * rInner, y4 = Math.sin(a1) * rInner;
 
           const path = document.createElementNS(ns, 'path');
+          path.setAttribute('class', 'wheel-slice');
           path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2} A ${rOuter} ${rOuter} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${rInner} ${rInner} 0 0 0 ${x1} ${y1} Z`);
           path.setAttribute('fill', '#FBF7EE');
           path.setAttribute('stroke', '#231F20');
@@ -3202,14 +3328,18 @@
           const lx = Math.cos(mid) * 102;
           const ly = Math.sin(mid) * 102;
 
-          const em = document.createElementNS(ns, 'text');
-          em.setAttribute('x', String(lx));
-          em.setAttribute('y', String(ly - 2));
-          em.setAttribute('text-anchor', 'middle');
-          em.setAttribute('font-size', '22');
-          em.style.pointerEvents = 'none';
-          em.textContent = TAUNTS[i].emoji;
-          wheelSvg.appendChild(em);
+          const ig = document.createElementNS(ns, 'g');
+          ig.setAttribute('transform', `translate(${(lx - 11.4).toFixed(1)}, ${(ly - 22).toFixed(1)}) scale(0.95)`);
+          ig.style.pointerEvents = 'none';
+          const ip = document.createElementNS(ns, 'path');
+          ip.setAttribute('d', TAUNTS[i].svgPath);
+          ip.setAttribute('fill', 'none');
+          ip.setAttribute('stroke', '#231F20');
+          ip.setAttribute('stroke-width', '2');
+          ip.setAttribute('stroke-linecap', 'round');
+          ip.setAttribute('stroke-linejoin', 'round');
+          ig.appendChild(ip);
+          wheelSvg.appendChild(ig);
 
           const tx = document.createElementNS(ns, 'text');
           tx.setAttribute('x', String(lx));
@@ -3227,7 +3357,7 @@
 
       function highlightWheelSlice(idx) {
         wheelHoveredIdx = idx;
-        wheelSvg.querySelectorAll('path').forEach((p) => {
+        wheelSvg.querySelectorAll('.wheel-slice').forEach((p) => {
           const i = Number(p.getAttribute('data-idx'));
           p.setAttribute('fill', i === idx ? '#F2D388' : '#FBF7EE');
         });
@@ -3628,9 +3758,10 @@
       canvas.addEventListener('pointercancel', finishDrawStroke);
 
       const btnDrawToggle = document.getElementById('btn-draw-toggle');
+      const drawToggleLabel = document.getElementById('draw-toggle-label');
       btnDrawToggle.addEventListener('click', () => {
         lobbyDrawMode = !lobbyDrawMode;
-        btnDrawToggle.textContent = lobbyDrawMode ? '✏️ Малювати: Увімк' : '✏️ Малювати: Вимк';
+        if (drawToggleLabel) drawToggleLabel.textContent = lobbyDrawMode ? 'Малювати: Увімк' : 'Малювати: Вимк';
         btnDrawToggle.classList.toggle('ink-blue', lobbyDrawMode);
         canvas.style.cursor = lobbyDrawMode ? 'crosshair' : '';
       });
@@ -4456,14 +4587,32 @@
       }
 
       function updateLeaderboardUI(scoredWho = null) {
+        const lbCard = document.getElementById('leaderboard');
         const localRow = document.getElementById('lb-row-local');
         const remoteRow = document.getElementById('lb-row-remote');
+        const showRemote = netConnected || (typeof tagState !== 'undefined' && tagState.active);
+
         document.getElementById('lb-name-local').textContent = localNick;
-        document.getElementById('lb-name-remote').textContent = remoteNick;
+        document.getElementById('lb-name-remote').textContent = netConnected ? remoteNick : 'Бот';
         document.getElementById('lb-score-local').textContent = localScore;
         document.getElementById('lb-score-remote').textContent = remoteScore;
 
-        remoteRow.style.opacity = netConnected ? '1' : '0.42';
+        if (!showRemote) {
+          lbCard.classList.add('solo-compact');
+          remoteRow.style.display = 'none';
+          localRow.style.transform = 'translateY(0px)';
+          document.getElementById('lb-rank-local').textContent = '1.';
+          if (scoredWho === 'local') {
+            const plusEl = document.getElementById('lb-plus-local');
+            plusEl.classList.add('show');
+            setTimeout(() => plusEl.classList.remove('show'), 900);
+          }
+          return;
+        }
+
+        lbCard.classList.remove('solo-compact');
+        remoteRow.style.display = '';
+        remoteRow.style.opacity = '1';
 
         const localFirst = localScore >= remoteScore;
         const newLeader = localScore > remoteScore ? 'local' : (remoteScore > localScore ? 'remote' : 'tie');
@@ -4478,7 +4627,7 @@
           overtaker.classList.remove('overtake');
           void overtaker.offsetWidth;
           overtaker.classList.add('overtake');
-          showToast((newLeader === 'local' ? localNick : remoteNick) + ' виривається вперед!');
+          showToast((newLeader === 'local' ? localNick : (netConnected ? remoteNick : 'Бот')) + ' виривається вперед!');
         }
         if (newLeader !== 'tie') prevLeader = newLeader;
 
@@ -4495,7 +4644,8 @@
           localIconState = ls;
           document.getElementById('lb-icon-local').innerHTML = makeStateSvg(ls, COSMETIC_COLORS[localCosmetics.colorIdx].hex);
         }
-        const rs = netConnected ? getPlayerMotionState(remotePlayer) : 'idle';
+        const opp = netConnected ? remotePlayer : (tagState.active ? tagState.bot : null);
+        const rs = opp ? getPlayerMotionState(opp) : 'idle';
         if (rs !== remoteIconState) {
           remoteIconState = rs;
           document.getElementById('lb-icon-remote').innerHTML = makeStateSvg(rs, COSMETIC_COLORS[remoteCosmetics.colorIdx].hex);
@@ -4606,22 +4756,23 @@
         }
         if (tagState.active) {
           const whoTxt = tagState.itWho === 'local' ? 'ТИ ВОДА!' : 'ТІКАЙ!';
-          document.getElementById('level-scrap').textContent = '🏃 Салочки · ' + Math.ceil(Math.max(0, tagState.timeLeft)) + 'с · ' + whoTxt;
+          document.getElementById('level-scrap').textContent = 'Салочки · ' + Math.ceil(Math.max(0, tagState.timeLeft)) + 'с · ' + whoTxt;
           return;
         }
-        const bestStr = (activeGhostData && activeGhostData.bestTime) ? (' · ★ ' + formatTimer(activeGhostData.bestTime)) : '';
+        const bestStr = (activeGhostData && activeGhostData.bestTime) ? (' · Рекорд: ' + formatTimer(activeGhostData.bestTime)) : '';
         document.getElementById('level-scrap').textContent = 'Раунд #' + roundNumber + ' · ' + formatTimer(roundElapsed) + bestStr;
       }
 
       function loadRound(seed, rNum, broadcast = false) {
         if (worldTime > 0.4) triggerPageFlip();
+        scuffs.length = 0;
         if (soloLobbyActive || (netMode === 'solo' && gamePhase === 'lobby')) {
           gamePhase = 'playing';
           soloLobbyActive = false;
           updateNetUI('Соло', '');
         }
         lobbyDrawMode = false;
-        btnDrawToggle.textContent = '✏️ Малювати: Вимк';
+        if (drawToggleLabel) drawToggleLabel.textContent = 'Малювати: Вимк';
         btnDrawToggle.classList.remove('ink-blue');
         canvas.style.cursor = '';
         currentSeed = seed;
@@ -4667,6 +4818,7 @@
         remotePlayer.ty = remotePlayer.y;
         remoteSnapshots.length = 0;
         syncHostPanelUI();
+        updateLeaderboardUI(null);
         updateLevelScrap();
 
         if (broadcast && netConnected) {
@@ -4726,12 +4878,13 @@
 
       // Podium pedestal coordinates inside the 4-wall Lobby Room (2nd left, 1st center tall, 3rd right)
       const PODIUM_SLOTS = [
-        { rank: 1, x: 260, y: 380, w: 72, h: 100, medal: '🥇', color: '#E9C46A' },
-        { rank: 2, x: 184, y: 412, w: 72, h: 68,  medal: '🥈', color: '#D1D5DB' },
-        { rank: 3, x: 336, y: 434, w: 72, h: 46,  medal: '🥉', color: '#D99B66' }
+        { rank: 1, x: 260, y: 380, w: 72, h: 100, badge: '#1', color: '#E9C46A' },
+        { rank: 2, x: 184, y: 412, w: 72, h: 68,  badge: '#2', color: '#D1D5DB' },
+        { rank: 3, x: 336, y: 434, w: 72, h: 46,  badge: '#3', color: '#D99B66' }
       ];
 
       function enterLobbyRoom(broadcast = false, withPodium = false) {
+        scuffs.length = 0;
         gamePhase = 'lobby';
         tagState.active = false;
         tagState.bot = null;
@@ -4741,6 +4894,7 @@
         podiumActive = withPodium;
         podiumTimer = withPodium ? 4.8 : 0;
 
+        updateLeaderboardUI(null);
         updateLevelScrap();
         resetPlayerToSpawn(false);
 
@@ -4992,7 +5146,8 @@
         const p = localPlayer;
         if (countDeath) {
           deaths++;
-          screenShake = 8;
+          screenShake = 9;
+          hitStopTimer = Math.max(hitStopTimer, 0.052);
           playSound('die');
           spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 14, 240);
           sendVfxEvent('die', p.x + p.w / 2, p.y + p.h / 2);
@@ -5330,6 +5485,9 @@
           if (Math.random() < 0.5) {
             spawnParticles(p.x + p.w / 2, p.y + p.h, surf === 'ice' ? '#72CFC9' : '#D49B27', 1, 80);
           }
+          if (Math.random() < 0.3) {
+            spawnScuff(p.x + p.w / 2, p.y + p.h, 15, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(139,94,60,0.32)');
+          }
         } else {
           p.rot = 0;
           const spdMult = SPEED_MODES[roomSettings.speedIdx].mult;
@@ -5340,6 +5498,9 @@
           const maxSpd = (p.sprinting ? CFG.sprintSpeed : CFG.walkSpeed) * spdMult * surfSpeedMult;
           const targetVx = moveDir * maxSpd;
           const turning = moveDir !== 0 && Math.sign(p.vx) !== 0 && Math.sign(p.vx) !== moveDir;
+          if (p.grounded && turning && Math.abs(p.vx) > 220 && Math.random() < 0.35) {
+            spawnScuff(p.x + p.w / 2, p.y + p.h, 14, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(35,31,32,0.28)');
+          }
 
           let accel = p.grounded
             ? (turning ? CFG.turnAccelGround : CFG.accelGround)
@@ -5474,6 +5635,8 @@
               s.wobble = 1.0;
               p.scaleX = 0.72;
               p.scaleY = 1.32;
+              hitStopTimer = Math.max(hitStopTimer, 0.034);
+              screenShake = Math.max(screenShake, 4.5);
               playSound('bounce');
               spawnShockwave(p.x + p.w / 2, p.y + p.h / 2, '#9B6BCE', 34);
               spawnPackParticles(localCosmetics.particlePack, p.x + p.w / 2, p.y + p.h / 2, 10, 190, '#9B6BCE');
@@ -5522,6 +5685,8 @@
                 s.wobble = 1.0;
                 p.scaleX = 0.72;
                 p.scaleY = 1.38;
+                hitStopTimer = Math.max(hitStopTimer, 0.034);
+                screenShake = Math.max(screenShake, 4.5);
                 playSound('bounce');
                 spawnShockwave(p.x + p.w / 2, s.y, '#9B6BCE', 38);
                 spawnPackParticles(localCosmetics.particlePack, p.x + p.w / 2, s.y, 12, 200, '#9B6BCE');
@@ -5532,6 +5697,7 @@
                 p.scaleY = 0.7;
                 p.stamina = Math.min(100, p.stamina + 12);
                 playSound(s.type === 'slime' ? 'slime' : 'land');
+                spawnScuff(p.x + p.w / 2, p.y + p.h, 18, s.type === 'ice' ? 'rgba(255,255,255,0.68)' : (s.type === 'slime' ? 'rgba(45,122,70,0.42)' : 'rgba(35,31,32,0.3)'));
                 sendStatePacket(true);
                 spawnParticles(p.x + p.w / 2, p.y + p.h, s.type === 'slime' ? '#84D97B' : (s.type === 'ice' ? '#72CFC9' : '#6A635A'), 5, 95);
                 sendVfxEvent('land', p.x + p.w / 2, p.y + p.h);
@@ -5564,11 +5730,23 @@
               jp.squish = 1.0;
               p.scaleX = 0.74;
               p.scaleY = 1.34;
+              hitStopTimer = Math.max(hitStopTimer, 0.032);
+              screenShake = Math.max(screenShake, 4);
               playSound('jumppad');
               spawnShockwave(jp.x + jp.w / 2, jp.y, '#F08C4B', 40);
               spawnPackParticles(localCosmetics.particlePack, jp.x + jp.w / 2, jp.y, 12, 220, '#F08C4B');
             }
           }
+        }
+
+        if (p.grounded && Math.abs(p.vx) > 90 && p.rollTimer <= 0 && !p.sliding) {
+          p.stepTimer -= dt;
+          if (p.stepTimer <= 0) {
+            p.stepTimer = p.sprinting ? 0.155 : 0.225;
+            playSound('step_' + (p.surfaceType || 'solid'));
+          }
+        } else {
+          p.stepTimer = 0.04;
         }
 
         if (p.grounded && (p.sprinting || p.surfaceType === 'ice') && Math.abs(p.vx) > 40 && Math.random() < 0.35) {
@@ -5662,7 +5840,7 @@
             }
           }
           if (rectsOverlap(p, eraserState)) {
-            showToast('🧽 Гумка стерла тебе!');
+            showToast('Гумка стерла тебе!');
             resetPlayerToSpawn(true);
             return;
           }
@@ -5681,10 +5859,11 @@
               tagState.itWho = (tagState.itWho === 'local') ? 'remote' : 'local';
               tagState.cooldown = 1.35;
               playSound('tag');
-              screenShake = 7;
+              hitStopTimer = Math.max(hitStopTimer, 0.048);
+              screenShake = 8;
               spawnShockwave(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 54);
               spawnPackParticles('ink', p.x + p.w / 2, p.y + p.h / 2, 16, 220, '#C83E31');
-              showToast(tagState.itWho === 'local' ? '🔴 Ти тепер ВОДА!' : '💨 Ти передав квача!');
+              showToast(tagState.itWho === 'local' ? 'Ти тепер ВОДА!' : 'Ти передав квача!');
               if (netConnected) sendGameMsg({ type: 'tag_sync', itWho: tagState.itWho, timeLeft: tagState.timeLeft });
             }
           }
@@ -5695,7 +5874,7 @@
             if (localWon) localScore++; else remoteScore++;
             playSound('win');
             updateLeaderboardUI(localWon ? 'local' : 'remote');
-            showToast(localWon ? '🏆 Ти переміг у Салочках!' : ('Переміг ' + (netConnected ? remoteNick : 'Чорнильний Бот') + '!'));
+            showToast(localWon ? 'Ти переміг у Салочках!' : ('Переміг ' + (netConnected ? remoteNick : 'Чорнильний Бот') + '!'));
             if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
               lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
               enterLobbyRoom(true, true);
@@ -5713,7 +5892,7 @@
           spawnPackParticles(localCosmetics.particlePack, lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, 24, 260);
           if (!activeGhostData || roundElapsed < activeGhostData.bestTime) {
             saveBestGhostForLevel(roundElapsed, ghostRecording);
-            showToast('🏆 Новий рекорд: ' + formatTimer(roundElapsed) + '!');
+            showToast('Новий рекорд: ' + formatTimer(roundElapsed) + '!');
           }
           updateLeaderboardUI('local');
 
@@ -5749,7 +5928,7 @@
         return ((n - Math.floor(n)) - 0.5) * 2.2;
       }
 
-      function drawInkedRect(x, y, w, h, seed, fill, hatch = false) {
+      function drawInkedRect(x, y, w, h, seed, fill, hatch = false, castShadow = true) {
         const f = boilFrame;
         const x1 = x + boilOffset(seed + 1, f);
         const y1 = y + boilOffset(seed + 2, f);
@@ -5759,6 +5938,11 @@
         const y3 = y + h + boilOffset(seed + 6, f);
         const x4 = x + boilOffset(seed + 7, f);
         const y4 = y + h + boilOffset(seed + 8, f);
+
+        if (castShadow && w > 8 && h > 8) {
+          ctx.fillStyle = 'rgba(35, 31, 32, 0.085)';
+          ctx.fillRect(x + 4, y + 5, w, h);
+        }
 
         ctx.beginPath();
         ctx.moveTo(x1, y1);
@@ -5775,6 +5959,16 @@
         } else if (fill) {
           ctx.fillStyle = fill;
           ctx.fill();
+        }
+
+        // Tactile paper/cardboard thickness lip & top pencil shade
+        if (w > 18 && h >= 14) {
+          ctx.fillStyle = 'rgba(35, 31, 32, 0.1)';
+          ctx.fillRect(x + 2, y + h - 4, w - 4, 3);
+          if (hatch) {
+            ctx.fillStyle = 'rgba(35, 31, 32, 0.08)';
+            ctx.fillRect(x + 2, y + 1, w - 4, 3);
+          }
         }
 
         ctx.strokeStyle = '#231F20';
@@ -6181,9 +6375,71 @@
         c.restore();
       }
 
-      function drawCosmeticCharacter(c, w, h, facing, sprinting, fillColor, shape, faceId, acc, acc2, jx, jy, faceState = null) {
+      function getCharLegMetrics(shape, h, showLegs = true) {
+        const legLift = (showLegs && h > 25) ? 6 : 0;
+        const bodyH = shape === 'cube' ? Math.min(h - legLift, 28) : Math.max(16, h - legLift);
+        return { legLift, bodyH };
+      }
+
+      function drawDoodleLegs(c, legLift, facing, legState, idleTimer = 0) {
+        if (legLift <= 0) return;
+        const hipY = -legLift - 1;
+        const ls = legState || {};
+        c.save();
+        c.strokeStyle = '#231F20';
+        c.lineWidth = 2.3;
+        c.lineCap = 'round';
+        c.lineJoin = 'round';
+
+        let lx = -5, ly = 0, rx = 5, ry = 0;
+        let lFoot = facing * 3.5, rFoot = facing * 3.5;
+
+        if (ls.running) {
+          const ph = ls.phase || 0;
+          const s1 = Math.sin(ph);
+          const s2 = Math.sin(ph + Math.PI);
+          lx = -2 + s1 * 6.5;
+          rx = 2 + s2 * 6.5;
+          ly = -Math.max(0, -Math.cos(ph)) * 4.5;
+          ry = -Math.max(0, -Math.cos(ph + Math.PI)) * 4.5;
+        } else if (ls.grounded === false) {
+          if (ls.wallDir) {
+            lx = ls.wallDir * 5; rx = ls.wallDir * 5;
+            ly = -2.5; ry = 0;
+            lFoot = -ls.wallDir * 3; rFoot = -ls.wallDir * 3;
+          } else if ((ls.vy || 0) < -30) {
+            // Rising jump tuck
+            lx = -5 - facing * 2.5; rx = 5 - facing * 1.5;
+            ly = -2.2; ry = -1.4;
+          } else {
+            // Falling reach
+            lx = -6; rx = 6;
+            ly = 1; ry = 0.5;
+          }
+        } else if (idleTimer > 4.0) {
+          // Subtle impatient foot tap when idle
+          ry = -Math.abs(Math.sin(worldTime * 8)) * 2.4;
+        }
+
+        c.beginPath();
+        c.moveTo(-4.5, hipY); c.lineTo(lx, ly); c.lineTo(lx + lFoot, ly);
+        c.moveTo(4.5, hipY); c.lineTo(rx, ry); c.lineTo(rx + rFoot, ry);
+        c.stroke();
+        c.restore();
+      }
+
+      function drawCosmeticCharacter(c, w, h, facing, sprinting, fillColor, shape, faceId, acc, acc2, jx, jy, faceState = null, legState = null) {
         const hw = w / 2;
-        const drawH = shape === 'cube' ? Math.min(h, w + 2) : h;
+        const showLegs = legState ? (legState.show !== false && h > 25) : (h > 25);
+        const { legLift, bodyH } = getCharLegMetrics(shape, h, showLegs);
+        const drawH = bodyH;
+
+        if (legLift > 0) {
+          drawDoodleLegs(c, legLift, facing, legState, faceState ? (faceState.idleTimer || 0) : 0);
+        }
+
+        c.save();
+        if (legLift > 0) c.translate(0, -legLift);
 
         // 1. Shape Silhouette
         c.beginPath();
@@ -6233,6 +6489,30 @@
         if (acc2 && acc2 !== 'none' && acc2 !== acc) {
           drawAccessory(c, acc2, anchors, facing, fillColor, faceCx, fm);
         }
+        c.restore();
+      }
+
+      function drawGroundShadow(pl, solids) {
+        if (!pl || !solids) return;
+        const pBot = pl.y + pl.h;
+        let floorY = Infinity;
+        for (const s of solids) {
+          if (s.erased || s.bState === 'broken') continue;
+          if (s.type === 'bridge' && !s.bridgeActive) continue;
+          if (s.x < pl.x + pl.w - 3 && s.x + s.w > pl.x + 3 && s.y >= pBot - 4) {
+            if (s.y < floorY) floorY = s.y;
+          }
+        }
+        if (!isFinite(floorY)) return;
+        const dist = Math.max(0, floorY - pBot);
+        if (dist > 185) return;
+        const f = Math.max(0, 1 - dist / 185);
+        ctx.save();
+        ctx.fillStyle = 'rgba(35, 31, 32, ' + (0.21 * f).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.ellipse(pl.x + pl.w / 2, floorY + 1, (pl.w * 0.56) * (0.45 + 0.55 * f), 3.1 * (0.5 + 0.5 * f), 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       }
 
       function drawSketchPlayer(p, color, label, isLocal) {
@@ -6309,7 +6589,15 @@
           idleTimer: p.idleTimer || 0,
           tauntId: p.tauntTimer > 0 ? p.tauntId : ''
         };
-        drawCosmeticCharacter(ctx, p.w, p.h, p.facing, p.sprinting, bodyColor, cos.shape, cos.face || 'classic', cos.acc, cos.acc2 || 'none', jx, jy, fState);
+        const lState = {
+          show: p.rollTimer <= 0 && !p.sliding && p.h > 25,
+          running: isMovingOnGround,
+          grounded: p.grounded,
+          phase: worldTime * (p.sprinting ? 18 : 13.5),
+          vy: p.vy || 0,
+          wallDir: p.wallDir || 0
+        };
+        drawCosmeticCharacter(ctx, p.w, p.h, p.facing, p.sprinting, bodyColor, cos.shape, cos.face || 'classic', cos.acc, cos.acc2 || 'none', jx, jy, fState, lState);
 
         ctx.restore();
 
@@ -6329,16 +6617,27 @@
           ctx.restore();
         }
 
-        // Floating Sketchbook Taunt Doodle above character
+        // Floating Sketchbook Taunt Callout above character (no OS emoji)
         if (p.tauntTimer > 0) {
           const tObj = TAUNTS.find((x) => x.id === p.tauntId);
           if (tObj) {
-            const bob = Math.sin(worldTime * 8) * 4;
+            const bob = Math.sin(worldTime * 8) * 3.5;
+            const txt = tObj.callout || tObj.name;
             ctx.save();
-            ctx.font = '700 22px "Caveat", cursive';
-            ctx.textAlign = 'center';
+            ctx.font = '700 19px "Caveat", cursive';
+            const tw = Math.max(42, ctx.measureText(txt).width + 16);
+            const bx = cx - tw / 2;
+            const by = p.y - 38 + bob;
+            ctx.fillStyle = '#FBF7EE';
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(bx, by, tw, 22, 6) : ctx.rect(bx, by, tw, 22);
+            ctx.fill();
+            ctx.stroke();
             ctx.fillStyle = '#231F20';
-            ctx.fillText(tObj.emoji + ' ' + tObj.name, cx, p.y - 16 + bob);
+            ctx.textAlign = 'center';
+            ctx.fillText(txt, cx, by + 16);
             ctx.restore();
           }
         }
@@ -6384,9 +6683,19 @@
         const sx = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
         const sy = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
 
-        // 1. Warm Sketchbook Paper Background
+        // 1. Warm Sketchbook Paper Background + Cotton Paper Fiber Grain
         ctx.fillStyle = '#F4EDE0';
         ctx.fillRect(0, 0, w, h);
+        if (!paperPattern) paperPattern = ctx.createPattern(paperCanvas, 'repeat');
+        if (paperPattern) {
+          ctx.save();
+          const pOffX = ((-cam.x * 0.55) % 128 + 128) % 128;
+          const pOffY = ((-cam.y * 0.55) % 128 + 128) % 128;
+          ctx.translate(pOffX - 128, pOffY - 128);
+          ctx.fillStyle = paperPattern;
+          ctx.fillRect(0, 0, w + 256, h + 256);
+          ctx.restore();
+        }
 
         // Faint pencil notebook rules, red margin line & parallax sketchbook doodles
         ctx.save();
@@ -6468,22 +6777,30 @@
         ctx.scale(finalZoom, finalZoom);
         ctx.translate(-w / 2 - cam.x + sx, -h / 2 - cam.y + sy);
 
-        // 2. Handwritten Page Number & Margin Sketch Notes
+        // 2. Handwritten Page Number & Margin Sketch Notes (anchored near start so Ring Spawn keeps them visible)
+        const hx = (lvl.isLobby || lvl.isTagArena) ? 44 : Math.round((lvl.spawn ? lvl.spawn.x : 80) - 52);
+        const hy = (lvl.isLobby || lvl.isTagArena) ? 215 : Math.round((lvl.spawn ? lvl.spawn.y : 420) - 110);
+        ctx.save();
+        ctx.textAlign = 'left';
         ctx.fillStyle = 'rgba(35, 31, 32, 0.09)';
         ctx.font = '700 120px "Caveat", cursive';
-        ctx.fillText('#' + lvl.id, 38, 255);
+        ctx.fillText('#' + lvl.id, hx, hy);
 
         ctx.fillStyle = '#231F20';
         ctx.font = '700 24px "Caveat", cursive';
-        ctx.fillText(lvl.title, 44, 282);
+        ctx.fillText(lvl.title, hx + 6, hy + 27);
+        ctx.restore();
 
         for (const n of lvl.notes) {
+          ctx.save();
+          ctx.textAlign = n.align || 'left';
           ctx.fillStyle = '#231F20';
           ctx.font = '700 23px "Caveat", cursive';
           ctx.fillText(n.text, n.x, n.y);
           ctx.fillStyle = '#6A635A';
           ctx.font = '500 18px "Caveat", cursive';
           ctx.fillText(n.sub, n.x, n.y + 20);
+          ctx.restore();
         }
 
         // 3. Hand-drawn Cross-Hatched & Special Platforms (Ice, Slime, Crumble, Fragile, Purple Trampoline)
@@ -6550,51 +6867,158 @@
           if (t === 'ice') {
             drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#CFEBF7', false);
             ctx.save();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.lineWidth = 2.2;
-            for (let sx2 = s.x + 12; sx2 < s.x + s.w - 14; sx2 += 34) {
+            // Frosty white upper glaze
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+            ctx.fillRect(s.x + 2, s.y + 2, Math.max(4, s.w - 4), 4);
+            // Crisp paired crystal sheen bands
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.lineCap = 'round';
+            for (let sx2 = s.x + 14; sx2 < s.x + s.w - 18; sx2 += 36) {
+              ctx.lineWidth = 2.4;
               ctx.beginPath();
-              ctx.moveTo(sx2, s.y + 5);
-              ctx.lineTo(sx2 + 12, s.y + Math.min(18, s.h - 5));
+              ctx.moveTo(sx2, s.y + 6);
+              ctx.lineTo(sx2 + 12, s.y + Math.min(20, s.h - 6));
               ctx.stroke();
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(sx2 + 6, s.y + 6);
+              ctx.lineTo(sx2 + 15, s.y + Math.min(16, s.h - 6));
+              ctx.stroke();
+            }
+            // Hand-inked hanging icicles underneath horizontal ice ledges
+            if (s.w >= 48) {
+              ctx.fillStyle = '#E6F7FD';
+              ctx.strokeStyle = '#231F20';
+              ctx.lineWidth = 1.5;
+              let icIdx = 0;
+              for (let ix = s.x + 14; ix < s.x + s.w - 16; ix += 30) {
+                const icH = 6 + ((i + icIdx) % 3) * 2.5;
+                ctx.beginPath();
+                ctx.moveTo(ix, s.y + s.h);
+                ctx.lineTo(ix + 4.5, s.y + s.h + icH);
+                ctx.lineTo(ix + 9, s.y + s.h);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                icIdx++;
+              }
             }
             ctx.restore();
           } else if (t === 'slime') {
             drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#84D97B', false);
             ctx.save();
-            ctx.fillStyle = '#57B889';
-            for (let bx = s.x + 14; bx < s.x + s.w - 10; bx += 26) {
-              ctx.beginPath();
-              ctx.arc(bx, s.y + s.h, 4, 0, Math.PI);
-              ctx.fill();
+            // Glossy interior slime bubbles
+            ctx.fillStyle = 'rgba(235, 255, 232, 0.65)';
+            const isTallWall = s.h > s.w * 1.5;
+            if (isTallWall) {
+              for (let by = s.y + 16; by < s.y + s.h - 14; by += 28) {
+                ctx.beginPath(); ctx.ellipse(s.x + s.w * 0.5, by, 3.2, 5.5, 0, 0, Math.PI * 2); ctx.fill();
+              }
+            } else {
+              for (let bx = s.x + 18; bx < s.x + s.w - 14; bx += 32) {
+                ctx.beginPath(); ctx.ellipse(bx, s.y + 9, 5, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+              }
+              // Inked dripping tendrils along bottom edge
+              ctx.fillStyle = '#68C762';
+              ctx.strokeStyle = '#231F20';
+              ctx.lineWidth = 1.6;
+              let dIdx = 0;
+              for (let bx = s.x + 16; bx < s.x + s.w - 14; bx += 28) {
+                const dripLen = 5 + ((i + dIdx) % 3) * 3.5 + Math.sin(worldTime * 2.2 + bx) * 1.4;
+                ctx.beginPath();
+                ctx.moveTo(bx - 4, s.y + s.h);
+                ctx.quadraticCurveTo(bx - 3, s.y + s.h + dripLen, bx, s.y + s.h + dripLen);
+                ctx.quadraticCurveTo(bx + 3, s.y + s.h + dripLen, bx + 4, s.y + s.h);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                dIdx++;
+              }
             }
             ctx.restore();
           } else if (t === 'trampoline') {
-            drawInkedRect(s.x - extraH * 0.4, s.y + extraH * 0.5, s.w + extraH * 0.8, Math.max(16, s.h - extraH), i * 17 + 1, '#9B6BCE', false);
+            const tx0 = s.x - extraH * 0.4;
+            const ty0 = s.y + extraH * 0.5;
+            const tw0 = s.w + extraH * 0.8;
+            const th0 = Math.max(16, s.h - extraH);
+            drawInkedRect(tx0, ty0, tw0, th0, i * 17 + 1, '#9B6BCE', false);
             ctx.save();
+            // Bottom stitched cushion band & top highlight
+            ctx.fillStyle = '#6D449E';
+            ctx.fillRect(tx0 + 2, ty0 + th0 - 7, tw0 - 4, 5);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.fillRect(tx0 + 4, ty0 + 3, tw0 - 8, 3);
+            // Left & right coiled spring zig-zags
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 1.7;
+            ctx.lineJoin = 'round';
+            const drawCoil = (cxCoil) => {
+              ctx.beginPath();
+              ctx.moveTo(cxCoil - 4, ty0 + 5);
+              ctx.lineTo(cxCoil + 4, ty0 + th0 * 0.35);
+              ctx.lineTo(cxCoil - 4, ty0 + th0 * 0.65);
+              ctx.lineTo(cxCoil + 4, ty0 + th0 - 6);
+              ctx.stroke();
+            };
+            if (tw0 > 64) {
+              drawCoil(tx0 + 16);
+              drawCoil(tx0 + tw0 - 16);
+            }
+            // Double upward bounce chevrons in center
             ctx.strokeStyle = '#FBF7EE';
-            ctx.lineWidth = 2.4;
+            ctx.lineWidth = 2.3;
+            ctx.lineCap = 'round';
             const mcx = s.x + s.w / 2;
             const mcy = s.y + s.h / 2 + extraH * 0.25;
             ctx.beginPath();
-            ctx.moveTo(mcx - 10, mcy + 4); ctx.lineTo(mcx, mcy - 5); ctx.lineTo(mcx + 10, mcy + 4);
+            ctx.moveTo(mcx - 9, mcy + 5); ctx.lineTo(mcx, mcy - 3); ctx.lineTo(mcx + 9, mcy + 5);
+            ctx.moveTo(mcx - 7, mcy); ctx.lineTo(mcx, mcy - 7); ctx.lineTo(mcx + 7, mcy);
             ctx.stroke();
             ctx.restore();
           } else if (t === 'crumble' || t === 'fragile') {
             drawInkedRect(s.x + ox, s.y + oy, s.w, s.h, i * 17 + 1, t === 'fragile' ? '#DFC29D' : '#D5B895', false);
             ctx.save();
-            ctx.strokeStyle = '#6A635A';
-            ctx.lineWidth = 1.6;
-            const midX = s.x + ox + s.w * 0.5;
-            ctx.beginPath();
-            ctx.moveTo(midX - 10, s.y + oy + 2);
-            ctx.lineTo(midX - 2, s.y + oy + s.h * 0.5);
-            ctx.lineTo(midX + 6, s.y + oy + s.h - 2);
-            ctx.stroke();
+            // Subtle kraft paper/wood grain lines
+            ctx.strokeStyle = 'rgba(106, 99, 90, 0.28)';
+            ctx.lineWidth = 1.2;
+            for (let gx = s.x + ox + 10; gx < s.x + ox + s.w - 22; gx += 34) {
+              ctx.beginPath();
+              ctx.moveTo(gx, s.y + oy + 7);
+              ctx.lineTo(gx + 16, s.y + oy + 7);
+              ctx.stroke();
+            }
+            // Multi-branching fracture cracks
+            ctx.strokeStyle = s.bState === 'shaking' ? '#231F20' : '#6A635A';
+            ctx.lineWidth = s.bState === 'shaking' ? 2.1 : 1.6;
+            const cracks = s.w > 130 ? 2 : 1;
+            for (let ci = 0; ci < cracks; ci++) {
+              const cxCr = s.x + ox + s.w * (cracks === 1 ? 0.5 : (ci === 0 ? 0.33 : 0.68));
+              ctx.beginPath();
+              ctx.moveTo(cxCr - 8, s.y + oy + 2);
+              ctx.lineTo(cxCr - 1, s.y + oy + s.h * 0.48);
+              ctx.lineTo(cxCr + 6, s.y + oy + s.h - 2);
+              ctx.moveTo(cxCr - 1, s.y + oy + s.h * 0.48);
+              ctx.lineTo(cxCr + 9, s.y + oy + s.h * 0.32);
+              ctx.stroke();
+            }
             ctx.restore();
           } else {
             drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true);
           }
+        }
+
+        // Subtle charcoal/chalk scuff marks from landings, slides & hard turns
+        for (const sc of scuffs) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, sc.life / sc.maxLife));
+          ctx.strokeStyle = sc.color;
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(sc.x - sc.w * 0.5, sc.y - 1);
+          ctx.lineTo(sc.x + sc.w * 0.5, sc.y - 1);
+          ctx.stroke();
+          ctx.restore();
         }
 
         // 3a. Jump Pads (Spring Plates) & Ink Switches
@@ -6666,7 +7090,7 @@
           ctx.restore();
         }
 
-        // 3b. Winners Podium Pedestals & Medals in Lobby!
+        // 3b. Winners Podium Pedestals & Hand-Drawn Ribbon Medals in Lobby!
         if (lvl.isLobby && podiumActive) {
           PODIUM_SLOTS.forEach((slot, idx) => {
             drawInkedRect(slot.x, slot.y, slot.w, slot.h, 610 + idx, slot.color, false);
@@ -6676,13 +7100,24 @@
             ctx.textBaseline = 'middle';
             ctx.font = '700 30px "Caveat", cursive';
             ctx.fillText(String(slot.rank), slot.x + slot.w / 2, slot.y + 24);
-            ctx.font = '20px sans-serif';
-            ctx.fillText(slot.medal, slot.x + slot.w / 2, slot.y + slot.h - 16);
-            // Floating winner crown/medal above occupant
+            // Hand-inked ribbon medal
+            const mx = slot.x + slot.w / 2;
+            const my = slot.y + slot.h - 16;
+            ctx.fillStyle = '#C83E31';
+            ctx.beginPath(); ctx.moveTo(mx - 4, my); ctx.lineTo(mx - 7, my + 12); ctx.lineTo(mx - 1, my + 9); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(mx + 4, my); ctx.lineTo(mx + 7, my + 12); ctx.lineTo(mx + 1, my + 9); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#FBF7EE';
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath(); ctx.arc(mx, my - 2, 7.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#231F20';
+            ctx.font = '700 13px "Caveat", cursive';
+            ctx.fillText(String(slot.rank), mx, my - 1);
+            // Floating winner tag above occupant
             if (podiumRanking[idx]) {
               const bob = Math.sin(worldTime * 5 + idx) * 4;
               ctx.font = '700 18px "Caveat", cursive';
-              ctx.fillText(slot.medal + ' ' + podiumRanking[idx].nick, slot.x + slot.w / 2, slot.y - 54 + bob);
+              ctx.fillText(slot.badge + ' ' + podiumRanking[idx].nick, mx, slot.y - 54 + bob);
             }
             ctx.restore();
           });
@@ -6752,7 +7187,7 @@
           ctx.font = '700 17px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
           const statusLine = lastMatchWinner
-            ? ('Переміг: ' + lastMatchWinner + ' ★')
+            ? ('Переміг: ' + lastMatchWinner)
             : (netMode === 'host' ? 'Ти хост — обирай і тисни СТАРТ' : 'Чекаємо, поки хост запустить гру...');
           ctx.fillText(statusLine, bcx, 352);
           ctx.restore();
@@ -6804,17 +7239,17 @@
         // 5. Hand-drawn Goal Door with floating sparkles
         if (lvl.goal) {
           const g = lvl.goal;
-          drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false);
+          drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false, false);
           ctx.strokeStyle = '#231F20';
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(g.x + g.w - 10, g.y + g.h * 0.55, 3, 0, Math.PI * 2);
           ctx.stroke();
+          const labelBob = Math.sin(worldTime * 3.5) * 3;
           ctx.fillStyle = '#231F20';
           ctx.font = '700 20px "Caveat", cursive';
           ctx.textAlign = 'center';
-          const labelBob = Math.sin(worldTime * 3.5) * 3;
-          ctx.fillText('Двері ★', g.x + g.w / 2, g.y - 8 + labelBob);
+          ctx.fillText('Фініш', g.x + g.w / 2, g.y - 8 + labelBob);
           for (let si = 0; si < 3; si++) {
             const ang = worldTime * 2.1 + si * 2.1;
             const sx2 = g.x + g.w / 2 + Math.cos(ang) * (g.w * 0.65);
@@ -6852,15 +7287,18 @@
           ctx.restore();
         }
 
-        // 6. Players & Tag Bot
+        // 6. Ground Contact Shadows + Players & Tag Bot
         if (netConnected) {
+          drawGroundShadow(remotePlayer, solids);
           drawSketchPlayer(remotePlayer, '#8FB3E8', remoteNick, false);
         } else if (tagState.active && tagState.bot) {
+          drawGroundShadow(tagState.bot, solids);
           drawSketchPlayer(tagState.bot, '#8FB3E8', 'Бот', false);
         }
+        drawGroundShadow(localPlayer, solids);
         drawSketchPlayer(localPlayer, '#F29A8E', 'Ти', true);
 
-        // Tag "ВОДА!" Red Ink Aura
+        // Tag "ВОДА!" Red Ink Aura & Hand-Inked Badge
         if (tagState.active) {
           const itPl = tagState.itWho === 'local' ? localPlayer : (netConnected ? remotePlayer : tagState.bot);
           if (itPl) {
@@ -6873,10 +7311,21 @@
             ctx.arc(itPl.x + itPl.w / 2, itPl.y + itPl.h / 2, pulse, 0, Math.PI * 2);
             ctx.stroke();
             ctx.setLineDash([]);
+            const bx = itPl.x + itPl.w / 2;
+            const by = itPl.y - 26;
+            ctx.translate(bx, by);
+            ctx.rotate(-0.04);
             ctx.fillStyle = '#C83E31';
-            ctx.font = '700 18px "Caveat", cursive';
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 1.9;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(-24, -11, 48, 20, 5) : ctx.rect(-24, -11, 48, 20);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#FBF7EE';
+            ctx.font = '700 16px "Caveat", cursive';
             ctx.textAlign = 'center';
-            ctx.fillText('🔴 ВОДА!', itPl.x + itPl.w / 2, itPl.y - 12);
+            ctx.fillText('ВОДА!', 0, 4);
             ctx.restore();
           }
         }
@@ -7141,6 +7590,13 @@
         if (screenShake > 0) screenShake = Math.max(0, screenShake - 28 * dt);
         if (pageFlipTimer > 0) pageFlipTimer = Math.max(0, pageFlipTimer - dt);
 
+        if (hitStopTimer > 0 && gamePhase !== 'launching' && gamePhase !== 'round_intro') {
+          hitStopTimer = Math.max(0, hitStopTimer - dt);
+          render();
+          requestAnimationFrame(loop);
+          return;
+        }
+
         if (gamePhase === 'launching') {
           launchTimer -= dt;
           const sec = Math.ceil(Math.max(0, launchTimer));
@@ -7244,6 +7700,11 @@
         for (let i = shockwaves.length - 1; i >= 0; i--) {
           shockwaves[i].life -= dt;
           if (shockwaves[i].life <= 0) shockwaves.splice(i, 1);
+        }
+
+        for (let i = scuffs.length - 1; i >= 0; i--) {
+          scuffs[i].life -= dt;
+          if (scuffs[i].life <= 0) scuffs.splice(i, 1);
         }
 
         for (let i = particles.length - 1; i >= 0; i--) {
@@ -7412,6 +7873,10 @@
         const breath = Math.sin(worldTime * 3.4) * 0.03;
         wpCtx.translate(70, 122);
         wpCtx.scale(2.15 * (1 - breath * 0.6), 2.15 * (1 + breath));
+        wpCtx.fillStyle = 'rgba(35, 31, 32, 0.16)';
+        wpCtx.beginPath();
+        wpCtx.ellipse(0, 1, 16, 3.5, 0, 0, Math.PI * 2);
+        wpCtx.fill();
         const col = COSMETIC_COLORS[localCosmetics.colorIdx].hex;
 
         // Live cursor tracking inside Wardrobe preview!
@@ -7542,8 +8007,9 @@
               c.globalAlpha = 0.28;
               drawCosmeticCharacter(c, 28, 40, 1, false, curCol, curShape, 'classic', 'none', 'none', 0, 0, { lookX: 1, lookY: 0 });
               c.restore();
-              const drawH = curShape === 'cube' ? 30 : 40;
-              const anchors = getShapeAnchors(curShape, 28, drawH);
+              const { legLift, bodyH } = getCharLegMetrics(curShape, 40, true);
+              c.translate(0, -legLift);
+              const anchors = getShapeAnchors(curShape, 28, bodyH);
               const fm = computeFaceMotion(1, { lookX: 1, lookY: 0 });
               drawAccessory(c, ac.id, anchors, 1, curCol, 2.5, fm);
               c.restore();
