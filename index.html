@@ -460,7 +460,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.3.0</div>
+      <div id="version-tag">v0.3.1</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -687,8 +687,8 @@
         accelAir: 1750,
         jumpVel: 555,
         doubleJumpVel: 495,
-        wallJumpVx: 360,
-        wallJumpVy: 520,
+        wallJumpVx: 210,
+        wallJumpVy: 505,
         maxJumps: 2,
         coyoteTime: 0.13,
         jumpBuffer: 0.13,
@@ -1303,21 +1303,9 @@
         const moveDir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
         if (moveDir !== 0 && p.rollTimer <= 0 && p.wallJumpLock <= 0) p.facing = moveDir;
 
-        const wantsSprint = keys.sprint && moveDir !== 0 && p.rollTimer <= 0;
-        if (wantsSprint && !p.exhausted && p.stamina > 0) {
-          p.sprinting = true;
-          p.stamina = Math.max(0, p.stamina - CFG.staminaDrain * dt);
-          if (p.stamina === 0) p.exhausted = true;
-        } else {
-          p.sprinting = false;
-          p.stamina = Math.min(100, p.stamina + CFG.staminaRegen * dt);
-          if (p.exhausted && p.stamina >= CFG.staminaExhaustThreshold) p.exhausted = false;
-        }
-
-        // Sweat drops when exhausted
-        if (p.exhausted && Math.random() < 0.2) {
-          spawnParticles(p.x + p.w / 2 + (Math.random() - 0.5) * 14, p.y + 4, '#2952A3', 1, 55);
-        }
+        p.sprinting = keys.sprint && moveDir !== 0 && p.rollTimer <= 0;
+        p.exhausted = false;
+        p.stamina = 100;
 
         const targetH = (p.rollTimer > 0 || (keys.down && p.grounded)) ? CFG.rollH : CFG.normalH;
         if (targetH !== p.h) {
@@ -1379,7 +1367,7 @@
             p.vx = -p.wallDir * CFG.wallJumpVx;
             p.vy = -CFG.wallJumpVy;
             p.facing = -p.wallDir;
-            p.wallJumpLock = 0.14;
+            p.wallJumpLock = 0.07;
             p.jumpBufferTimer = 0;
             p.scaleX = 0.78;
             p.scaleY = 1.24;
