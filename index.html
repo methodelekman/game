@@ -474,43 +474,66 @@
       margin-top: 2px;
     }
 
-    /* Host Lobby Controls Strip (bottom center while in Lobby Room) */
+    /* Big Host Action Buttons (Only visible to Host in Lobby!) */
     #host-panel {
       position: absolute;
-      bottom: 16px;
+      bottom: 22px;
       left: 50%;
-      transform: translateX(-50%) rotate(-0.4deg);
-      background: var(--sheet);
-      border: 2.5px solid var(--ink);
-      border-radius: 6px 10px 5px 9px;
-      box-shadow: 4px 5px 0 rgba(35, 31, 32, 0.25);
-      padding: 10px 14px;
+      transform: translateX(-50%);
       display: none;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
+      gap: 16px;
       z-index: 24;
-      max-width: calc(100% - 28px);
     }
 
     #host-panel.visible {
       display: flex;
     }
 
-    .hp-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 17px;
-      font-weight: 700;
-      padding-right: 8px;
-      border-right: 1.5px dashed rgba(35, 31, 32, 0.28);
+    .big-host-btn {
+      font-size: 26px !important;
+      padding: 10px 26px !important;
+      border-width: 3px !important;
+      box-shadow: 4px 5px 0 rgba(35, 31, 32, 0.3) !important;
     }
 
-    .hp-item:last-child {
-      border-right: none;
-      padding-right: 0;
+    /* Host Settings Notebook Modal */
+    #settings-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(35, 31, 32, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 32;
+      padding: 18px;
+    }
+
+    #settings-modal.open {
+      display: flex;
+    }
+
+    .settings-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .set-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px dashed rgba(35, 31, 32, 0.22);
+    }
+
+    .set-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .hp-check {
@@ -518,7 +541,7 @@
       align-items: center;
       gap: 4px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
     }
 
     /* Animated Bottom-Up Push Chat */
@@ -806,27 +829,45 @@
       </div>
 
       <div id="host-panel">
-        <div class="hp-item">
-          <span>Раунди:</span>
-          <button class="sketch-btn" id="hp-rounds-minus" style="padding:1px 7px;">−</button>
-          <span id="hp-rounds-val" style="min-width:22px; text-align:center;">5</span>
-          <button class="sketch-btn" id="hp-rounds-plus" style="padding:1px 7px;">+</button>
-          <label class="hp-check"><input type="checkbox" id="hp-rounds-inf" checked /> ∞</label>
-        </div>
-        <div class="hp-item">
-          <span>Швидкість:</span>
-          <button class="sketch-btn" id="hp-speed-btn" style="padding:2px 9px;">Норма</button>
-        </div>
-        <div class="hp-item">
-          <span>Гравітація:</span>
-          <button class="sketch-btn" id="hp-grav-btn" style="padding:2px 9px;">Норма</button>
-        </div>
-        <div class="hp-item">
-          <span>Колізія:</span>
-          <button class="sketch-btn" id="hp-coll-btn" style="padding:2px 9px;">Увімк</button>
-        </div>
-        <div class="hp-item">
-          <button class="sketch-btn ink-red" id="hp-start-btn" style="padding:3px 14px;">Почати гру ▶</button>
+        <button class="sketch-btn big-host-btn" id="hp-open-settings">⚙ Налаштування</button>
+        <button class="sketch-btn ink-red big-host-btn" id="hp-start-btn">▶ СТАРТ</button>
+      </div>
+
+      <div id="settings-modal">
+        <div class="notebook-page" style="max-width:440px;">
+          <div class="tape tl"></div>
+          <div class="tape tr"></div>
+          <div class="nb-header">
+            <div>
+              <div class="nb-title">Налаштування кімнати</div>
+              <div class="nb-sub">друзі одразу бачать зміни на стіні</div>
+            </div>
+            <button class="sketch-btn" id="hp-close-settings">✕</button>
+          </div>
+          <div class="settings-grid">
+            <div class="set-row">
+              <span>Раунди:</span>
+              <div class="set-controls">
+                <button class="sketch-btn" id="hp-rounds-minus" style="padding:1px 9px;">−</button>
+                <span id="hp-rounds-val" style="min-width:28px; text-align:center;">∞</span>
+                <button class="sketch-btn" id="hp-rounds-plus" style="padding:1px 9px;">+</button>
+                <label class="hp-check"><input type="checkbox" id="hp-rounds-inf" checked /> ∞</label>
+              </div>
+            </div>
+            <div class="set-row">
+              <span>Швидкість:</span>
+              <button class="sketch-btn" id="hp-speed-btn" style="padding:3px 14px;">Норма</button>
+            </div>
+            <div class="set-row">
+              <span>Гравітація:</span>
+              <button class="sketch-btn" id="hp-grav-btn" style="padding:3px 14px;">Норма</button>
+            </div>
+            <div class="set-row" style="border-bottom:none;">
+              <span>Колізія гравців:</span>
+              <button class="sketch-btn" id="hp-coll-btn" style="padding:3px 14px;">Увімк</button>
+            </div>
+          </div>
+          <button class="sketch-btn ink-blue" id="hp-done-settings" style="width:100%; font-size:21px;">Готово</button>
         </div>
       </div>
 
@@ -849,7 +890,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.8.0</div>
+      <div id="version-tag">v0.9.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -932,6 +973,32 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
           osc.start(now);
           osc.stop(now + 0.16);
+        } else if (type === 'tick') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(340, now + 0.08);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.11);
+        } else if (type === 'go') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.07);
+          osc.frequency.setValueAtTime(783.99, now + 0.14);
+          gain.gain.setValueAtTime(0.11, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.36);
+        } else if (type === 'vortex') {
+          playNoiseBurst(0.28, 700, 0.15);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(95, now);
+          osc.frequency.exponentialRampToValueAtTime(290, now + 0.25);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.start(now);
+          osc.stop(now + 0.29);
         } else if (type === 'mantle') {
           playNoiseBurst(0.07, 1100, 0.09);
           osc.type = 'sine';
@@ -1034,20 +1101,30 @@
         { id: 'facepalm', name: 'Фейспалм', emoji: '🤦', dur: 2.0 }
       ];
 
+      // Cinematic Launch & Round-Start Intro State
+      let launchTimer = 0;       // 5.0 -> 0.0 countdown in lobby
+      let launchSeed = 0;
+      let launchLastSec = 6;
+      let blackoutAlpha = 0;
+      let roundIntroTimer = 0;   // 3.0 -> 0.0 countdown on level 1
+      let roundIntroLastSec = 4;
+      let goBannerTimer = 0;
+      const VORTEX_POS = { x: 480, y: 418 };
+
       function generateLobbyLevel() {
         return {
           id: 'ЛОБІ',
           isLobby: true,
-          title: 'Кімната очікування · Налаштування на стіні',
-          spawn: { x: 220, y: 420 },
+          title: '',
+          spawn: { x: 200, y: 420 },
           goal: null,
           notes: [],
+          // Pure empty room with 4 solid walls (floor, ceiling, left, right)
           platforms: [
-            { x: 0, y: 480, w: 960, h: 140 },
-            { x: -40, y: 120, w: 40, h: 500 },
-            { x: 960, y: 120, w: 40, h: 500 },
-            { x: 110, y: 375, w: 120, h: 24 },
-            { x: 730, y: 375, w: 120, h: 24 }
+            { x: 0, y: 480, w: 960, h: 80 },
+            { x: 0, y: 40, w: 960, h: 40 },
+            { x: -40, y: 40, w: 40, h: 520 },
+            { x: 960, y: 40, w: 40, h: 520 }
           ],
           movers: [],
           hazards: []
@@ -1898,14 +1975,7 @@
           enterLobbyRoom(false);
         } else if (data.type === 'start_match') {
           if (data.settings) Object.assign(roomSettings, data.settings);
-          localScore = 0;
-          remoteScore = 0;
-          prevLeader = 'tie';
-          gamePhase = 'playing';
-          syncHostPanelUI();
-          updateLeaderboardUI(null);
-          loadRound(data.seed, 1, false);
-          showToast('Матч почався!');
+          beginLaunchSequence(data.seed, false);
         } else if (data.type === 'ping') {
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
@@ -2272,20 +2342,55 @@
         roomSettings.playerCollision = !roomSettings.playerCollision;
         broadcastLobbySettings();
       });
-      document.getElementById('hp-start-btn').addEventListener('click', () => {
+      const settingsModal = document.getElementById('settings-modal');
+      document.getElementById('hp-open-settings').addEventListener('click', () => {
+        settingsModal.classList.add('open');
+      });
+      document.getElementById('hp-close-settings').addEventListener('click', () => {
+        settingsModal.classList.remove('open');
+      });
+      document.getElementById('hp-done-settings').addEventListener('click', () => {
+        settingsModal.classList.remove('open');
+      });
+
+      function beginLaunchSequence(seed, broadcast = false) {
+        settingsModal.classList.remove('open');
         localScore = 0;
         remoteScore = 0;
         prevLeader = 'tie';
         lastMatchWinner = '';
-        gamePhase = 'playing';
-        syncHostPanelUI();
         updateLeaderboardUI(null);
-        const startSeed = Math.floor(Math.random() * 900000) + 100000;
-        loadRound(startSeed, 1, false);
-        if (netConnected) {
-          sendGameMsg({ type: 'start_match', seed: startSeed, settings: roomSettings });
+        gamePhase = 'launching';
+        launchSeed = seed;
+        launchTimer = 5.0;
+        launchLastSec = 6;
+        blackoutAlpha = 0;
+        syncHostPanelUI();
+        playSound('tick');
+        if (broadcast && netConnected) {
+          sendGameMsg({ type: 'start_match', seed: launchSeed, settings: roomSettings });
         }
-        showToast('Погнали!');
+      }
+
+      function finishLaunchIntoRound1() {
+        gamePhase = 'round_intro';
+        roundIntroTimer = 3.0;
+        roundIntroLastSec = 4;
+        goBannerTimer = 0;
+        loadRound(launchSeed, 1, false);
+        // Place camera at Finish Door so it sweeps cinematically back to players!
+        if (currentLevel && currentLevel.goal) {
+          cam.x = currentLevel.goal.x - canvas.clientWidth * 0.5;
+          cam.y = currentLevel.goal.y - canvas.clientHeight * 0.5;
+        }
+        spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 58);
+        spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 22, 260);
+        playSound('tick');
+      }
+
+      document.getElementById('hp-start-btn').addEventListener('click', () => {
+        const startSeed = Math.floor(Math.random() * 900000) + 100000;
+        beginLaunchSequence(startSeed, true);
       });
 
       function resetPlayerToSpawn(countDeath = false) {
@@ -2885,12 +2990,26 @@
         const h = canvas.clientHeight;
         const lvl = currentLevel;
 
-        // Smooth velocity-guided camera (turning A/D never jerks the view)
-        const velLeadX = Math.max(-75, Math.min(75, localPlayer.vx * 0.16));
-        const targetCamX = localPlayer.x - w * 0.44 + velLeadX;
-        const targetCamY = Math.max(-140, Math.min(120, localPlayer.y - h * 0.58));
-        cam.x += (targetCamX - cam.x) * 0.065;
-        cam.y += (targetCamY - cam.y) * 0.055;
+        if (lvl.isLobby) {
+          // Center camera cleanly on the 4-wall lobby room
+          const targetCamX = 480 - w * 0.5;
+          const targetCamY = 290 - h * 0.5;
+          cam.x += (targetCamX - cam.x) * 0.09;
+          cam.y += (targetCamY - cam.y) * 0.09;
+        } else if (gamePhase === 'round_intro') {
+          // Cinematic camera sweep from Finish Door back onto the starting players!
+          const targetCamX = localPlayer.x - w * 0.42;
+          const targetCamY = Math.max(-140, Math.min(120, localPlayer.y - h * 0.58));
+          cam.x += (targetCamX - cam.x) * 0.045;
+          cam.y += (targetCamY - cam.y) * 0.045;
+        } else {
+          // Smooth velocity-guided camera (turning A/D never jerks the view)
+          const velLeadX = Math.max(-75, Math.min(75, localPlayer.vx * 0.16));
+          const targetCamX = localPlayer.x - w * 0.44 + velLeadX;
+          const targetCamY = Math.max(-140, Math.min(120, localPlayer.y - h * 0.58));
+          cam.x += (targetCamX - cam.x) * 0.065;
+          cam.y += (targetCamY - cam.y) * 0.055;
+        }
 
         const sx = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
         const sy = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
@@ -3001,6 +3120,55 @@
             : (netMode === 'host' ? 'Налаштуй внизу і тисни «Почати гру»' : 'Чекаємо, поки хост запустить матч...');
           ctx.fillText(statusLine, 480, 392);
           ctx.restore();
+
+          // Physical Glowing START Portal Button on the Lobby Wall (opens during 3..2..1 tornado!)
+          ctx.save();
+          const vx = VORTEX_POS.x;
+          const vy = VORTEX_POS.y;
+          if (gamePhase === 'launching') {
+            const openAmt = launchTimer <= 3.0 ? Math.min(1, (3.0 - launchTimer) / 1.4) : 0.15;
+            // Radiant golden/cobalt light beams
+            const rays = 12;
+            ctx.save();
+            ctx.translate(vx, vy);
+            ctx.rotate(worldTime * (2.5 + openAmt * 6));
+            for (let i = 0; i < rays; i++) {
+              ctx.rotate((Math.PI * 2) / rays);
+              ctx.fillStyle = i % 2 === 0 ? 'rgba(212, 155, 39, ' + (0.18 + openAmt * 0.35) + ')' : 'rgba(41, 82, 163, ' + (0.12 + openAmt * 0.28) + ')';
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(18 + openAmt * 260, -14 - openAmt * 26);
+              ctx.lineTo(18 + openAmt * 260, 14 + openAmt * 26);
+              ctx.closePath();
+              ctx.fill();
+            }
+            ctx.restore();
+
+            // Swirling ink vortex rings
+            const rCore = 22 + openAmt * 38;
+            ctx.beginPath();
+            ctx.arc(vx, vy, rCore, 0, Math.PI * 2);
+            ctx.fillStyle = '#161415';
+            ctx.fill();
+            ctx.strokeStyle = '#E9C46A';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            for (let k = 1; k <= 3; k++) {
+              ctx.beginPath();
+              ctx.arc(vx, vy, rCore + k * (14 + openAmt * 18), worldTime * (4 + k), worldTime * (4 + k) + Math.PI * 1.35);
+              ctx.strokeStyle = k === 2 ? '#2952A3' : '#D49B27';
+              ctx.lineWidth = 2.5;
+              ctx.stroke();
+            }
+          } else {
+            drawInkedRect(vx - 54, vy - 18, 108, 36, 560, '#F2D388', false);
+            ctx.fillStyle = '#231F20';
+            ctx.font = '700 22px "Caveat", cursive';
+            ctx.textAlign = 'center';
+            ctx.fillText('★ СТАРТ ★', vx, vy + 7);
+          }
+          ctx.restore();
         }
 
         // 5. Hand-drawn Goal Door
@@ -3085,7 +3253,70 @@
           ctx.fillRect(0, 0, w, h);
         }
 
-        // 10. Torn Paper Win Stamp
+        // 10a. Launch Countdown (5..1) & Round Intro Countdown (3..2..1..GO!)
+        if (gamePhase === 'launching' && launchTimer > 0.1) {
+          const sec = Math.ceil(launchTimer);
+          const frac = launchTimer - Math.floor(launchTimer);
+          const pop = 1 + frac * 0.35;
+          ctx.save();
+          ctx.translate(w / 2, h * 0.24);
+          ctx.scale(pop, pop);
+          ctx.fillStyle = sec <= 3 ? '#C83E31' : '#231F20';
+          ctx.font = '700 84px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(sec), 0, 0);
+          ctx.font = '700 24px "Caveat", cursive';
+          ctx.fillStyle = '#6A635A';
+          ctx.fillText(sec <= 3 ? 'ЗАТЯГУЄ В ПОРТАЛ!' : 'ПРИГОТУЙТЕСЬ...', 0, 32);
+          ctx.restore();
+        }
+
+        if (gamePhase === 'round_intro' && roundIntroTimer > 0) {
+          const sec = Math.ceil(roundIntroTimer);
+          const frac = roundIntroTimer - Math.floor(roundIntroTimer);
+          const pop = 1 + frac * 0.45;
+          ctx.save();
+          ctx.translate(w / 2, h * 0.38);
+          ctx.scale(pop, pop);
+          // Bright sketchbook burst behind number
+          ctx.fillStyle = 'rgba(233, 196, 106, 0.35)';
+          ctx.beginPath();
+          ctx.arc(0, -18, 62, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          ctx.fillStyle = sec === 1 ? '#C83E31' : '#231F20';
+          ctx.font = '700 96px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(sec), 0, 14);
+          ctx.restore();
+        }
+
+        if (goBannerTimer > 0) {
+          const pop = 1 + (1 - goBannerTimer) * 0.25;
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, goBannerTimer * 2);
+          ctx.translate(w / 2, h * 0.36);
+          ctx.rotate(-0.04);
+          ctx.scale(pop, pop);
+          ctx.fillStyle = '#C83E31';
+          ctx.font = '700 88px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText('ПОЇХАЛИ!', 0, 10);
+          ctx.restore();
+        }
+
+        // 10b. Smooth Ink-Black Transition Screen
+        if (blackoutAlpha > 0.01) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(18, 16, 17, ' + blackoutAlpha.toFixed(3) + ')';
+          ctx.fillRect(0, 0, w, h);
+          ctx.restore();
+        }
+
+        // 10c. Torn Paper Win Stamp
         if (winBannerTimer > 0) {
           ctx.save();
           ctx.translate(w / 2, h / 2);
@@ -3119,7 +3350,95 @@
 
         if (screenShake > 0) screenShake = Math.max(0, screenShake - 28 * dt);
 
-        updatePhysics(dt);
+        if (gamePhase === 'launching') {
+          launchTimer -= dt;
+          const sec = Math.ceil(Math.max(0, launchTimer));
+          if (sec < launchLastSec && sec > 0) {
+            launchLastSec = sec;
+            playSound(sec <= 3 ? 'vortex' : 'tick');
+            if (sec <= 3) spawnShockwave(VORTEX_POS.x, VORTEX_POS.y, '#D49B27', 85);
+          }
+
+          if (launchTimer > 3.0) {
+            // 5..4: Players can still walk around freely before suction begins
+            updatePhysics(dt);
+          } else {
+            // 3..0: Screen shakes & TORNADO sucks BOTH players into the glowing START button!
+            const pullProg = Math.min(1, (3.0 - launchTimer) / 2.6);
+            screenShake = 5 + pullProg * 18;
+
+            const suckPlayer = (pl) => {
+              const cx = pl.x + pl.w / 2;
+              const cy = pl.y + pl.h / 2;
+              const dx = VORTEX_POS.x - cx;
+              const dy = VORTEX_POS.y - cy;
+              const dist = Math.max(4, Math.hypot(dx, dy));
+              const nx = dx / dist;
+              const ny = dy / dist;
+              // Tangential swirl + inward pull
+              const pullSpd = 170 + pullProg * 640;
+              const swirlSpd = (1 - pullProg * 0.5) * 260;
+              pl.x += (nx * pullSpd - ny * swirlSpd) * dt;
+              pl.y += (ny * pullSpd + nx * swirlSpd) * dt;
+              pl.rot += (10 + pullProg * 18) * dt;
+              pl.rollTimer = 0.05; // triggers spin rotation in renderer
+              const shrink = Math.max(0.15, 1 - pullProg * 0.85);
+              pl.scaleX = shrink;
+              pl.scaleY = shrink;
+            };
+
+            suckPlayer(localPlayer);
+            if (netConnected) suckPlayer(remotePlayer);
+
+            if (Math.random() < 0.75) {
+              const ang = Math.random() * Math.PI * 2;
+              const r = 45 + Math.random() * 140;
+              particles.push({
+                x: VORTEX_POS.x + Math.cos(ang) * r,
+                y: VORTEX_POS.y + Math.sin(ang) * r,
+                vx: -Math.cos(ang) * 240 - Math.sin(ang) * 180,
+                vy: -Math.sin(ang) * 240 + Math.cos(ang) * 180,
+                size: 4 + Math.random() * 5,
+                life: 0.35,
+                maxLife: 0.35,
+                color: Math.random() < 0.5 ? '#D49B27' : '#2952A3',
+                rot: ang
+              });
+            }
+
+            // Rapid fade to black in the last 0.65s
+            if (launchTimer < 0.65) {
+              blackoutAlpha = Math.min(1, (0.65 - launchTimer) / 0.55);
+            }
+            if (launchTimer <= 0) {
+              finishLaunchIntoRound1();
+            }
+          }
+        } else if (gamePhase === 'round_intro') {
+          // Fade out from black + 3..2..1..GO countdown with inputs frozen
+          blackoutAlpha = Math.max(0, blackoutAlpha - 2.2 * dt);
+          roundIntroTimer -= dt;
+          const sec = Math.ceil(Math.max(0, roundIntroTimer));
+          if (sec < roundIntroLastSec && sec > 0) {
+            roundIntroLastSec = sec;
+            playSound('tick');
+            spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#C83E31', 48);
+          }
+          localPlayer.scaleX += (1 - localPlayer.scaleX) * Math.min(1, 10 * dt);
+          localPlayer.scaleY += (1 - localPlayer.scaleY) * Math.min(1, 10 * dt);
+          if (roundIntroTimer <= 0) {
+            gamePhase = 'playing';
+            goBannerTimer = 0.95;
+            playSound('go');
+            screenShake = 6;
+            spawnShockwave(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 75);
+            spawnParticles(localPlayer.x + localPlayer.w / 2, localPlayer.y + localPlayer.h / 2, '#D49B27', 18, 240);
+          }
+        } else {
+          blackoutAlpha = Math.max(0, blackoutAlpha - 2.5 * dt);
+          if (goBannerTimer > 0) goBannerTimer = Math.max(0, goBannerTimer - dt);
+          updatePhysics(dt);
+        }
 
         for (let i = shockwaves.length - 1; i >= 0; i--) {
           shockwaves[i].life -= dt;
@@ -3136,7 +3455,7 @@
           if (pt.life <= 0) particles.splice(i, 1);
         }
 
-        if (netConnected) {
+        if (netConnected && gamePhase !== 'launching') {
           // Smooth Snapshot Interpolation Buffer (zero teleports, exact motion!)
           const interpDelay = p2pActive ? 32 : 85;
           const renderTime = performance.now() - interpDelay;
