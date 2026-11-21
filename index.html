@@ -460,7 +460,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.4.0</div>
+      <div id="version-tag">v0.5.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -846,6 +846,7 @@
         p.scaleX = 1.45;
         p.scaleY = 0.62;
         playSound('roll');
+        sendStatePacket(true);
         spawnShockwave(p.x + p.w / 2, p.y + p.h / 2, '#2952A3', 32);
         spawnParticles(p.x + p.w / 2, p.y + p.h, '#2952A3', 9, 200);
       }
@@ -910,6 +911,9 @@
       let pingMs = 0;
       let lastPingSent = 0;
       let netSyncTimer = 0;
+      let remoteGrounded = false;
+      let lastRemotePacketTs = 0;
+      let lastSentKey = '';
       let connectTimeout = null;
       let roomTopic = '';
       const myClientId = 'g_' + Math.random().toString(36).slice(2, 10);
@@ -992,7 +996,7 @@
         publishMqtt(payload);
       }
 
-      function sendStatePacket() {
+      function sendStatePacket(force = false) {
         if (!netConnected) return;
         const compact = [
           Math.round(localPlayer.x),
@@ -1003,8 +1007,15 @@
           Number(localPlayer.scaleX.toFixed(2)),
           Number(localPlayer.scaleY.toFixed(2)),
           Number(localPlayer.rollTimer.toFixed(2)),
-          Number(localPlayer.rot.toFixed(2))
+          Number(localPlayer.rot.toFixed(2)),
+          Math.round(localPlayer.h),
+          localPlayer.grounded ? 1 : 0,
+          Number(worldTime.toFixed(2))
         ];
+        const key = compact[0] + ',' + compact[1] + ',' + compact[2] + ',' + compact[3] + ',' + compact[9] + ',' + compact[10];
+        if (!force && key === lastSentKey) return;
+        lastSentKey = key;
+
         if (p2pActive && rtcDc && rtcDc.readyState === 'open') {
           try { rtcDc.send('S|' + compact.join('|')); return; } catch (_) {}
         }
@@ -1012,15 +1023,38 @@
       }
 
       function applyRemoteStateArr(d) {
-        remotePlayer.tx = d[0];
-        remotePlayer.ty = d[1];
-        remotePlayer.vx = d[2];
-        remotePlayer.vy = d[3];
+        const halfRtt = Math.min(0.18, (pingMs || 40) / 2000);
+        const rx = d[0];
+        const ry = d[1];
+        const rvx = d[2];
+        const rvy = d[3];
+        const rg = d[10] === 1;
+
+        // Dead-reckoning with gravity compensation (no floating in mid-air!)
+        const predX = rx + rvx * halfRtt;
+        const predY = ry + (rg ? 0 : (rvy * halfRtt + 0.5 * CFG.gravity * halfRtt * halfRtt));
+        const predVy = rg ? 0 : Math.min(CFG.maxFallSpeed, rvy + CFG.gravity * halfRtt);
+
+        remotePlayer.tx = predX;
+        remotePlayer.ty = predY;
+        remotePlayer.vx = rvx;
+        remotePlayer.vy = predVy;
         remotePlayer.facing = d[4];
         remotePlayer.scaleX = d[5];
         remotePlayer.scaleY = d[6];
         remotePlayer.rollTimer = d[7];
         remotePlayer.rot = d[8];
+        if (d[9]) remotePlayer.h = d[9];
+        remoteGrounded = rg;
+        remotePlayer.grounded = rg;
+        lastRemotePacketTs = performance.now();
+
+        // Sync moving-platform clock from Host so both players see movers in the exact same spot
+        if (netMode !== 'host' && typeof d[11] === 'number') {
+          const drift = (d[11] + halfRtt) - worldTime;
+          if (Math.abs(drift) > 0.35) worldTime = d[11] + halfRtt;
+          else worldTime += drift * 0.08;
+        }
       }
 
       function handleGameMessage(raw) {
@@ -1439,6 +1473,7 @@
             p.scaleX = 1.38;
             p.scaleY = 0.72;
             playSound('dashjump');
+            sendStatePacket(true);
             spawnShockwave(p.x + p.w / 2, p.y + p.h, '#D49B27', 42);
             spawnParticles(p.x + p.w / 2, p.y + p.h, '#D49B27', 12, 220);
           } else if (p.coyoteTimer > 0) {
@@ -1529,6 +1564,7 @@
                 p.scaleX = 1.32;
                 p.scaleY = 0.7;
                 playSound('land');
+                sendStatePacket(true);
                 spawnParticles(p.x + p.w / 2, p.y + p.h, '#6A635A', 5, 95);
               }
               p.vy = 0;
@@ -1562,6 +1598,44 @@
             if (rectsOverlap(p, h)) {
               resetPlayerToSpawn(true);
               return;
+            }
+          }
+        }
+
+        // Player-to-Player Collision (stand on friend's head, reset jumps, or gently bump shoulders!)
+        if (netConnected) {
+          const rp = remotePlayer;
+          if (rectsOverlap(p, rp)) {
+            const pBottom = p.y + p.h;
+            const rpTop = rp.y;
+            const overlapTop = pBottom - rpTop;
+            const overlapBottom = (rp.y + rp.h) - p.y;
+            const overlapLeft = (p.x + p.w) - rp.x;
+            const overlapRight = (rp.x + rp.w) - p.x;
+            const minOverlapX = Math.min(overlapLeft, overlapRight);
+            const minOverlapY = Math.min(overlapTop, overlapBottom);
+
+            if (minOverlapY <= minOverlapX + 4) {
+              if (overlapTop < overlapBottom && p.vy >= 0) {
+                p.y = rp.y - p.h;
+                p.vy = 0;
+                p.grounded = true;
+                p.jumpsLeft = CFG.maxJumps;
+                p.airRollUsed = false;
+                p.x += rp.vx * dt;
+              } else if (overlapBottom < overlapTop && p.vy < 0) {
+                p.y = rp.y + rp.h;
+                p.vy = 0;
+              }
+            } else {
+              const push = Math.min(minOverlapX, 10);
+              if (overlapLeft < overlapRight) {
+                p.x -= push * 0.65;
+                if (p.vx > 0) p.vx *= 0.4;
+              } else {
+                p.x += push * 0.65;
+                if (p.vx < 0) p.vx *= 0.4;
+              }
             }
           }
         }
@@ -1957,28 +2031,52 @@
         }
 
         if (netConnected) {
-          remotePlayer.tx += remotePlayer.vx * dt;
-          remotePlayer.ty += remotePlayer.vy * dt;
-          remotePlayer.x += remotePlayer.vx * dt;
-          remotePlayer.y += remotePlayer.vy * dt;
+          const lvl = LEVELS[currentLevelIdx];
+          const allSolids = lvl.platforms.concat(activeMovers);
+          const staleMs = performance.now() - lastRemotePacketTs;
+
+          if (!remoteGrounded) {
+            remotePlayer.vy = Math.min(CFG.maxFallSpeed, remotePlayer.vy + CFG.gravity * dt);
+          } else {
+            remotePlayer.vy = 0;
+          }
+
+          if (staleMs < 320) {
+            remotePlayer.tx += remotePlayer.vx * dt;
+            remotePlayer.ty += remotePlayer.vy * dt;
+          }
+
+          // Clamp remote player cleanly onto platforms so friend never floats in mid-air
+          const rBox = { x: remotePlayer.tx, y: remotePlayer.ty, w: remotePlayer.w, h: remotePlayer.h };
+          for (const s of allSolids) {
+            if (rectsOverlap(rBox, s)) {
+              const overlapTop = (rBox.y + rBox.h) - s.y;
+              if (overlapTop > 0 && overlapTop <= 24 && remotePlayer.vy >= 0) {
+                remotePlayer.ty = s.y - remotePlayer.h;
+                remotePlayer.vy = 0;
+                remoteGrounded = true;
+              }
+            }
+          }
 
           const errX = remotePlayer.tx - remotePlayer.x;
           const errY = remotePlayer.ty - remotePlayer.y;
-          if (Math.abs(errX) > 130 || Math.abs(errY) > 130) {
+          if (Math.abs(errX) > 150 || Math.abs(errY) > 150) {
             remotePlayer.x = remotePlayer.tx;
             remotePlayer.y = remotePlayer.ty;
           } else {
-            remotePlayer.x += errX * Math.min(1, 15 * dt);
-            remotePlayer.y += errY * Math.min(1, 15 * dt);
+            const blend = 1 - Math.exp(-22 * dt);
+            remotePlayer.x += errX * blend;
+            remotePlayer.y += errY * blend;
           }
 
           netSyncTimer += dt;
-          const syncInterval = p2pActive ? 0.025 : 0.075;
+          const syncInterval = p2pActive ? 0.016 : 0.045;
           if (netSyncTimer >= syncInterval) {
             netSyncTimer = 0;
-            sendStatePacket();
+            sendStatePacket(false);
           }
-          if (ts - lastPingSent > 2000) {
+          if (ts - lastPingSent > 1500) {
             lastPingSent = ts;
             sendGameMsg({ type: 'ping', t: performance.now() });
           }
