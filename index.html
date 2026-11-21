@@ -85,6 +85,117 @@
       pointer-events: none;
     }
 
+    /* Animated Sketchbook Leaderboard */
+    #leaderboard {
+      position: absolute;
+      top: 56px;
+      left: 16px;
+      width: 220px;
+      background: rgba(251, 247, 238, 0.92);
+      border: 2px solid var(--ink);
+      border-radius: 5px 9px 4px 8px;
+      padding: 6px 10px 8px;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.22);
+      transform: rotate(-0.8deg);
+      z-index: 19;
+      pointer-events: none;
+    }
+
+    .lb-head {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--pencil);
+      border-bottom: 1.5px dashed rgba(35, 31, 32, 0.3);
+      margin-bottom: 5px;
+      padding-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .lb-rows {
+      position: relative;
+      height: 70px;
+    }
+
+    .lb-row {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s ease;
+    }
+
+    .lb-row.overtake {
+      background: rgba(212, 155, 39, 0.35);
+      animation: lbPop 0.55s ease;
+    }
+
+    @keyframes lbPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    .lb-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .lb-rank {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--pencil);
+      width: 16px;
+    }
+
+    .lb-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lb-name {
+      font-size: 18px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 105px;
+    }
+
+    .lb-score {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .lb-plus {
+      font-size: 14px;
+      color: var(--red);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .lb-plus.show {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+
     .sketch-btn {
       appearance: none;
       position: relative;
@@ -395,7 +506,29 @@
     <div id="stage-wrap">
       <canvas id="game-canvas"></canvas>
 
-      <div id="level-scrap">Аркуш 01 / 04 · 0</div>
+      <div id="level-scrap">Раунд #1 · ✕0</div>
+
+      <div id="leaderboard">
+        <div class="lb-head"><span>Лідерборд</span><span>Очки</span></div>
+        <div class="lb-rows" id="lb-rows">
+          <div class="lb-row" id="lb-row-local" style="transform: translateY(0px);">
+            <div class="lb-left">
+              <span class="lb-rank" id="lb-rank-local">1.</span>
+              <span class="lb-icon" id="lb-icon-local"></span>
+              <span class="lb-name" id="lb-name-local" style="color:#A83226;">Ти</span>
+            </div>
+            <div class="lb-score"><span class="lb-plus" id="lb-plus-local">+1</span><span id="lb-score-local">0</span></div>
+          </div>
+          <div class="lb-row" id="lb-row-remote" style="transform: translateY(34px); opacity: 0.45;">
+            <div class="lb-left">
+              <span class="lb-rank" id="lb-rank-remote">2.</span>
+              <span class="lb-icon" id="lb-icon-remote"></span>
+              <span class="lb-name" id="lb-name-remote" style="color:#2952A3;">Друг</span>
+            </div>
+            <div class="lb-score"><span class="lb-plus" id="lb-plus-remote">+1</span><span id="lb-score-remote">0</span></div>
+          </div>
+        </div>
+      </div>
 
       <div id="corner-tabs">
         <button class="sketch-btn" id="btn-restart" title="Перемалювати (R)">↺ Заново</button>
@@ -440,6 +573,10 @@
           </div>
 
           <div>
+            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;">Твій нік у лідерборді:</div>
+            <div class="room-row" style="margin-bottom:8px;">
+              <input class="room-input" id="nick-input" value="Гравець" maxlength="12" style="text-transform:none; font-size:20px;" aria-label="Твій нік" />
+            </div>
             <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;">Код сторінки для друга:</div>
             <div class="room-row">
               <input class="room-input" id="room-code" value="SKETCH1" maxlength="14" aria-label="Код кімнати" />
@@ -460,7 +597,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.6.0</div>
+      <div id="version-tag">v0.7.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -589,105 +726,117 @@
       });
 
       // =========================================================
-      // 2. LEVELS (Hand-sketched Notebook Modules)
+      // 2. PROCEDURAL RANDOM LEVEL GENERATOR (Seeded for Co-op Sync)
       // =========================================================
-      const LEVELS = [
-        {
-          id: '01',
-          title: 'Аркуш 01 · Проба пера',
-          spawn: { x: 80, y: 420 },
-          goal: { x: 1450, y: 380, w: 38, h: 60 },
-          notes: [
-            { x: 70, y: 325, text: 'WASD — кроки', sub: 'SPACE — стрибок (2 пера)' },
-            { x: 480, y: 305, text: 'SHIFT — біг', sub: 'не задихнись!' },
-            { x: 960, y: 325, text: 'CTRL / C — перекат', sub: 'пірнай під балку' }
-          ],
-          platforms: [
-            { x: 0, y: 480, w: 440, h: 120 },
-            { x: 520, y: 480, w: 320, h: 120 },
-            { x: 900, y: 480, w: 340, h: 120 },
-            { x: 980, y: 396, w: 140, h: 48 },
-            { x: 1320, y: 440, w: 240, h: 160 }
-          ],
-          movers: [],
-          hazards: [
-            { x: 640, y: 466, w: 52, h: 14 }
-          ]
-        },
-        {
-          id: '02',
-          title: 'Аркуш 02 · Чорнильний стрибок',
-          spawn: { x: 80, y: 420 },
-          goal: { x: 1580, y: 220, w: 38, h: 60 },
-          notes: [
-            { x: 80, y: 325, text: 'Розгін + Стрибок + Перекат', sub: 'синій шарф — твій деш у повітрі' },
-            { x: 830, y: 255, text: 'Лише 1 деш у повітрі', sub: 'відновиться на землі' }
-          ],
-          platforms: [
-            { x: 0, y: 480, w: 300, h: 120 },
-            { x: 390, y: 420, w: 170, h: 36 },
-            { x: 650, y: 360, w: 180, h: 36 },
-            { x: 1090, y: 360, w: 210, h: 36 },
-            { x: 1390, y: 280, w: 280, h: 320 }
-          ],
-          movers: [],
-          hazards: [
-            { x: 450, y: 406, w: 46, h: 14 },
-            { x: 1170, y: 346, w: 50, h: 14 }
-          ]
-        },
-        {
-          id: '03',
-          title: 'Аркуш 03 · Живі блоки',
-          spawn: { x: 70, y: 420 },
-          goal: { x: 1680, y: 300, w: 38, h: 60 },
-          notes: [
-            { x: 70, y: 325, text: 'Рухомі ескізи', sub: 'стрибай у такт' },
-            { x: 1130, y: 235, text: 'Вузька щілина', sub: 'притиснись на CTRL' }
-          ],
-          platforms: [
-            { x: 0, y: 480, w: 250, h: 120 },
-            { x: 740, y: 410, w: 180, h: 36 },
-            { x: 1020, y: 380, w: 360, h: 36 },
-            { x: 1130, y: 296, w: 150, h: 48 },
-            { x: 1550, y: 360, w: 220, h: 240 }
-          ],
-          movers: [
-            { x: 320, y: 450, w: 130, h: 26, ax: 320, ay: 450, bx: 550, by: 420, speed: 1.4 },
-            { x: 1390, y: 360, w: 110, h: 26, ax: 1390, ay: 430, bx: 1390, by: 300, speed: 1.7 }
-          ],
-          hazards: [
-            { x: 800, y: 396, w: 52, h: 14 },
-            { x: 1295, y: 366, w: 48, h: 14 }
-          ]
-        },
-        {
-          id: '04',
-          title: 'Аркуш 04 · Остання сторінка',
-          spawn: { x: 70, y: 420 },
-          goal: { x: 1820, y: 200, w: 38, h: 60 },
-          notes: [
-            { x: 70, y: 325, text: 'Фінал зошита', sub: 'не витрачай дарма дихання' }
-          ],
-          platforms: [
-            { x: 0, y: 480, w: 220, h: 120 },
-            { x: 310, y: 420, w: 140, h: 32 },
-            { x: 540, y: 350, w: 150, h: 32 },
-            { x: 1030, y: 350, w: 260, h: 34 },
-            { x: 1100, y: 266, w: 120, h: 48 },
-            { x: 1680, y: 260, w: 240, h: 340 }
-          ],
-          movers: [
-            { x: 760, y: 350, w: 120, h: 26, ax: 740, ay: 350, bx: 880, by: 350, speed: 1.8 },
-            { x: 1360, y: 320, w: 110, h: 26, ax: 1360, ay: 370, bx: 1520, by: 270, speed: 1.6 }
-          ],
-          hazards: [
-            { x: 355, y: 406, w: 44, h: 14 },
-            { x: 590, y: 336, w: 44, h: 14 },
-            { x: 1240, y: 336, w: 40, h: 14 }
-          ]
-        }
+      let roundNumber = 1;
+      let currentSeed = Math.floor(Math.random() * 900000) + 100000;
+      let currentLevel = null;
+
+      function mulberry32(seed) {
+        let a = seed >>> 0;
+        return function() {
+          a |= 0;
+          a = (a + 0x6D2B79F5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      const SKETCH_TITLES = [
+        'Свіжий аркуш', 'Чорнильний ривок', 'Перегони на полях',
+        'Штрихований паркур', 'Кінетичний ескіз', 'Лабіринт туші'
       ];
+
+      function generateRandomLevel(seed, roundNum) {
+        const rng = mulberry32(seed);
+        const platforms = [];
+        const movers = [];
+        const hazards = [];
+        const notes = [];
+
+        platforms.push({ x: 0, y: 480, w: 280, h: 140 });
+        if (roundNum === 1) {
+          notes.push({ x: 55, y: 340, text: 'Хто перший у двері — +1 очко!', sub: 'CTRL+SPACE — Dash-Jump · S на бігу — підкат' });
+        }
+
+        let curX = 280;
+        let curY = 480;
+        const segments = 5 + Math.floor(rng() * 3);
+
+        for (let i = 0; i < segments; i++) {
+          const type = rng();
+
+          if (type < 0.28) {
+            const gap1 = 65 + Math.floor(rng() * 45);
+            const mw = 115 + Math.floor(rng() * 35);
+            const travelX = rng() < 0.65 ? (110 + Math.floor(rng() * 80)) : 0;
+            const travelY = travelX === 0 ? (90 + Math.floor(rng() * 50)) : (rng() < 0.5 ? -45 : 35);
+            const ax = curX + gap1;
+            const ay = curY - 10;
+            const bx = ax + travelX;
+            const by = Math.max(220, Math.min(490, ay + travelY));
+            movers.push({ x: ax, y: ay, w: mw, h: 26, ax, ay, bx, by, speed: 1.35 + rng() * 0.65 });
+
+            const nextX = bx + mw + 75 + Math.floor(rng() * 45);
+            const nextY = Math.max(240, Math.min(500, by + Math.floor((rng() - 0.5) * 60)));
+            const nextW = 190 + Math.floor(rng() * 90);
+            platforms.push({ x: nextX, y: nextY, w: nextW, h: 36 });
+            curX = nextX + nextW;
+            curY = nextY;
+          } else if (type < 0.52) {
+            const gap = 75 + Math.floor(rng() * 55);
+            const px = curX + gap;
+            const py = Math.max(270, Math.min(500, curY + Math.floor((rng() - 0.5) * 70)));
+            const pw = 320 + Math.floor(rng() * 90);
+            platforms.push({ x: px, y: py, w: pw, h: 42 });
+            const beamW = 115 + Math.floor(rng() * 45);
+            const beamX = px + Math.floor((pw - beamW) * 0.5);
+            platforms.push({ x: beamX, y: py - 82, w: beamW, h: 48 });
+            curX = px + pw;
+            curY = py;
+          } else if (type < 0.76) {
+            const gap = 80 + Math.floor(rng() * 50);
+            const px = curX + gap;
+            const stepUp = 75 + Math.floor(rng() * 55);
+            const py = Math.max(210, curY - stepUp);
+            const pw = 165 + Math.floor(rng() * 80);
+            platforms.push({ x: px, y: py, w: pw, h: Math.max(40, (curY - py) + 60) });
+            if (pw > 180 && rng() < 0.65) {
+              hazards.push({ x: px + Math.floor(pw * 0.45), y: py - 14, w: 42, h: 14 });
+            }
+            curX = px + pw;
+            curY = py;
+          } else {
+            const gap = 120 + Math.floor(rng() * 90);
+            const px = curX + gap;
+            const py = Math.max(240, Math.min(500, curY + Math.floor((rng() - 0.45) * 80)));
+            const pw = 210 + Math.floor(rng() * 100);
+            platforms.push({ x: px, y: py, w: pw, h: 38 });
+            if (rng() < 0.75) {
+              hazards.push({ x: px + Math.floor(pw * 0.42), y: py - 14, w: 46, h: 14 });
+            }
+            curX = px + pw;
+            curY = py;
+          }
+        }
+
+        const endGap = 85 + Math.floor(rng() * 45);
+        const endX = curX + endGap;
+        const endY = Math.max(230, Math.min(480, curY + Math.floor((rng() - 0.5) * 60)));
+        platforms.push({ x: endX, y: endY, w: 240, h: 240 });
+
+        return {
+          id: String(roundNum).padStart(2, '0'),
+          title: 'Раунд #' + roundNum + ' · ' + SKETCH_TITLES[seed % SKETCH_TITLES.length],
+          spawn: { x: 80, y: 420 },
+          goal: { x: endX + 130, y: endY - 62, w: 40, h: 62 },
+          notes,
+          platforms,
+          movers,
+          hazards
+        };
+      }
 
       // =========================================================
       // 3. PHYSICS & BALANCED LIMITS CONSTANTS
@@ -732,8 +881,20 @@
       const canvas = document.getElementById('game-canvas');
       const ctx = canvas.getContext('2d');
 
-      let currentLevelIdx = 0;
       let deaths = 0;
+      let localNick = 'Гравець';
+      let remoteNick = 'Друг';
+      let localScore = 0;
+      let remoteScore = 0;
+      let prevLeader = 'tie';
+      let localIconState = '';
+      let remoteIconState = '';
+      let doorLock = false;
+
+      try {
+        const savedNick = localStorage.getItem('sketch_nick');
+        if (savedNick) localNick = savedNick.slice(0, 12);
+      } catch (_) {}
       let worldTime = 0;
       let winBannerTimer = 0;
       let screenShake = 0;
@@ -757,7 +918,7 @@
       let paperPattern = null;
 
       function createPlayer(isRemote = false) {
-        const sp = LEVELS[currentLevelIdx].spawn;
+        const sp = currentLevel ? currentLevel.spawn : { x: 80, y: 420 };
         return {
           x: sp.x,
           y: sp.y,
@@ -1134,7 +1295,7 @@
           lobbyMsg.textContent = 'Друг на аркуші! Піднімаю прямий P2P...';
           lobbyModal.classList.add('hidden');
           showToast('Друг підключився!');
-          publishMqtt({ type: 'hello_ack', level: currentLevelIdx });
+          publishMqtt({ type: 'hello_ack', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore });
           sendStatePacket(true);
           if (netMode === 'host') startWebRtcOffer();
         }
@@ -1144,15 +1305,45 @@
         } else if (data.t === 'e') {
           playRemoteVfx(data.ev, data.x, data.y, data.ex || 0);
         } else if (data.type === 'hello' || data.type === 'hello_ack') {
+          if (data.nick) remoteNick = String(data.nick).slice(0, 12);
+          if (typeof data.score === 'number') remoteScore = data.score;
+          updateLeaderboardUI(null);
           if (netMode === 'host') {
-            publishMqtt({ type: 'level', idx: currentLevelIdx });
+            sendGameMsg({
+              type: 'sync_round',
+              seed: currentSeed,
+              round: roundNumber,
+              hostScore: localScore,
+              clientScore: remoteScore,
+              nick: localNick
+            });
             if (!rtcPc || rtcPc.connectionState === 'failed') startWebRtcOffer();
-          } else if (typeof data.level === 'number' && data.level !== currentLevelIdx) {
-            loadLevel(data.level, false);
+          } else if (typeof data.seed === 'number' && data.seed !== currentSeed) {
+            loadRound(data.seed, data.round || 1, false);
           }
           sendStatePacket(true);
-        } else if (data.type === 'level') {
-          if (data.idx !== currentLevelIdx) loadLevel(data.idx, false);
+        } else if (data.type === 'sync_round') {
+          if (data.nick) remoteNick = String(data.nick).slice(0, 12);
+          if (typeof data.hostScore === 'number') remoteScore = data.hostScore;
+          if (typeof data.clientScore === 'number') localScore = data.clientScore;
+          updateLeaderboardUI(null);
+          if (typeof data.seed === 'number' && data.seed !== currentSeed) {
+            loadRound(data.seed, data.round || 1, false);
+          }
+        } else if (data.type === 'next_round') {
+          if (netMode === 'host') {
+            if (typeof data.hostScore === 'number') localScore = data.hostScore;
+            if (typeof data.clientScore === 'number') remoteScore = data.clientScore;
+          } else {
+            if (typeof data.hostScore === 'number') remoteScore = data.hostScore;
+            if (typeof data.clientScore === 'number') localScore = data.clientScore;
+          }
+          playSound('win');
+          updateLeaderboardUI('remote');
+          loadRound(data.seed, data.round || (roundNumber + 1), false);
+        } else if (data.type === 'nick' && data.nick) {
+          remoteNick = String(data.nick).slice(0, 12);
+          updateLeaderboardUI(null);
         } else if (data.type === 'ping') {
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
@@ -1270,7 +1461,7 @@
                 lobbyMsg.textContent = 'Помилка входу: ' + err.message;
                 return;
               }
-              publishMqtt({ type: 'hello', level: currentLevelIdx, role: netMode });
+              publishMqtt({ type: 'hello', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore, role: netMode });
               if (netMode === 'host') {
                 lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита! Копіюй лінк і кидай другу.';
                 updateNetUI('Чекаю P2...', 'waiting');
@@ -1350,28 +1541,112 @@
       // =========================================================
       let activeMovers = [];
 
-      function updateLevelScrap() {
-        document.getElementById('level-scrap').textContent =
-          'Аркуш ' + String(currentLevelIdx + 1).padStart(2, '0') + ' / ' + String(LEVELS.length).padStart(2, '0') + ' · ✕' + deaths;
+      function getPlayerMotionState(p) {
+        if (p.rollTimer > 0) return 'dash';
+        if (p.sliding) return 'slide';
+        if (!p.grounded) return p.vy < -30 ? 'jump' : 'fall';
+        if (Math.abs(p.vx) > 45) return p.sprinting ? 'sprint' : 'run';
+        return 'idle';
       }
 
-      function loadLevel(idx, broadcast = true) {
-        currentLevelIdx = (idx + LEVELS.length) % LEVELS.length;
+      function makeStateSvg(state, color) {
+        const ink = '#231F20';
+        if (state === 'dash') {
+          return '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 8h7M1 13h6M3 18h5" stroke="#2952A3" stroke-width="2" stroke-linecap="round"/><circle cx="15" cy="12" r="6" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/></svg>';
+        }
+        if (state === 'slide') {
+          return '<svg viewBox="0 0 24 24" width="22" height="22"><rect x="4" y="12" width="16" height="8" rx="3" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/><path d="M2 20h6" stroke="#D49B27" stroke-width="2.2" stroke-linecap="round"/></svg>';
+        }
+        if (state === 'jump') {
+          return '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 22v-5" stroke="#D49B27" stroke-width="2" stroke-linecap="round"/><rect x="7" y="3" width="10" height="13" rx="2" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/><circle cx="13" cy="8" r="1.2" fill="' + ink + '"/></svg>';
+        }
+        if (state === 'fall') {
+          return '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 2v4M15 2v4" stroke="#6A635A" stroke-width="1.8" stroke-linecap="round"/><rect x="6" y="9" width="12" height="12" rx="2" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/><circle cx="13" cy="15" r="1.3" fill="' + ink + '"/></svg>';
+        }
+        if (state === 'run' || state === 'sprint') {
+          const lean = state === 'sprint' ? 'skewX(-14)' : 'skewX(-7)';
+          return '<svg viewBox="0 0 24 24" width="22" height="22"><g transform="' + lean + ' translate(3,0)"><rect x="6" y="5" width="11" height="14" rx="2" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/><circle cx="13" cy="10" r="1.2" fill="' + ink + '"/></g></svg>';
+        }
+        return '<svg viewBox="0 0 24 24" width="22" height="22"><rect x="6" y="5" width="12" height="15" rx="2" fill="' + color + '" stroke="' + ink + '" stroke-width="2"/><circle cx="10" cy="11" r="1.2" fill="' + ink + '"/><circle cx="14" cy="11" r="1.2" fill="' + ink + '"/></svg>';
+      }
+
+      function updateLeaderboardUI(scoredWho = null) {
+        const localRow = document.getElementById('lb-row-local');
+        const remoteRow = document.getElementById('lb-row-remote');
+        document.getElementById('lb-name-local').textContent = localNick;
+        document.getElementById('lb-name-remote').textContent = remoteNick;
+        document.getElementById('lb-score-local').textContent = localScore;
+        document.getElementById('lb-score-remote').textContent = remoteScore;
+
+        remoteRow.style.opacity = netConnected ? '1' : '0.42';
+
+        const localFirst = localScore >= remoteScore;
+        const newLeader = localScore > remoteScore ? 'local' : (remoteScore > localScore ? 'remote' : 'tie');
+
+        localRow.style.transform = localFirst ? 'translateY(0px)' : 'translateY(34px)';
+        remoteRow.style.transform = localFirst ? 'translateY(34px)' : 'translateY(0px)';
+        document.getElementById('lb-rank-local').textContent = localFirst ? '1.' : '2.';
+        document.getElementById('lb-rank-remote').textContent = localFirst ? '2.' : '1.';
+
+        if (newLeader !== 'tie' && prevLeader !== 'tie' && newLeader !== prevLeader) {
+          const overtaker = newLeader === 'local' ? localRow : remoteRow;
+          overtaker.classList.remove('overtake');
+          void overtaker.offsetWidth;
+          overtaker.classList.add('overtake');
+          showToast((newLeader === 'local' ? localNick : remoteNick) + ' виривається вперед!');
+        }
+        if (newLeader !== 'tie') prevLeader = newLeader;
+
+        if (scoredWho === 'local' || scoredWho === 'remote') {
+          const plusEl = document.getElementById(scoredWho === 'local' ? 'lb-plus-local' : 'lb-plus-remote');
+          plusEl.classList.add('show');
+          setTimeout(() => plusEl.classList.remove('show'), 900);
+        }
+      }
+
+      function updateLeaderboardIcons() {
+        const ls = getPlayerMotionState(localPlayer);
+        if (ls !== localIconState) {
+          localIconState = ls;
+          document.getElementById('lb-icon-local').innerHTML = makeStateSvg(ls, '#F29A8E');
+        }
+        const rs = netConnected ? getPlayerMotionState(remotePlayer) : 'idle';
+        if (rs !== remoteIconState) {
+          remoteIconState = rs;
+          document.getElementById('lb-icon-remote').innerHTML = makeStateSvg(rs, '#8FB3E8');
+        }
+      }
+
+      function updateLevelScrap() {
+        document.getElementById('level-scrap').textContent = 'Раунд #' + roundNumber + ' · ✕' + deaths;
+      }
+
+      function loadRound(seed, rNum, broadcast = false) {
+        currentSeed = seed;
+        roundNumber = rNum;
+        currentLevel = generateRandomLevel(seed, rNum);
+        doorLock = false;
         updateLevelScrap();
         resetPlayerToSpawn(false);
-        const sp = LEVELS[currentLevelIdx].spawn;
+        const sp = currentLevel.spawn;
         remotePlayer.x = sp.x;
         remotePlayer.y = sp.y;
         remotePlayer.tx = sp.x;
         remotePlayer.ty = sp.y;
         remoteSnapshots.length = 0;
         if (broadcast && netConnected) {
-          sendGameMsg({ type: 'level', idx: currentLevelIdx });
+          sendGameMsg({
+            type: 'next_round',
+            seed: currentSeed,
+            round: roundNumber,
+            hostScore: netMode === 'host' ? localScore : remoteScore,
+            clientScore: netMode === 'host' ? remoteScore : localScore
+          });
         }
       }
 
       function resetPlayerToSpawn(countDeath = false) {
-        const sp = LEVELS[currentLevelIdx].spawn;
+        const sp = currentLevel ? currentLevel.spawn : { x: 80, y: 420 };
         const p = localPlayer;
         if (countDeath) {
           deaths++;
@@ -1399,7 +1674,7 @@
 
       function updateMovers(t, dt) {
         const prevT = t - dt;
-        activeMovers = LEVELS[currentLevelIdx].movers.map((m, idx) => {
+        activeMovers = currentLevel.movers.map((m, idx) => {
           const s = (Math.sin(t * m.speed) + 1) * 0.5;
           const prevS = (Math.sin(prevT * m.speed) + 1) * 0.5;
           const x = m.ax + (m.bx - m.ax) * s;
@@ -1416,7 +1691,7 @@
 
       function updatePhysics(dt) {
         const p = localPlayer;
-        const lvl = LEVELS[currentLevelIdx];
+        const lvl = currentLevel;
         updateMovers(worldTime, dt);
         const movers = activeMovers;
         const allSolids = lvl.platforms.concat(movers);
@@ -1724,14 +1999,14 @@
           }
         }
 
-        if (winBannerTimer <= 0 && rectsOverlap(p, lvl.goal)) {
-          winBannerTimer = 1.1;
+        if (!doorLock && rectsOverlap(p, lvl.goal)) {
+          doorLock = true;
+          localScore++;
           playSound('win');
           spawnParticles(lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, '#D49B27', 22, 260);
-          setTimeout(() => {
-            winBannerTimer = 0;
-            loadLevel(currentLevelIdx + 1, true);
-          }, 950);
+          updateLeaderboardUI('local');
+          const nextSeed = Math.floor(Math.random() * 900000) + 100000;
+          loadRound(nextSeed, roundNumber + 1, true);
         }
       }
 
@@ -1907,7 +2182,7 @@
       function render() {
         const w = canvas.clientWidth;
         const h = canvas.clientHeight;
-        const lvl = LEVELS[currentLevelIdx];
+        const lvl = currentLevel;
 
         // Smooth velocity-guided camera (turning A/D never jerks the view)
         const velLeadX = Math.max(-75, Math.min(75, localPlayer.vx * 0.16));
@@ -1988,17 +2263,22 @@
           ctx.restore();
         });
 
-        // 5. Hand-drawn Goal Flag
+        // 5. Hand-drawn Goal Door
         const g = lvl.goal;
         drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false);
+        ctx.strokeStyle = '#231F20';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(g.x + g.w - 10, g.y + g.h * 0.55, 3, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.fillStyle = '#231F20';
         ctx.font = '700 20px "Caveat", cursive';
         ctx.textAlign = 'center';
-        ctx.fillText('Фініш ★', g.x + g.w / 2, g.y - 8);
+        ctx.fillText('Двері ★', g.x + g.w / 2, g.y - 8);
 
         // 6. Players
         if (netConnected) {
-          drawSketchPlayer(remotePlayer, '#8FB3E8', 'Друг (P2)', false);
+          drawSketchPlayer(remotePlayer, '#8FB3E8', remoteNick, false);
         }
         drawSketchPlayer(localPlayer, '#F29A8E', 'Ти', true);
 
@@ -2182,13 +2462,25 @@
           }
         }
 
+        updateLeaderboardIcons();
         render();
         requestAnimationFrame(loop);
       }
 
+      const nickInput = document.getElementById('nick-input');
+      nickInput.value = localNick;
+      nickInput.addEventListener('input', () => {
+        localNick = (nickInput.value || 'Гравець').trim().slice(0, 12) || 'Гравець';
+        try { localStorage.setItem('sketch_nick', localNick); } catch (_) {}
+        updateLeaderboardUI(null);
+        if (netConnected) sendGameMsg({ type: 'nick', nick: localNick });
+      });
+
       window.onload = () => {
         resizeCanvas();
-        loadLevel(0, false);
+        loadRound(currentSeed, 1, false);
+        updateLeaderboardUI(null);
+        updateLeaderboardIcons();
         requestAnimationFrame(loop);
       };
     })();
