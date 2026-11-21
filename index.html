@@ -697,6 +697,158 @@
       cursor: pointer;
     }
 
+    /* Among Us–style Sketchbook Wardrobe Modal */
+    #wardrobe-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(35, 31, 32, 0.36);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 34;
+      padding: 16px;
+    }
+
+    #wardrobe-modal.open {
+      display: flex;
+    }
+
+    .wardrobe-page {
+      max-width: 650px !important;
+      gap: 12px !important;
+    }
+
+    .wardrobe-body {
+      display: grid;
+      grid-template-columns: 168px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .wardrobe-preview-box {
+      background: rgba(244, 237, 224, 0.8);
+      border: 2px dashed var(--ink);
+      border-radius: 6px 10px 5px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 8px;
+      gap: 6px;
+    }
+
+    #wardrobe-preview {
+      width: 140px;
+      height: 150px;
+      display: block;
+    }
+
+    .w-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .w-tab {
+      flex: 1;
+      text-align: center;
+      font-size: 18px !important;
+      padding: 4px 6px !important;
+    }
+
+    .w-tab.active {
+      background: #F2D388;
+      transform: translateY(-2px);
+    }
+
+    .w-grid {
+      display: grid;
+      gap: 8px;
+      max-height: 235px;
+      overflow-y: auto;
+      padding: 4px 2px;
+    }
+
+    .w-grid.colors {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .w-grid.shapes {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .w-grid.accs {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .swatch-btn {
+      height: 44px;
+      border: 2.2px solid var(--ink);
+      border-radius: 6px 4px 8px 5px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(35, 31, 32, 0.22);
+      transition: transform 0.1s ease;
+      position: relative;
+    }
+
+    .swatch-btn:hover { transform: scale(1.06); }
+    .swatch-btn.selected {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+      transform: scale(1.06);
+    }
+
+    .item-chip {
+      appearance: none;
+      background: var(--sheet);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 6px 4px 7px 5px;
+      padding: 6px 4px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      line-height: 1.05;
+      box-shadow: 2px 2px 0 rgba(35, 31, 32, 0.18);
+      transition: transform 0.1s ease, background-color 0.1s ease;
+    }
+
+    .item-chip:hover {
+      transform: translateY(-2px);
+      background: #F4EDE0;
+    }
+
+    .item-chip.selected {
+      background: #F2D388;
+      border-width: 2.5px;
+    }
+
+    .item-chip-ico {
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    @media (max-width: 640px) {
+      .wardrobe-body {
+        grid-template-columns: 1fr;
+      }
+      .wardrobe-preview-box {
+        flex-direction: row;
+        justify-content: center;
+      }
+      #wardrobe-preview {
+        width: 96px;
+        height: 100px;
+      }
+      .w-grid.accs {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
     /* Subtle Pencil Version Tag */
     #version-tag {
       position: absolute;
@@ -874,6 +1026,7 @@
       </div>
 
       <div id="corner-tabs">
+        <button class="sketch-btn" id="btn-wardrobe" title="Косметика та образ">🎨 Образ</button>
         <button class="sketch-btn" id="btn-taunt" title="Колесо таунтів (B)">★ Таунти (B)</button>
         <button class="sketch-btn" id="btn-restart" title="Перемалювати (R)">↺ Заново</button>
         <button class="sketch-btn" id="btn-mute">Звук: є</button>
@@ -1006,7 +1159,36 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.11.0</div>
+      <div id="wardrobe-modal">
+        <div class="notebook-page wardrobe-page">
+          <div class="tape tl"></div>
+          <div class="tape tr"></div>
+          <div class="nb-header">
+            <div>
+              <div class="nb-title">Гардероб // Косметика</div>
+              <div class="nb-sub">16 кольорів · 6 форм · 20 аксесуарів</div>
+            </div>
+            <button class="sketch-btn" id="btn-close-wardrobe">✕</button>
+          </div>
+          <div class="wardrobe-body">
+            <div class="wardrobe-preview-box">
+              <canvas id="wardrobe-preview" width="140" height="150"></canvas>
+              <div style="font-size:17px; font-weight:700; color:var(--pencil);" id="wardrobe-summary">Корал · Прямокутник</div>
+            </div>
+            <div>
+              <div class="w-tabs">
+                <button class="sketch-btn w-tab active" data-wtab="colors">Колір (16)</button>
+                <button class="sketch-btn w-tab" data-wtab="shapes">Форма (6)</button>
+                <button class="sketch-btn w-tab" data-wtab="accs">Косметика (20)</button>
+              </div>
+              <div class="w-grid colors" id="wardrobe-grid"></div>
+            </div>
+          </div>
+          <button class="sketch-btn ink-blue" id="btn-done-wardrobe" style="width:100%; font-size:21px;">Зберегти образ</button>
+        </div>
+      </div>
+
+      <div id="version-tag">v0.12.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -1300,6 +1482,71 @@
 
       let gamePhase = 'playing'; // 'lobby' | 'playing'
       let lastMatchWinner = '';
+
+      const COSMETIC_COLORS = [
+        { name: 'Корал',    hex: '#F29A8E' },
+        { name: 'Червоний', hex: '#D94B43' },
+        { name: 'Апельсин', hex: '#F08C4B' },
+        { name: 'Золото',   hex: '#E9C46A' },
+        { name: 'Лимон',    hex: '#F3E37C' },
+        { name: 'Лайм',     hex: '#A7D46F' },
+        { name: 'Смарагд',  hex: '#57B889' },
+        { name: 'Мʼята',    hex: '#72CFC9' },
+        { name: 'Блакить',  hex: '#8FB3E8' },
+        { name: 'Кобальт',  hex: '#4A77D4' },
+        { name: 'Індиго',   hex: '#6D68C4' },
+        { name: 'Фіолет',   hex: '#A879D9' },
+        { name: 'Рожевий',  hex: '#EA8EC2' },
+        { name: 'Какао',    hex: '#B07D5B' },
+        { name: 'Графіт',   hex: '#7A7D85' },
+        { name: 'Кремовий', hex: '#FBF7EE' }
+      ];
+
+      const COSMETIC_SHAPES = [
+        { id: 'rect',    name: 'Прямокутник', ico: '▯' },
+        { id: 'cube',    name: 'Куб',         ico: '■' },
+        { id: 'circle',  name: 'Круг',        ico: '●' },
+        { id: 'tri',     name: 'Трикутник',   ico: '▲' },
+        { id: 'diamond', name: 'Ромб',        ico: '◆' },
+        { id: 'pill',    name: 'Капсула',     ico: '⬭' }
+      ];
+
+      const COSMETIC_ACCS = [
+        { id: 'none',       name: 'Немає',       ico: '✕' },
+        { id: 'shades',     name: 'Сонячні',     ico: '🕶' },
+        { id: 'glasses',    name: 'Окуляри',     ico: '👓' },
+        { id: 'cap',        name: 'Кепка',       ico: '🧢' },
+        { id: 'crown',      name: 'Корона',      ico: '👑' },
+        { id: 'eyepatch',   name: 'Пірат',       ico: '🏴‍☠️' },
+        { id: 'tophat',     name: 'Циліндр',     ico: '🎩' },
+        { id: 'beanie',     name: 'Біні',        ico: '🧶' },
+        { id: 'halo',       name: 'Німб',        ico: '😇' },
+        { id: 'horns',      name: 'Ріжки',       ico: '😈' },
+        { id: 'cat',        name: 'Котик',       ico: '🐱' },
+        { id: 'headband',   name: 'Ніндзя',      ico: '🥋' },
+        { id: 'wizard',     name: 'Маг',         ico: '🧙' },
+        { id: 'headphones', name: 'Навушники',   ico: '🎧' },
+        { id: 'mustache',   name: 'Вуса',        ico: '🥸' },
+        { id: 'bowtie',     name: 'Метелик',     ico: '🎀' },
+        { id: 'sprout',     name: 'Паросток',    ico: '🌱' },
+        { id: 'viking',     name: 'Вікінг',      ico: '⚔️' },
+        { id: 'bandana',    name: 'Бандана',     ico: '🧣' },
+        { id: 'party',      name: 'Ковпак',      ico: '🎉' }
+      ];
+
+      let localCosmetics = { colorIdx: 0, shape: 'rect', acc: 'none' };
+      let remoteCosmetics = { colorIdx: 8, shape: 'rect', acc: 'none' };
+
+      try {
+        const savedCos = JSON.parse(localStorage.getItem('sketch_cosmetics') || 'null');
+        if (savedCos && typeof savedCos.colorIdx === 'number') {
+          localCosmetics = {
+            colorIdx: Math.max(0, Math.min(COSMETIC_COLORS.length - 1, savedCos.colorIdx)),
+            shape: COSMETIC_SHAPES.some((x) => x.id === savedCos.shape) ? savedCos.shape : 'rect',
+            acc: COSMETIC_ACCS.some((x) => x.id === savedCos.acc) ? savedCos.acc : 'none'
+          };
+        }
+      } catch (_) {}
 
       const TAUNTS = [
         { id: 'wave', name: 'Махає', emoji: '👋', dur: 2.0 },
@@ -2124,7 +2371,7 @@
           lobbyMsg.textContent = 'Друг на аркуші! Піднімаю прямий P2P...';
           lobbyModal.classList.add('hidden');
           showToast('Друг підключився!');
-          publishMqtt({ type: 'hello_ack', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore });
+          publishMqtt({ type: 'hello_ack', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore, c: localCosmetics });
           sendStatePacket(true);
           if (netMode === 'host') startWebRtcOffer();
         }
@@ -2135,6 +2382,7 @@
           playRemoteVfx(data.ev, data.x, data.y, data.ex || 0);
         } else if (data.type === 'hello' || data.type === 'hello_ack') {
           if (data.nick) remoteNick = String(data.nick).slice(0, 12);
+          if (data.c && typeof data.c.colorIdx === 'number') { remoteCosmetics = data.c; remoteIconState = ''; }
           if (typeof data.score === 'number') remoteScore = data.score;
           updateLeaderboardUI(null);
           if (netMode === 'host') {
@@ -2178,6 +2426,10 @@
           playSound('win');
           updateLeaderboardUI('remote');
           loadRound(data.seed, data.round || (roundNumber + 1), false);
+        } else if (data.type === 'cosmetics' && data.c) {
+          remoteCosmetics = data.c;
+          remoteIconState = '';
+          updateLeaderboardUI(null);
         } else if (data.type === 'nick' && data.nick) {
           remoteNick = String(data.nick).slice(0, 12);
           updateLeaderboardUI(null);
@@ -2331,7 +2583,7 @@
                 lobbyMsg.textContent = 'Помилка входу: ' + err.message;
                 return;
               }
-              publishMqtt({ type: 'hello', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore, role: netMode });
+              publishMqtt({ type: 'hello', seed: currentSeed, round: roundNumber, nick: localNick, score: localScore, c: localCosmetics, role: netMode });
               if (netMode === 'host') {
                 lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита!';
                 updateNetUI('Чекаю P2...', 'waiting');
@@ -2485,12 +2737,12 @@
         const ls = getPlayerMotionState(localPlayer);
         if (ls !== localIconState) {
           localIconState = ls;
-          document.getElementById('lb-icon-local').innerHTML = makeStateSvg(ls, '#F29A8E');
+          document.getElementById('lb-icon-local').innerHTML = makeStateSvg(ls, COSMETIC_COLORS[localCosmetics.colorIdx].hex);
         }
         const rs = netConnected ? getPlayerMotionState(remotePlayer) : 'idle';
         if (rs !== remoteIconState) {
           remoteIconState = rs;
-          document.getElementById('lb-icon-remote').innerHTML = makeStateSvg(rs, '#8FB3E8');
+          document.getElementById('lb-icon-remote').innerHTML = makeStateSvg(rs, COSMETIC_COLORS[remoteCosmetics.colorIdx].hex);
         }
       }
 
@@ -3209,6 +3461,163 @@
         ctx.stroke();
       }
 
+      function drawCosmeticCharacter(c, w, h, facing, sprinting, fillColor, shape, acc, jx, jy) {
+        const hw = w / 2;
+        const drawH = shape === 'cube' ? Math.min(h, w + 2) : h;
+
+        // 1. Shape Silhouette
+        c.beginPath();
+        if (shape === 'circle') {
+          c.ellipse(jx * 0.4, -drawH / 2 + jy * 0.4, hw + 2, drawH / 2, 0, 0, Math.PI * 2);
+        } else if (shape === 'tri') {
+          c.moveTo(jx, -drawH - 2 + jy);
+          c.lineTo(hw + 3 - jx, jy);
+          c.lineTo(-hw - 3 + jx, -jy);
+          c.closePath();
+        } else if (shape === 'diamond') {
+          c.moveTo(jx, -drawH - 2 + jy);
+          c.lineTo(hw + 3, -drawH / 2);
+          c.lineTo(-jx, jy);
+          c.lineTo(-hw - 3, -drawH / 2);
+          c.closePath();
+        } else if (shape === 'pill') {
+          const r = hw;
+          c.moveTo(-hw, -drawH + r);
+          c.arc(0, -drawH + r, r, Math.PI, 0);
+          c.lineTo(hw, -r);
+          c.arc(0, -r, r, 0, Math.PI);
+          c.closePath();
+        } else {
+          // rect or cube
+          c.moveTo(-hw + jx, -drawH + jy);
+          c.lineTo(hw - jx, -drawH - jy);
+          c.lineTo(hw + jx, -jy);
+          c.lineTo(-hw - jx, jy);
+          c.closePath();
+        }
+        c.fillStyle = fillColor;
+        c.fill();
+        c.strokeStyle = '#231F20';
+        c.lineWidth = 2.4;
+        c.lineJoin = 'round';
+        c.stroke();
+
+        // 2. Expressive Face
+        const faceY = shape === 'tri' ? -drawH * 0.42 : (shape === 'diamond' ? -drawH * 0.55 : -drawH + 12);
+        const ex = facing > 0 ? 3 : -5;
+        c.fillStyle = '#231F20';
+        c.beginPath();
+        c.arc(ex - 2, faceY, 2.1, 0, Math.PI * 2);
+        c.arc(ex + 6, faceY, 2.1, 0, Math.PI * 2);
+        c.fill();
+        c.beginPath();
+        c.lineWidth = 1.6;
+        if (sprinting) {
+          c.moveTo(ex - 1, faceY + 7); c.lineTo(ex + 6, faceY + 6);
+        } else {
+          c.arc(ex + 2, faceY + 5, 3, 0.15, Math.PI - 0.15);
+        }
+        c.stroke();
+
+        // 3. Hand-Drawn Accessory (20 items!)
+        if (!acc || acc === 'none') return;
+        const topY = -drawH;
+        c.save();
+        c.strokeStyle = '#231F20';
+        c.lineWidth = 2;
+        c.lineJoin = 'round';
+        c.lineCap = 'round';
+
+        if (acc === 'shades') {
+          c.fillStyle = '#18181B';
+          c.fillRect(ex - 7, faceY - 3.5, 8, 5.5);
+          c.fillRect(ex + 3, faceY - 3.5, 8, 5.5);
+          c.beginPath(); c.moveTo(ex + 1, faceY - 1); c.lineTo(ex + 3, faceY - 1); c.stroke();
+        } else if (acc === 'glasses') {
+          c.fillStyle = 'rgba(255,255,255,0.45)';
+          c.beginPath(); c.arc(ex - 2, faceY, 4.2, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.arc(ex + 6, faceY, 4.2, 0, Math.PI * 2); c.fill(); c.stroke();
+        } else if (acc === 'cap') {
+          c.fillStyle = '#C83E31';
+          c.beginPath(); c.arc(0, topY + 2, hw, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(facing > 0 ? 2 : -2, topY + 2); c.lineTo(facing * (hw + 9), topY + 2); c.lineWidth = 3; c.stroke();
+        } else if (acc === 'crown') {
+          c.fillStyle = '#E9C46A';
+          c.beginPath();
+          c.moveTo(-10, topY + 1); c.lineTo(-11, topY - 10); c.lineTo(-4, topY - 4);
+          c.lineTo(0, topY - 12); c.lineTo(4, topY - 4); c.lineTo(11, topY - 10);
+          c.lineTo(10, topY + 1); c.closePath(); c.fill(); c.stroke();
+        } else if (acc === 'eyepatch') {
+          c.beginPath(); c.moveTo(-hw, faceY - 5); c.lineTo(hw, faceY + 2); c.stroke();
+          c.fillStyle = '#18181B';
+          c.beginPath(); c.arc(ex + 6, faceY, 4.2, 0, Math.PI * 2); c.fill(); c.stroke();
+        } else if (acc === 'tophat') {
+          c.fillStyle = '#27272A';
+          c.fillRect(-10, topY - 16, 20, 16); c.strokeRect(-10, topY - 16, 20, 16);
+          c.beginPath(); c.moveTo(-15, topY); c.lineTo(15, topY); c.lineWidth = 3.5; c.stroke();
+          c.fillStyle = '#C83E31'; c.fillRect(-10, topY - 4, 20, 3);
+        } else if (acc === 'beanie') {
+          c.fillStyle = '#2952A3';
+          c.beginPath(); c.arc(0, topY + 3, hw - 1, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = '#FBF7EE';
+          c.beginPath(); c.arc(0, topY - hw + 2, 4, 0, Math.PI * 2); c.fill(); c.stroke();
+        } else if (acc === 'halo') {
+          c.strokeStyle = '#D49B27'; c.lineWidth = 2.6;
+          c.beginPath(); c.ellipse(0, topY - 10, 11, 3.5, 0, 0, Math.PI * 2); c.stroke();
+        } else if (acc === 'horns') {
+          c.fillStyle = '#C83E31';
+          c.beginPath(); c.moveTo(-9, topY + 2); c.quadraticCurveTo(-15, topY - 9, -6, topY - 11); c.lineTo(-4, topY + 1); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(9, topY + 2); c.quadraticCurveTo(15, topY - 9, 6, topY - 11); c.lineTo(4, topY + 1); c.fill(); c.stroke();
+        } else if (acc === 'cat') {
+          c.fillStyle = fillColor;
+          c.beginPath(); c.moveTo(-11, topY + 2); c.lineTo(-10, topY - 10); c.lineTo(-2, topY + 1); c.closePath(); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(11, topY + 2); c.lineTo(10, topY - 10); c.lineTo(2, topY + 1); c.closePath(); c.fill(); c.stroke();
+        } else if (acc === 'headband') {
+          c.fillStyle = '#C83E31';
+          c.fillRect(-hw, topY + 4, w, 4.5); c.strokeRect(-hw, topY + 4, w, 4.5);
+          c.beginPath(); c.moveTo(-facing * hw, topY + 6); c.lineTo(-facing * (hw + 9), topY + 11); c.strokeStyle = '#C83E31'; c.lineWidth = 3; c.stroke();
+        } else if (acc === 'wizard') {
+          c.fillStyle = '#6D68C4';
+          c.beginPath(); c.moveTo(-15, topY + 1); c.lineTo(2, topY - 20); c.lineTo(15, topY + 1); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = '#E9C46A'; c.beginPath(); c.arc(0, topY - 7, 2.2, 0, Math.PI * 2); c.fill();
+        } else if (acc === 'headphones') {
+          c.beginPath(); c.arc(0, topY + 6, hw + 2, Math.PI, 0); c.lineWidth = 2.6; c.stroke();
+          c.fillStyle = '#231F20';
+          c.fillRect(-hw - 4, topY + 4, 5, 11);
+          c.fillRect(hw - 1, topY + 4, 5, 11);
+        } else if (acc === 'mustache') {
+          c.fillStyle = '#3B2F2F';
+          c.beginPath(); c.ellipse(ex - 1, faceY + 5, 4.5, 2.2, -0.2, 0, Math.PI * 2); c.fill();
+          c.beginPath(); c.ellipse(ex + 5, faceY + 5, 4.5, 2.2, 0.2, 0, Math.PI * 2); c.fill();
+        } else if (acc === 'bowtie') {
+          c.fillStyle = '#C83E31';
+          const by = -7;
+          c.beginPath(); c.moveTo(0, by); c.lineTo(-7, by - 4); c.lineTo(-7, by + 4); c.closePath(); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(0, by); c.lineTo(7, by - 4); c.lineTo(7, by + 4); c.closePath(); c.fill(); c.stroke();
+        } else if (acc === 'sprout') {
+          c.strokeStyle = '#2D7A46'; c.lineWidth = 2.2;
+          c.beginPath(); c.moveTo(0, topY); c.quadraticCurveTo(0, topY - 9, 3, topY - 12); c.stroke();
+          c.fillStyle = '#57B889';
+          c.beginPath(); c.ellipse(-4, topY - 10, 4.5, 2.5, -0.4, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.ellipse(5, topY - 12, 4.5, 2.5, 0.3, 0, Math.PI * 2); c.fill(); c.stroke();
+        } else if (acc === 'viking') {
+          c.fillStyle = '#9CA3AF';
+          c.beginPath(); c.arc(0, topY + 3, hw, Math.PI, 0); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = '#FBF7EE';
+          c.beginPath(); c.moveTo(-hw, topY); c.quadraticCurveTo(-hw - 8, topY - 9, -hw - 2, topY - 13); c.lineTo(-hw + 3, topY - 2); c.fill(); c.stroke();
+          c.beginPath(); c.moveTo(hw, topY); c.quadraticCurveTo(hw + 8, topY - 9, hw + 2, topY - 13); c.lineTo(hw - 3, topY - 2); c.fill(); c.stroke();
+        } else if (acc === 'bandana') {
+          c.fillStyle = '#2952A3';
+          c.beginPath(); c.moveTo(-hw, -10); c.lineTo(hw, -10); c.lineTo(0, -1); c.closePath(); c.fill(); c.stroke();
+        } else if (acc === 'party') {
+          c.fillStyle = '#EA8EC2';
+          c.beginPath(); c.moveTo(-9, topY + 1); c.lineTo(0, topY - 17); c.lineTo(9, topY + 1); c.closePath(); c.fill(); c.stroke();
+          c.fillStyle = '#E9C46A';
+          c.beginPath(); c.arc(0, topY - 18, 3, 0, Math.PI * 2); c.fill(); c.stroke();
+        }
+        c.restore();
+      }
+
       function drawSketchPlayer(p, color, label, isLocal) {
         // Inked motion ghosts during roll
         for (const g of p.ghosts) {
@@ -3266,50 +3675,9 @@
         const jx = boilOffset(101, boilFrame) * 0.6;
         const jy = boilOffset(102, boilFrame) * 0.6;
 
-        // Sketchy inked character silhouette
-        ctx.beginPath();
-        ctx.moveTo(-p.w / 2 + jx, -p.h + jy);
-        ctx.lineTo(p.w / 2 - jx, -p.h - jy);
-        ctx.lineTo(p.w / 2 + jx, -jy);
-        ctx.lineTo(-p.w / 2 - jx, jy);
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = '#231F20';
-        ctx.lineWidth = 2.5;
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-
-        // Expressive Face!
-        const ex = p.facing > 0 ? 4 : -6;
-        ctx.fillStyle = '#231F20';
-        if (p.exhausted) {
-          // Tired / panting eyes
-          ctx.lineWidth = 1.8;
-          ctx.beginPath();
-          ctx.moveTo(ex - 4, -p.h + 11); ctx.lineTo(ex + 2, -p.h + 13);
-          ctx.moveTo(ex + 4, -p.h + 11); ctx.lineTo(ex + 8, -p.h + 13);
-          ctx.stroke();
-          // Open panting mouth
-          ctx.beginPath();
-          ctx.ellipse(ex + 2, -p.h + 20, 3, 2 + Math.sin(worldTime * 16) * 0.9, 0, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          // Lively expressive eyes
-          ctx.beginPath();
-          ctx.arc(ex - 2, -p.h + 12, 2.2, 0, Math.PI * 2);
-          ctx.arc(ex + 6, -p.h + 12, 2.2, 0, Math.PI * 2);
-          ctx.fill();
-          // Smile or determined expression
-          ctx.beginPath();
-          ctx.lineWidth = 1.6;
-          if (p.sprinting) {
-            ctx.moveTo(ex - 1, -p.h + 19); ctx.lineTo(ex + 6, -p.h + 18);
-          } else {
-            ctx.arc(ex + 2, -p.h + 17, 3.2, 0.15, Math.PI - 0.15);
-          }
-          ctx.stroke();
-        }
+        const cos = isLocal ? localCosmetics : remoteCosmetics;
+        const bodyColor = COSMETIC_COLORS[cos.colorIdx] ? COSMETIC_COLORS[cos.colorIdx].hex : color;
+        drawCosmeticCharacter(ctx, p.w, p.h, p.facing, p.sprinting, bodyColor, cos.shape, cos.acc, jx, jy);
 
         ctx.restore();
 
@@ -3937,6 +4305,101 @@
         updateLeaderboardUI(null);
         if (netConnected) sendGameMsg({ type: 'nick', nick: localNick });
       });
+
+      // =========================================================
+      // WARDROBE (Among Us–style Cosmetics Picker + Live Preview)
+      // =========================================================
+      const wardrobeModal = document.getElementById('wardrobe-modal');
+      const wardrobeGrid = document.getElementById('wardrobe-grid');
+      const wardrobePreview = document.getElementById('wardrobe-preview');
+      const wpCtx = wardrobePreview.getContext('2d');
+      const wardrobeSummary = document.getElementById('wardrobe-summary');
+      let currentWTab = 'colors';
+
+      function saveAndSyncCosmetics() {
+        try { localStorage.setItem('sketch_cosmetics', JSON.stringify(localCosmetics)); } catch (_) {}
+        localIconState = '';
+        updateLeaderboardIcons();
+        const cObj = COSMETIC_COLORS[localCosmetics.colorIdx];
+        const sObj = COSMETIC_SHAPES.find((x) => x.id === localCosmetics.shape) || COSMETIC_SHAPES[0];
+        wardrobeSummary.textContent = cObj.name + ' · ' + sObj.name;
+        if (netConnected) sendGameMsg({ type: 'cosmetics', c: localCosmetics });
+        renderWardrobePreview();
+      }
+
+      function renderWardrobePreview() {
+        wpCtx.clearRect(0, 0, 140, 150);
+        wpCtx.save();
+        wpCtx.translate(70, 122);
+        wpCtx.scale(2.15, 2.15);
+        const col = COSMETIC_COLORS[localCosmetics.colorIdx].hex;
+        drawCosmeticCharacter(wpCtx, 28, 40, 1, false, col, localCosmetics.shape, localCosmetics.acc, 0, 0);
+        wpCtx.restore();
+      }
+
+      function renderWardrobeGrid() {
+        wardrobeGrid.innerHTML = '';
+        wardrobeGrid.className = 'w-grid ' + currentWTab;
+
+        if (currentWTab === 'colors') {
+          COSMETIC_COLORS.forEach((col, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'swatch-btn' + (localCosmetics.colorIdx === idx ? ' selected' : '');
+            btn.style.background = col.hex;
+            btn.title = col.name;
+            btn.addEventListener('click', () => {
+              localCosmetics.colorIdx = idx;
+              playSound('click');
+              saveAndSyncCosmetics();
+              renderWardrobeGrid();
+            });
+            wardrobeGrid.appendChild(btn);
+          });
+        } else if (currentWTab === 'shapes') {
+          COSMETIC_SHAPES.forEach((sh) => {
+            const btn = document.createElement('button');
+            btn.className = 'item-chip' + (localCosmetics.shape === sh.id ? ' selected' : '');
+            btn.innerHTML = '<span class="item-chip-ico">' + sh.ico + '</span><span>' + sh.name + '</span>';
+            btn.addEventListener('click', () => {
+              localCosmetics.shape = sh.id;
+              playSound('click');
+              saveAndSyncCosmetics();
+              renderWardrobeGrid();
+            });
+            wardrobeGrid.appendChild(btn);
+          });
+        } else {
+          COSMETIC_ACCS.forEach((ac) => {
+            const btn = document.createElement('button');
+            btn.className = 'item-chip' + (localCosmetics.acc === ac.id ? ' selected' : '');
+            btn.innerHTML = '<span class="item-chip-ico">' + ac.ico + '</span><span>' + ac.name + '</span>';
+            btn.addEventListener('click', () => {
+              localCosmetics.acc = ac.id;
+              playSound('click');
+              saveAndSyncCosmetics();
+              renderWardrobeGrid();
+            });
+            wardrobeGrid.appendChild(btn);
+          });
+        }
+      }
+
+      document.querySelectorAll('.w-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          currentWTab = tab.dataset.wtab;
+          document.querySelectorAll('.w-tab').forEach((t) => t.classList.toggle('active', t === tab));
+          playSound('paper');
+          renderWardrobeGrid();
+        });
+      });
+
+      document.getElementById('btn-wardrobe').addEventListener('click', () => {
+        wardrobeModal.classList.add('open');
+        renderWardrobeGrid();
+        saveAndSyncCosmetics();
+      });
+      document.getElementById('btn-close-wardrobe').addEventListener('click', () => wardrobeModal.classList.remove('open'));
+      document.getElementById('btn-done-wardrobe').addEventListener('click', () => wardrobeModal.classList.remove('open'));
 
       window.onload = () => {
         resizeCanvas();
