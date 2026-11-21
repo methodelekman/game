@@ -400,6 +400,18 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    #version-tag {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: rgba(22, 22, 26, 0.26);
+      pointer-events: none;
+      z-index: 15;
+    }
+
     /* Touch Controls */
     #touch-controls {
       position: absolute;
@@ -558,6 +570,7 @@
         </div>
       </div>
 
+      <div id="version-tag">v0.1.5</div>
       <div id="toast">Скопійовано</div>
     </div>
   </div>
