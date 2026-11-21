@@ -1195,6 +1195,46 @@
     }
     #touch-edit-bar.visible { display: flex; }
 
+    /* Lobby Pencil Drawing Palette Dock */
+    #lobby-draw-bar {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 23;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: rgba(251, 247, 238, 0.95);
+      border: 2px solid var(--ink);
+      border-radius: 6px 10px 5px 8px;
+      padding: 4px 10px;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.22);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #lobby-draw-bar.visible { display: flex; }
+    .draw-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.1s ease;
+    }
+    .draw-swatch.active {
+      transform: scale(1.22);
+      outline: 2px solid var(--red);
+      outline-offset: 1px;
+    }
+
+    @media (max-width: 1120px) {
+      #lobby-draw-bar {
+        top: 54px;
+      }
+    }
+
     @media (max-width: 768px) {
       #level-scrap {
         top: 8px;
@@ -1270,6 +1310,11 @@
         transform: none;
         z-index: 22;
       }
+      #lobby-draw-bar {
+        top: 44px;
+        padding: 2px 6px;
+        gap: 4px;
+      }
     }
   </style>
 </head>
@@ -1310,6 +1355,16 @@
           <span class="status-dot" id="net-dot"></span>
           <span id="net-label">Соло</span>
         </button>
+      </div>
+
+      <div id="lobby-draw-bar">
+        <button class="sketch-btn" id="btn-draw-toggle" style="font-size:15px; padding:2px 9px;">✏️ Малювати: Вимк</button>
+        <button class="draw-swatch active" data-dcol="#231F20" style="background:#231F20;" title="Чорний"></button>
+        <button class="draw-swatch" data-dcol="#C83E31" style="background:#C83E31;" title="Червоний"></button>
+        <button class="draw-swatch" data-dcol="#2952A3" style="background:#2952A3;" title="Синій"></button>
+        <button class="draw-swatch" data-dcol="#D49B27" style="background:#D49B27;" title="Золотий"></button>
+        <button class="draw-swatch" data-dcol="#2D7A46" style="background:#2D7A46;" title="Зелений"></button>
+        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" title="Очистити малюнки">🧹</button>
       </div>
 
       <div id="touch-edit-bar">
@@ -1386,6 +1441,7 @@
             <button class="sketch-btn ink-red" id="btn-host">Створити (P1)</button>
             <button class="sketch-btn ink-blue" id="btn-join">Приєднатися (P2)</button>
             <button class="sketch-btn" id="btn-solo">Грати соло</button>
+            <button class="sketch-btn" id="btn-solo-lobby" style="flex:1 1 100%; font-size:17px;">✏️ Кімната лобі (малювати й налаштувати)</button>
           </div>
 
           <div class="lobby-status">
@@ -1415,6 +1471,10 @@
             <button class="sketch-btn" id="hp-close-settings">✕</button>
           </div>
           <div class="settings-grid" style="gap:9px; font-size:19px;">
+            <div class="set-row">
+              <span>Режим гри:</span>
+              <button class="sketch-btn ink-red" id="hp-mode-btn" style="padding:2px 12px;">🏁 Гонка (Двері)</button>
+            </div>
             <div class="set-row">
               <span>Раунди:</span>
               <div class="set-controls">
@@ -1509,6 +1569,10 @@
                 <input type="range" id="rng-music-vol" min="0" max="100" value="100" />
                 <span id="val-music-vol" style="min-width:38px;">100%</span>
               </div>
+            </div>
+            <div class="set-row">
+              <span>Привид спідрану (рекорди):</span>
+              <button class="sketch-btn" id="btn-ghost-toggle" style="padding:3px 14px;">Увімкнено</button>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
               <button class="sketch-btn" id="gs-open-map-settings" style="flex:1; font-size:17px;">🗺 Генератор карти / Сід</button>
@@ -1635,6 +1699,17 @@
           </div>
           <div style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.15.0</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Перегортання сторінки:</b> плавна анімація перегортання аркуша зошита з шелестом паперу між раундами.</li>
+                <li><b>Олівцевий Привид + Таймер:</b> живий таймер раунда, рекорди для кожного сіду та прозорий «олівцевий привид» твого найкращого забігу.</li>
+                <li><b>Режим «Тікай від гумки»:</b> гігантський шкільний ластик повзе за вами й буквально стирає платформи позаду.</li>
+                <li><b>Режим «Салочки / Квачик»:</b> окрема арена на 50 сек із батутами, льодом і слаймом (у соло — з розумним Чорнильним Ботом!).</li>
+                <li><b>Кнопки й пунктирні мости:</b> червоні/сині кнопки-перемикачі, що тимчасово домальовують пунктирні мости тушшю.</li>
+                <li><b>Малювання в лобі:</b> спільна палітра олівців у кімнаті лобі — малюй просто на стінах у реальному часі з другом!</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.14.2</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Кайфовий мувмент без стаміни:</b> прибрано обмеження стаміни та червону втому — деш і деш-джамп знову швидкі й вільні, при цьому кожен прийом має свою роль (стрибок — висота, деш-джамп — довгий плоский ривок, підкат — швидкість у тунелях і на льоді).</li>
@@ -1681,7 +1756,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.14.2 · Changelog</button>
+      <button id="version-tag">v0.15.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2015,6 +2090,19 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
           osc.connect(gain); gain.connect(ctx.destination);
           osc.start(now); osc.stop(now + 0.23);
+        } else if (type === 'pageflip') {
+          playNoiseBurst(0.24, 1700, 0.11);
+          playNoiseBurst(0.14, 3100, 0.06);
+        } else if (type === 'switch') {
+          playNoiseBurst(0.04, 1500, 0.08);
+          playPluck(ctx, 340, now, 0.08, 0.1);
+          playPluck(ctx, 540, now + 0.045, 0.13, 0.1);
+        } else if (type === 'tag') {
+          playNoiseBurst(0.08, 1300, 0.13);
+          playPluck(ctx, 587.33, now, 0.14, 0.12);
+          playPluck(ctx, 440.0, now + 0.06, 0.16, 0.1);
+        } else if (type === 'erase') {
+          playNoiseBurst(0.09, 680, 0.05);
         }
       }
 
@@ -2203,6 +2291,12 @@
         return Math.floor(Math.random() * 900000) + 100000;
       }
 
+      const GAME_MODES = [
+        { id: 'race',   label: '🏁 Гонка (Двері)' },
+        { id: 'eraser', label: '🧽 Тікай від гумки' },
+        { id: 'tag',    label: '🏃 Салочки (Квачик)' }
+      ];
+
       const SPAWN_RING_MODES = [
         { radius: 0,    label: 'Вимк (прямий)' },
         { radius: 460,  label: 'Малий (460)' },
@@ -2220,7 +2314,8 @@
         lockSeed: false,
         levelLength: 8,
         levelHeight: 380,
-        spawnRingIdx: 0
+        spawnRingIdx: 0,
+        gameModeIdx: 0
       };
 
       let gamePhase = 'playing'; // 'lobby' | 'playing'
@@ -2352,6 +2447,7 @@
         return {
           id: 'ЛОБІ',
           isLobby: true,
+          isTagArena: false,
           title: '',
           spawn: { x: 200, y: 420 },
           goal: null,
@@ -2365,28 +2461,91 @@
           movers: [],
           hazards: [],
           jumpPads: [],
+          switches: [],
           deathY: 800,
           ringMeta: null
         };
       }
 
-      function makePlatform(x, y, w, h, type = 'solid') {
+      function makePlatform(x, y, w, h, type = 'solid', extra = null) {
         return {
           x, y, w, h, type,
           bState: 'intact',
           bTimer: 0,
           respawnDur: type === 'fragile' ? 2.5 : 3.2,
-          wobble: 0
+          wobble: 0,
+          erased: false,
+          bridgeId: extra && extra.bridgeId != null ? extra.bridgeId : null,
+          bridgeActive: false,
+          bridgeColor: extra && extra.bridgeColor ? extra.bridgeColor : '#C83E31',
+          isGoalPlat: !!(extra && extra.isGoalPlat)
+        };
+      }
+
+      function generateTagArena(seed, roundNum) {
+        const rng = mulberry32(seed);
+        const platforms = [
+          makePlatform(0, 560, 1120, 60, 'solid'),
+          makePlatform(0, 40, 1120, 40, 'solid'),
+          makePlatform(-40, 40, 40, 580, 'solid'),
+          makePlatform(1120, 40, 40, 580, 'solid')
+        ];
+        const jumpPads = [
+          { x: 110, y: 546, w: 44, h: 14, power: 820, squish: 0 },
+          { x: 966, y: 546, w: 44, h: 14, power: 820, squish: 0 }
+        ];
+        const switches = [];
+
+        // Center ice runway or slime runway
+        platforms.push(makePlatform(420, 440, 280, 28, rng() < 0.5 ? 'ice' : 'solid'));
+        // Two purple side trampolines
+        platforms.push(makePlatform(230, 470, 95, 28, 'trampoline'));
+        platforms.push(makePlatform(795, 470, 95, 28, 'trampoline'));
+        // Mid-high breakables & solid platforms
+        platforms.push(makePlatform(95, 330, 165, 26, 'solid'));
+        platforms.push(makePlatform(860, 330, 165, 26, 'solid'));
+        platforms.push(makePlatform(340, 290, 130, 24, 'crumble'));
+        platforms.push(makePlatform(650, 290, 130, 24, 'crumble'));
+        // Slime climb pillars
+        platforms.push(makePlatform(545, 230, 30, 160, 'slime'));
+        // High central trampoline & switch bridge
+        platforms.push(makePlatform(480, 195, 160, 24, 'trampoline'));
+        switches.push({ id: 1, x: 544, y: 428, w: 32, h: 12, color: '#C83E31', active: false, timer: 0, dur: 6.5 });
+        platforms.push(makePlatform(475, 315, 170, 20, 'bridge', { bridgeId: 1, bridgeColor: '#C83E31' }));
+
+        return {
+          id: String(roundNum).padStart(2, '0'),
+          isLobby: false,
+          isTagArena: true,
+          title: 'Раунд #' + roundNum + ' · Салочки (Арена)',
+          spawn: { x: 180, y: 500 },
+          spawn2: { x: 900, y: 500 },
+          goal: null,
+          notes: [{ x: 400, y: 125, text: 'Салочки! Тікай або лови!', sub: 'Хто не «ВОДА» по таймеру — отримує +1 очко' }],
+          platforms,
+          movers: [],
+          hazards: [],
+          jumpPads,
+          switches,
+          deathY: 920,
+          ringMeta: null
         };
       }
 
       function generateRandomLevel(seed, roundNum, opts = roomSettings) {
+        const modeObj = GAME_MODES[opts.gameModeIdx || 0] || GAME_MODES[0];
+        if (modeObj.id === 'tag') {
+          return generateTagArena(seed, roundNum);
+        }
+
         const rng = mulberry32(seed);
         const platforms = [];
         const movers = [];
         const hazards = [];
         const jumpPads = [];
+        const switches = [];
         const notes = [];
+        let nextSwitchId = 1;
 
         const segments = Math.max(4, Math.min(16, opts.levelLength || 8));
         const vertSpan = Math.max(180, Math.min(880, opts.levelHeight || 380));
@@ -2418,7 +2577,7 @@
           platforms.push(makePlatform(sx - 95, sy, 220, 44, 'solid'));
 
           if (roundNum === 1) {
-            notes.push({ x: sx - 85, y: sy - 95, text: 'Кільцевий спавн! Шукай Двері ★', sub: 'Джамп-пади (▲), батути (фіолетові), лід, слайм, ламкі блоки' });
+            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? '🧽 Тікай від гумки до Дверей ★!' : 'Кільцевий спавн! Шукай Двері ★', sub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути' });
           }
 
           // Build reachable intermediate waypoints around/across the ring toward goal
@@ -2463,18 +2622,16 @@
               const pw = isFinalGoal ? 230 : (135 + Math.floor(rng() * 85));
               const px = nx - Math.floor(pw / 2);
               const ph = pType === 'fragile' ? 20 : 34;
-              platforms.push(makePlatform(px, ny, pw, ph, pType));
+              platforms.push(makePlatform(px, ny, pw, ph, pType, isFinalGoal ? { isGoalPlat: true } : null));
 
-              // If the next jump climbs steeply UPWARD, guarantee a Jump Pad or Purple Trampoline on the platform!
               if (stepDy < -90 && !isFinalGoal) {
                 if (pType !== 'trampoline') {
                   jumpPads.push({ x: px + Math.floor(pw * 0.5) - 22, y: ny - 14, w: 44, h: 14, power: 820, squish: 0 });
                 }
-              } else if (!isFinalGoal && pw > 175 && pType === 'solid' && rng() < 0.35) {
+              } else if (!isFinalGoal && pw > 175 && pType === 'solid' && rng() < 0.32) {
                 hazards.push({ x: px + Math.floor(pw * 0.45), y: ny - 14, w: 40, h: 14 });
               }
 
-              // Slime wall-pillar helper on steep climbs
               if (stepDy < -120 && rng() < 0.55) {
                 const wallSide = rng() < 0.5 ? px - 36 : px + pw + 10;
                 platforms.push(makePlatform(wallSide, ny - 105, 26, 110, 'slime'));
@@ -2488,12 +2645,12 @@
             cy = target.y;
           }
         } else {
-          // Classic Left->Right mode with customizable Width (segments), Height (vertSpan), and 5 new block types
+          // Classic Left->Right mode with customizable Width, Height, Switches/Bridges & 5 block types
           const minY = Math.round(480 - vertSpan * 0.72);
           const maxY = Math.round(480 + vertSpan * 0.28);
           platforms.push(makePlatform(0, 480, 280, 140, 'solid'));
           if (roundNum === 1) {
-            notes.push({ x: 55, y: 340, text: 'Хто перший у двері — +1 очко!', sub: 'Вибирай прийом під ситуацію: Деш, Підкат, Батут, Стіна' });
+            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? '🧽 Тікай від гумки до Дверей ★!' : 'Хто перший у двері — +1 очко!', sub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути' });
           }
 
           let curX = 280;
@@ -2502,7 +2659,7 @@
           for (let i = 0; i < segments; i++) {
             const typeRoll = rng();
 
-            if (typeRoll < 0.18) {
+            if (typeRoll < 0.16) {
               // Moving platform + landing pad
               const gap1 = 65 + Math.floor(rng() * 45);
               const mw = 115 + Math.floor(rng() * 35);
@@ -2520,8 +2677,29 @@
               platforms.push(makePlatform(nextX, nextY, nextW, 36, rng() < 0.35 ? 'ice' : 'solid'));
               curX = nextX + nextW;
               curY = nextY;
-            } else if (typeRoll < 0.34) {
-              // Low-ceiling slide/crouch tunnel (rewards slide & mobile auto-crouch!)
+            } else if (typeRoll < 0.32) {
+              // Ink Switch + Dashed Bridge puzzle segment!
+              const gap = 70 + Math.floor(rng() * 40);
+              const px = curX + gap;
+              const py = Math.max(minY + 40, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 60)));
+              const pw = 140;
+              platforms.push(makePlatform(px, py, pw, 36, 'solid'));
+              const swId = nextSwitchId++;
+              const swCol = swId % 2 === 1 ? '#C83E31' : '#2952A3';
+              switches.push({ id: swId, x: px + Math.floor(pw * 0.5) - 16, y: py - 12, w: 32, h: 12, color: swCol, active: false, timer: 0, dur: 6.5 });
+              // Two dashed bridge spans across a wide gap (safe fallback step below if inactive or fast dash across)
+              const b1x = px + pw + 48;
+              const b1w = 115;
+              const b2x = b1x + b1w + 48;
+              const b2w = 115;
+              platforms.push(makePlatform(b1x, py - 8, b1w, 22, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
+              platforms.push(makePlatform(b2x, py - 16, b2w, 22, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
+              const endBx = b2x + b2w + 55;
+              platforms.push(makePlatform(endBx, py, 130, 36, 'solid'));
+              curX = endBx + 130;
+              curY = py;
+            } else if (typeRoll < 0.46) {
+              // Low-ceiling slide/crouch tunnel
               const gap = 75 + Math.floor(rng() * 50);
               const px = curX + gap;
               const py = Math.max(minY + 60, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 70)));
@@ -2532,7 +2710,7 @@
               platforms.push(makePlatform(beamX, py - 80, beamW, 48, 'solid'));
               curX = px + pw;
               curY = py;
-            } else if (typeRoll < 0.50) {
+            } else if (typeRoll < 0.62) {
               // Jump-Pad or Purple Trampoline vertical launch + high ledge!
               const gap = 70 + Math.floor(rng() * 45);
               const px = curX + gap;
@@ -2549,7 +2727,7 @@
               platforms.push(makePlatform(highX, highY, highW, 34, rng() < 0.3 ? 'crumble' : 'solid'));
               curX = highX + highW;
               curY = highY;
-            } else if (typeRoll < 0.68) {
+            } else if (typeRoll < 0.78) {
               // Breakable bridge sequence (crumble + fragile platforms)
               let bx = curX + 75;
               let by = Math.max(minY, Math.min(maxY, curY - 20));
@@ -2563,12 +2741,11 @@
               }
               curX = bx - 50;
               curY = by;
-            } else if (typeRoll < 0.84) {
+            } else if (typeRoll < 0.90) {
               // Ice runway or Slime wall-climb section
               const gap = 80 + Math.floor(rng() * 50);
               const px = curX + gap;
               if (rng() < 0.5) {
-                // Fast Ice Runway + spike hazard in middle
                 const py = Math.max(minY, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 55)));
                 const pw = 250 + Math.floor(rng() * 90);
                 platforms.push(makePlatform(px, py, pw, 36, 'ice'));
@@ -2578,7 +2755,6 @@
                 curX = px + pw;
                 curY = py;
               } else {
-                // Sticky Slime Wall Pillar + upper step
                 const py = Math.max(minY + 60, curY - 15);
                 platforms.push(makePlatform(px, py, 145, 36, 'slime'));
                 const wallX = px + 145 + 75;
@@ -2607,7 +2783,7 @@
           const endGap = 85 + Math.floor(rng() * 45);
           const endX = curX + endGap;
           const endY = Math.max(minY, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 60)));
-          platforms.push(makePlatform(endX, endY, 240, 240, 'solid'));
+          platforms.push(makePlatform(endX, endY, 240, 240, 'solid', { isGoalPlat: true }));
           goalRect = { x: endX + 130, y: endY - 62, w: 40, h: 62 };
         }
 
@@ -2617,6 +2793,8 @@
 
         return {
           id: String(roundNum).padStart(2, '0'),
+          isLobby: false,
+          isTagArena: false,
           title: 'Раунд #' + roundNum + ' · ' + SKETCH_TITLES[seed % SKETCH_TITLES.length],
           spawn: spawnPos,
           goal: goalRect,
@@ -2625,6 +2803,7 @@
           movers,
           hazards,
           jumpPads,
+          switches,
           deathY: maxBot + 290,
           ringMeta
         };
@@ -3353,6 +3532,7 @@
       let zoomSwipeY = null;
       canvas.addEventListener('touchstart', (e) => {
         if (isAnyModalOpen() || touchRepositionMode) return;
+        if (lobbyDrawMode && currentLevel && currentLevel.isLobby) return;
         if (e.touches.length === 2) {
           e.preventDefault();
           zoomPinchDist = Math.hypot(
@@ -3368,6 +3548,7 @@
 
       canvas.addEventListener('touchmove', (e) => {
         if (isAnyModalOpen() || touchRepositionMode) return;
+        if (lobbyDrawMode && currentLevel && currentLevel.isLobby) return;
         if (e.touches.length === 2) {
           e.preventDefault();
           const dist = Math.hypot(
@@ -3394,6 +3575,77 @@
         else if (e.touches.length === 0) zoomSwipeY = null;
       });
       canvas.addEventListener('touchcancel', () => { zoomPinchDist = 0; zoomSwipeY = null; });
+
+      // Shared Lobby Pencil Wall Drawing
+      let lobbyDrawMode = false;
+      let lobbyDrawColor = '#231F20';
+      const lobbyStrokes = [];
+      let activeDrawStroke = null;
+      let soloLobbyActive = false;
+
+      function screenToWorld(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const w = canvas.clientWidth || rect.width || 1;
+        const h = canvas.clientHeight || rect.height || 1;
+        const responsiveScale = w < 820 ? Math.max(0.56, Math.min(0.95, w / 860)) : 1.0;
+        const fz = camZoom * responsiveScale * userZoom;
+        const sx = clientX - rect.left;
+        const sy = clientY - rect.top;
+        return {
+          x: (sx - w * 0.5) / fz + w * 0.5 + cam.x,
+          y: (sy - h * 0.5) / fz + h * 0.5 + cam.y
+        };
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (!lobbyDrawMode || !currentLevel || !currentLevel.isLobby || isAnyModalOpen() || touchRepositionMode) return;
+        e.preventDefault();
+        canvas.setPointerCapture(e.pointerId);
+        const pt = screenToWorld(e.clientX, e.clientY);
+        activeDrawStroke = { color: lobbyDrawColor, pts: [[Math.round(pt.x), Math.round(pt.y)]] };
+        lobbyStrokes.push(activeDrawStroke);
+        if (lobbyStrokes.length > 85) lobbyStrokes.shift();
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!activeDrawStroke) return;
+        const pt = screenToWorld(e.clientX, e.clientY);
+        const last = activeDrawStroke.pts[activeDrawStroke.pts.length - 1];
+        if (Math.hypot(pt.x - last[0], pt.y - last[1]) >= 4 && activeDrawStroke.pts.length < 180) {
+          activeDrawStroke.pts.push([Math.round(pt.x), Math.round(pt.y)]);
+        }
+      });
+
+      const finishDrawStroke = () => {
+        if (!activeDrawStroke) return;
+        const st = activeDrawStroke;
+        activeDrawStroke = null;
+        if (netConnected && st.pts.length >= 1) {
+          sendGameMsg({ type: 'draw_stroke', stroke: st });
+        }
+      };
+      canvas.addEventListener('pointerup', finishDrawStroke);
+      canvas.addEventListener('pointercancel', finishDrawStroke);
+
+      const btnDrawToggle = document.getElementById('btn-draw-toggle');
+      btnDrawToggle.addEventListener('click', () => {
+        lobbyDrawMode = !lobbyDrawMode;
+        btnDrawToggle.textContent = lobbyDrawMode ? '✏️ Малювати: Увімк' : '✏️ Малювати: Вимк';
+        btnDrawToggle.classList.toggle('ink-blue', lobbyDrawMode);
+        canvas.style.cursor = lobbyDrawMode ? 'crosshair' : '';
+      });
+      document.querySelectorAll('.draw-swatch').forEach((sw) => {
+        sw.addEventListener('click', () => {
+          lobbyDrawColor = sw.dataset.dcol;
+          document.querySelectorAll('.draw-swatch').forEach((s) => s.classList.toggle('active', s === sw));
+          if (!lobbyDrawMode) btnDrawToggle.click();
+        });
+      });
+      document.getElementById('btn-draw-clear').addEventListener('click', () => {
+        lobbyStrokes.length = 0;
+        playSound('paper');
+        if (netConnected) sendGameMsg({ type: 'draw_clear' });
+      });
 
       window.addEventListener('blur', () => {
         keys.left = keys.right = keys.up = keys.down = keys.sprint = false;
@@ -3461,16 +3713,30 @@
         });
       }
 
+      let ghostEnabled = true;
+      try {
+        const sg = localStorage.getItem('sketch_ghost_en');
+        if (sg === '0') ghostEnabled = false;
+      } catch (_) {}
+
       function syncAudioUI() {
         const btnMute = document.getElementById('btn-mute');
         const btnMus = document.getElementById('btn-music-toggle');
+        const btnGh = document.getElementById('btn-ghost-toggle');
         if (btnMute) btnMute.textContent = muted ? 'Вимкнено' : 'Увімкнено';
         if (btnMus) btnMus.textContent = musicEnabled ? 'Увімкнено' : 'Вимкнено';
+        if (btnGh) btnGh.textContent = ghostEnabled ? 'Увімкнено' : 'Вимкнено';
         document.getElementById('rng-sfx-vol').value = String(Math.round(sfxVolume * 100));
         document.getElementById('val-sfx-vol').textContent = Math.round(sfxVolume * 100) + '%';
         document.getElementById('rng-music-vol').value = String(Math.round(musicVolume * 100));
         document.getElementById('val-music-vol').textContent = Math.round(musicVolume * 100) + '%';
       }
+
+      document.getElementById('btn-ghost-toggle').addEventListener('click', () => {
+        ghostEnabled = !ghostEnabled;
+        try { localStorage.setItem('sketch_ghost_en', ghostEnabled ? '1' : '0'); } catch (_) {}
+        syncAudioUI();
+      });
 
       document.getElementById('btn-game-settings').addEventListener('click', (e) => {
         e.currentTarget.blur();
@@ -3742,6 +4008,8 @@
           spawnPackParticles(rpPack, x, y, 5, 110, rpPack === 'ink' ? '#6A635A' : null);
         } else if (ev === 'die') {
           spawnPackParticles(rpPack, x, y, 14, 240, rpPack === 'ink' ? '#C83E31' : null);
+        } else if (ev === 'sw') {
+          activateSwitch(extra, false);
         } else if (ev === 'taunt') {
           const t = TAUNTS[extra] || TAUNTS[0];
           if (t) triggerTauntOnPlayer(rp, t.id);
@@ -3898,6 +4166,17 @@
         } else if (data.type === 'chat' && data.text) {
           playSound('paper');
           appendChatMessage(String(data.nick || remoteNick).slice(0, 12), String(data.text).slice(0, 90), '#2952A3');
+        } else if (data.type === 'draw_stroke' && data.stroke && Array.isArray(data.stroke.pts)) {
+          lobbyStrokes.push(data.stroke);
+          if (lobbyStrokes.length > 85) lobbyStrokes.shift();
+        } else if (data.type === 'draw_clear') {
+          lobbyStrokes.length = 0;
+        } else if (data.type === 'tag_sync') {
+          if (data.itWho) tagState.itWho = (data.itWho === 'local' ? 'remote' : 'local');
+          if (typeof data.timeLeft === 'number') tagState.timeLeft = data.timeLeft;
+          tagState.cooldown = 1.25;
+          playSound('tag');
+          screenShake = 6;
         } else if (data.type === 'lobby_settings' && data.settings) {
           Object.assign(roomSettings, data.settings);
           syncHostPanelUI();
@@ -4077,10 +4356,20 @@
         ensureAudio();
         cleanupNet();
         netMode = 'solo';
+        soloLobbyActive = false;
         gamePhase = 'playing';
         syncHostPanelUI();
         updateNetUI('Соло', '');
         if (currentLevel && currentLevel.isLobby) loadRound(resolveNextSeed(), 1, false);
+        lobbyModal.classList.add('hidden');
+      });
+      document.getElementById('btn-solo-lobby').addEventListener('click', () => {
+        ensureAudio();
+        cleanupNet();
+        netMode = 'solo';
+        soloLobbyActive = true;
+        updateNetUI('Лобі (Соло)', '');
+        enterLobbyRoom(false);
         lobbyModal.classList.add('hidden');
       });
       document.getElementById('btn-close-lobby').addEventListener('click', () => {
@@ -4213,27 +4502,173 @@
         }
       }
 
+      // Page-Flip Transition, Speedrun Ghost + Timer, Eraser Chase & Tag Arena State
+      let pageFlipTimer = 0;
+      const PAGE_FLIP_DUR = 0.44;
+      let roundElapsed = 0;
+      let ghostRecording = [];
+      let ghostRecAccum = 0;
+      let activeGhostData = null;
+
+      const eraserState = { active: false, x: -240, y: 0, w: 96, h: 420, dir: 'right', rubTimer: 0 };
+      const tagState = { active: false, timeLeft: 50, itWho: 'local', cooldown: 0, bot: null, botJumpCd: 0, botDashCd: 0 };
+
+      function triggerPageFlip() {
+        pageFlipTimer = PAGE_FLIP_DUR;
+        playSound('pageflip');
+      }
+
+      function formatTimer(sec) {
+        const s = Math.max(0, sec);
+        const mins = Math.floor(s / 60);
+        const rem = (s % 60).toFixed(1).padStart(4, '0');
+        return (mins > 0 ? String(mins).padStart(2, '0') + ':' : '') + rem + 'с';
+      }
+
+      function getLevelGhostKey() {
+        return `${currentSeed}_${roomSettings.levelLength}_${roomSettings.levelHeight}_${roomSettings.spawnRingIdx}_${roomSettings.gameModeIdx}`;
+      }
+
+      function loadBestGhostForLevel() {
+        try {
+          const all = JSON.parse(localStorage.getItem('sketch_ghosts_v1') || '{}');
+          activeGhostData = all[getLevelGhostKey()] || null;
+        } catch (_) {
+          activeGhostData = null;
+        }
+      }
+
+      function saveBestGhostForLevel(timeSec, frames) {
+        if (!frames || frames.length < 2) return;
+        try {
+          const all = JSON.parse(localStorage.getItem('sketch_ghosts_v1') || '{}');
+          const key = getLevelGhostKey();
+          all[key] = { bestTime: Number(timeSec.toFixed(3)), frames };
+          const keysList = Object.keys(all);
+          if (keysList.length > 25) delete all[keysList[0]];
+          localStorage.setItem('sketch_ghosts_v1', JSON.stringify(all));
+          activeGhostData = all[key];
+        } catch (_) {}
+      }
+
+      function activateSwitch(switchId, broadcast = true) {
+        if (!currentLevel || !currentLevel.switches) return;
+        const sw = currentLevel.switches.find((x) => x.id === switchId);
+        if (!sw) return;
+        sw.active = true;
+        sw.timer = sw.dur || 6.5;
+        for (const pl of currentLevel.platforms) {
+          if (pl.bridgeId === switchId) pl.bridgeActive = true;
+        }
+        playSound('switch');
+        spawnPackParticles(localCosmetics.particlePack, sw.x + sw.w / 2, sw.y, 8, 150, sw.color);
+        if (broadcast && netConnected) {
+          sendVfxEvent('sw', sw.x, sw.y, switchId);
+        }
+      }
+
+      function initEraserForLevel() {
+        const lvl = currentLevel;
+        const modeObj = GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0];
+        if (!lvl || lvl.isLobby || lvl.isTagArena || modeObj.id !== 'eraser') {
+          eraserState.active = false;
+          return;
+        }
+        eraserState.active = true;
+        eraserState.rubTimer = 0;
+        const sp = lvl.spawn || { x: 80, y: 420 };
+        const gl = lvl.goal || { x: sp.x + 1000, y: sp.y };
+        if (gl.y < sp.y - 180) {
+          eraserState.dir = 'up';
+          eraserState.x = sp.x - 1200;
+          eraserState.y = sp.y + 240;
+          eraserState.w = 3400;
+          eraserState.h = 110;
+        } else if (gl.x < sp.x - 140) {
+          eraserState.dir = 'left';
+          eraserState.x = sp.x + 280;
+          eraserState.y = -600;
+          eraserState.w = 104;
+          eraserState.h = 1800;
+        } else {
+          eraserState.dir = 'right';
+          eraserState.x = sp.x - 270;
+          eraserState.y = -600;
+          eraserState.w = 104;
+          eraserState.h = 1800;
+        }
+      }
+
       function updateLevelScrap() {
-        document.getElementById('level-scrap').textContent = 'Раунд #' + roundNumber + ' · ✕' + deaths;
+        if (currentLevel && currentLevel.isLobby) {
+          document.getElementById('level-scrap').textContent = podiumActive ? 'Пʼєдестал переможців!' : 'Лобі кімнати';
+          return;
+        }
+        if (tagState.active) {
+          const whoTxt = tagState.itWho === 'local' ? 'ТИ ВОДА!' : 'ТІКАЙ!';
+          document.getElementById('level-scrap').textContent = '🏃 Салочки · ' + Math.ceil(Math.max(0, tagState.timeLeft)) + 'с · ' + whoTxt;
+          return;
+        }
+        const bestStr = (activeGhostData && activeGhostData.bestTime) ? (' · ★ ' + formatTimer(activeGhostData.bestTime)) : '';
+        document.getElementById('level-scrap').textContent = 'Раунд #' + roundNumber + ' · ' + formatTimer(roundElapsed) + bestStr;
       }
 
       function loadRound(seed, rNum, broadcast = false) {
+        if (worldTime > 0.4) triggerPageFlip();
+        if (soloLobbyActive || (netMode === 'solo' && gamePhase === 'lobby')) {
+          gamePhase = 'playing';
+          soloLobbyActive = false;
+          updateNetUI('Соло', '');
+        }
+        lobbyDrawMode = false;
+        btnDrawToggle.textContent = '✏️ Малювати: Вимк';
+        btnDrawToggle.classList.remove('ink-blue');
+        canvas.style.cursor = '';
         currentSeed = seed;
         roundNumber = rNum;
         currentLevel = generateRandomLevel(seed, rNum, roomSettings);
         doorLock = false;
-        updateLevelScrap();
+
+        if (currentLevel.isTagArena) {
+          tagState.active = true;
+          tagState.timeLeft = 50;
+          tagState.itWho = (rNum % 2 === 1) ? 'remote' : 'local';
+          tagState.cooldown = 1.2;
+          tagState.botJumpCd = 0;
+          tagState.botDashCd = 0;
+          if (!netConnected) {
+            tagState.bot = createPlayer(true);
+            const sp2 = currentLevel.spawn2 || { x: 900, y: 480 };
+            tagState.bot.x = sp2.x;
+            tagState.bot.y = sp2.y;
+          } else {
+            tagState.bot = null;
+          }
+        } else {
+          tagState.active = false;
+          tagState.bot = null;
+        }
+
         resetPlayerToSpawn(false);
         const sp = currentLevel.spawn;
-        // Spawn stacked vertically (slightly higher) so players NEVER overlap inside each other!
         const localIsTop = netConnected && netMode !== 'host';
-        localPlayer.x = sp.x;
-        localPlayer.y = localIsTop ? (sp.y - 68) : (sp.y - 20);
-        remotePlayer.x = sp.x;
-        remotePlayer.y = localIsTop ? (sp.y - 20) : (sp.y - 68);
+        if (currentLevel.isTagArena && currentLevel.spawn2 && netConnected && netMode !== 'host') {
+          localPlayer.x = currentLevel.spawn2.x;
+          localPlayer.y = currentLevel.spawn2.y;
+          remotePlayer.x = sp.x;
+          remotePlayer.y = sp.y;
+        } else {
+          localPlayer.x = sp.x;
+          localPlayer.y = localIsTop ? (sp.y - 68) : (sp.y - 20);
+          remotePlayer.x = (currentLevel.isTagArena && currentLevel.spawn2) ? currentLevel.spawn2.x : sp.x;
+          remotePlayer.y = (currentLevel.isTagArena && currentLevel.spawn2) ? currentLevel.spawn2.y : (localIsTop ? (sp.y - 20) : (sp.y - 68));
+        }
         remotePlayer.tx = remotePlayer.x;
         remotePlayer.ty = remotePlayer.y;
         remoteSnapshots.length = 0;
+        syncHostPanelUI();
+        updateLevelScrap();
+
         if (broadcast && netConnected) {
           sendGameMsg({
             type: 'next_round',
@@ -4248,8 +4683,10 @@
       function syncHostPanelUI() {
         const hp = document.getElementById('host-panel');
         const canCancel = gamePhase === 'launching' && launchTimer > 0.65;
-        const showHost = (gamePhase === 'lobby' || canCancel) && netMode === 'host';
+        const showHost = (gamePhase === 'lobby' || canCancel) && (netMode === 'host' || soloLobbyActive);
         hp.classList.toggle('visible', showHost);
+        const drawBar = document.getElementById('lobby-draw-bar');
+        if (drawBar) drawBar.classList.toggle('visible', !!(currentLevel && currentLevel.isLobby && gamePhase === 'lobby'));
         const startBtn = document.getElementById('hp-start-btn');
         const topRow = document.getElementById('hp-top-row');
         if (gamePhase === 'launching') {
@@ -4261,6 +4698,9 @@
           startBtn.classList.remove('cancelling');
           topRow.style.display = '';
         }
+        const modeObj = GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0];
+        const modeBtn = document.getElementById('hp-mode-btn');
+        if (modeBtn) modeBtn.textContent = modeObj.label;
         document.getElementById('hp-rounds-val').textContent = roomSettings.infinite ? '∞' : String(roomSettings.rounds);
         document.getElementById('hp-rounds-inf').checked = !!roomSettings.infinite;
         document.getElementById('hp-speed-btn').textContent = SPEED_MODES[roomSettings.speedIdx].label;
@@ -4293,12 +4733,15 @@
 
       function enterLobbyRoom(broadcast = false, withPodium = false) {
         gamePhase = 'lobby';
+        tagState.active = false;
+        tagState.bot = null;
+        eraserState.active = false;
         currentLevel = generateLobbyLevel();
         doorLock = false;
         podiumActive = withPodium;
         podiumTimer = withPodium ? 4.8 : 0;
 
-        document.getElementById('level-scrap').textContent = withPodium ? 'Пʼєдестал переможців!' : 'Лобі кімнати';
+        updateLevelScrap();
         resetPlayerToSpawn(false);
 
         if (withPodium) {
@@ -4355,6 +4798,10 @@
         }
       }
 
+      document.getElementById('hp-mode-btn').addEventListener('click', () => {
+        roomSettings.gameModeIdx = (roomSettings.gameModeIdx + 1) % GAME_MODES.length;
+        broadcastLobbySettings();
+      });
       document.getElementById('hp-rounds-minus').addEventListener('click', () => {
         roomSettings.infinite = false;
         roomSettings.rounds = Math.max(1, roomSettings.rounds - 1);
@@ -4421,6 +4868,7 @@
           showToast('Налаштування збережено — тисни СТАРТ!');
           return;
         }
+        settingsModal.classList.remove('open');
         const s = resolveNextSeed();
         loadRound(s, roundNumber, netConnected && netMode === 'host');
         showToast('Рівень перегенеровано (сід: ' + s + ')');
@@ -4544,16 +4992,28 @@
         const p = localPlayer;
         if (countDeath) {
           deaths++;
-          updateLevelScrap();
           screenShake = 8;
           playSound('die');
           spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 14, 240);
           sendVfxEvent('die', p.x + p.w / 2, p.y + p.h / 2);
         }
+        roundElapsed = 0;
+        ghostRecording = [];
+        ghostRecAccum = 0;
+        loadBestGhostForLevel();
+        initEraserForLevel();
         if (currentLevel && currentLevel.platforms) {
           for (const pl of currentLevel.platforms) {
             if (pl.bState) { pl.bState = 'intact'; pl.bTimer = 0; }
             if (pl.wobble) pl.wobble = 0;
+            pl.erased = false;
+            if (pl.bridgeId != null) pl.bridgeActive = false;
+          }
+        }
+        if (currentLevel && currentLevel.switches) {
+          for (const sw of currentLevel.switches) {
+            sw.active = false;
+            sw.timer = 0;
           }
         }
         if (currentLevel && currentLevel.jumpPads) {
@@ -4575,6 +5035,7 @@
         p.rot = 0;
         p.scaleX = 1.2;
         p.scaleY = 0.8;
+        updateLevelScrap();
       }
 
       function updateMovers(t, dt) {
@@ -4594,11 +5055,116 @@
         return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
       }
 
+      function updateTagBot(dt, allSolids, lvl) {
+        const bot = tagState.bot;
+        if (!bot) return;
+        const botIsIt = tagState.itWho === 'remote';
+        const dxToPlayer = localPlayer.x - bot.x;
+        let wantDir = botIsIt ? Math.sign(dxToPlayer) : -Math.sign(dxToPlayer);
+        if (wantDir === 0) wantDir = bot.facing || 1;
+        if (!botIsIt && (bot.x < 90 || bot.x > 1000)) {
+          wantDir = bot.x < 90 ? 1 : -1;
+        }
+        bot.facing = wantDir;
+        bot.sprinting = true;
+        const targetVx = wantDir * (botIsIt ? 365 : 345);
+        bot.vx += (targetVx - bot.vx) * Math.min(1, 9 * dt);
+
+        tagState.botJumpCd = Math.max(0, tagState.botJumpCd - dt);
+        tagState.botDashCd = Math.max(0, tagState.botDashCd - dt);
+        const wantHigh = botIsIt ? (localPlayer.y < bot.y - 36) : (bot.y > 460 || Math.random() < 0.02);
+        if (bot.grounded && tagState.botJumpCd <= 0 && (wantHigh || Math.abs(bot.vx) < 40)) {
+          bot.vy = -CFG.jumpVel;
+          bot.grounded = false;
+          tagState.botJumpCd = 0.48 + Math.random() * 0.35;
+        }
+        if (botIsIt && tagState.botDashCd <= 0 && Math.abs(dxToPlayer) > 160 && Math.abs(dxToPlayer) < 320 && Math.abs(localPlayer.y - bot.y) < 70) {
+          bot.vx = wantDir * 560;
+          bot.rollTimer = 0.18;
+          tagState.botDashCd = 2.4;
+        }
+        if (bot.rollTimer > 0) {
+          bot.rollTimer -= dt;
+          bot.rot += bot.facing * 18 * dt;
+        } else {
+          bot.rot = 0;
+        }
+        bot.vy = Math.min(CFG.maxFallSpeed, bot.vy + CFG.gravity * dt);
+        bot.x += bot.vx * dt;
+        for (const s of allSolids) {
+          if (rectsOverlap(bot, s)) {
+            if (bot.vx > 0) bot.x = s.x - bot.w;
+            else if (bot.vx < 0) bot.x = s.x + s.w;
+            bot.vx = -bot.vx * 0.5;
+            if (bot.grounded && tagState.botJumpCd <= 0) {
+              bot.vy = -CFG.jumpVel;
+              bot.grounded = false;
+              tagState.botJumpCd = 0.45;
+            }
+          }
+        }
+        bot.grounded = false;
+        bot.y += bot.vy * dt;
+        for (const s of allSolids) {
+          if (rectsOverlap(bot, s)) {
+            if (bot.vy >= 0) {
+              bot.y = s.y - bot.h;
+              if (s.type === 'trampoline') { bot.vy = -760; bot.grounded = false; }
+              else { bot.vy = 0; bot.grounded = true; }
+            } else {
+              bot.y = s.y + s.h;
+              bot.vy = 0;
+            }
+          }
+        }
+        if (lvl.jumpPads) {
+          for (const jp of lvl.jumpPads) {
+            if (rectsOverlap(bot, jp)) {
+              bot.y = jp.y - bot.h;
+              bot.vy = -(jp.power || 820);
+              jp.squish = 1.0;
+            }
+          }
+        }
+        bot.scaleX += (1 - bot.scaleX) * Math.min(1, 14 * dt);
+        bot.scaleY += (1 - bot.scaleY) * Math.min(1, 14 * dt);
+      }
+
       function updatePhysics(dt) {
         const p = localPlayer;
         const lvl = currentLevel;
         updateMovers(worldTime, dt);
         const movers = activeMovers;
+
+        // Round timer & Speedrun Ghost recording (Race / Eraser modes)
+        if (gamePhase === 'playing' && !lvl.isLobby && !lvl.isTagArena) {
+          roundElapsed += dt;
+          ghostRecAccum += dt;
+          if (ghostRecAccum >= 0.05 && ghostRecording.length < 1200) {
+            ghostRecAccum -= 0.05;
+            ghostRecording.push([Number(roundElapsed.toFixed(2)), Math.round(p.x), Math.round(p.y), p.facing, Math.round(p.h)]);
+          }
+          updateLevelScrap();
+        }
+
+        // Ink Switches & Dashed Bridges timers
+        if (lvl.switches) {
+          for (const sw of lvl.switches) {
+            if (sw.active) {
+              sw.timer -= dt;
+              if (sw.timer <= 0) {
+                sw.active = false;
+                sw.timer = 0;
+                for (const pl of lvl.platforms) {
+                  if (pl.bridgeId === sw.id) pl.bridgeActive = false;
+                }
+              }
+            }
+            if (rectsOverlap(p, sw) && (!sw.active || sw.timer < sw.dur - 0.6)) {
+              activateSwitch(sw.id, true);
+            }
+          }
+        }
 
         // Update breakable platform timers, trampoline wobble, and jump pad squish
         for (const pl of lvl.platforms) {
@@ -4628,7 +5194,9 @@
           }
         }
 
-        const solidPlatforms = lvl.platforms.filter((s) => s.bState !== 'broken');
+        const solidPlatforms = lvl.platforms.filter((s) =>
+          s.bState !== 'broken' && !s.erased && (s.type !== 'bridge' || s.bridgeActive)
+        );
         const allSolids = solidPlatforms.concat(movers).concat(lvl.isLobby && podiumActive ? PODIUM_SLOTS : []);
 
         if (p.ridingMoverIdx >= 0 && movers[p.ridingMoverIdx]) {
@@ -5066,11 +5634,87 @@
           }
         }
 
+        // Eraser Chase Mode: giant school eraser sweeps & erases platforms behind!
+        if (eraserState.active && gamePhase === 'playing') {
+          if (eraserState.dir === 'right') {
+            const distBehind = p.x - (eraserState.x + eraserState.w);
+            const spd = distBehind > 440 ? 215 : 132;
+            eraserState.x += spd * dt;
+          } else if (eraserState.dir === 'left') {
+            const distBehind = eraserState.x - (p.x + p.w);
+            const spd = distBehind > 440 ? 215 : 132;
+            eraserState.x -= spd * dt;
+          } else {
+            const distBelow = eraserState.y - (p.y + p.h);
+            const spd = distBelow > 340 ? 140 : 82;
+            eraserState.y -= spd * dt;
+          }
+          eraserState.rubTimer += dt;
+          if (eraserState.rubTimer >= 0.42) {
+            eraserState.rubTimer = 0;
+            if (Math.random() < 0.65) playSound('erase');
+          }
+          for (const pl of lvl.platforms) {
+            if (pl.erased || pl.isGoalPlat) continue;
+            if (rectsOverlap(eraserState, pl)) {
+              pl.erased = true;
+              spawnPackParticles('ink', pl.x + pl.w / 2, pl.y + pl.h / 2, 7, 130, Math.random() < 0.5 ? '#E89298' : '#8FB3E8');
+            }
+          }
+          if (rectsOverlap(p, eraserState)) {
+            showToast('🧽 Гумка стерла тебе!');
+            resetPlayerToSpawn(true);
+            return;
+          }
+        }
+
+        // Tag / Квачик Mode (Co-op or Solo Ink Bot)
+        if (tagState.active && gamePhase === 'playing') {
+          if (!netConnected && tagState.bot) updateTagBot(dt, allSolids, lvl);
+          tagState.timeLeft -= dt;
+          tagState.cooldown = Math.max(0, tagState.cooldown - dt);
+          updateLevelScrap();
+
+          const opp = netConnected ? remotePlayer : tagState.bot;
+          if (opp && tagState.cooldown <= 0 && rectsOverlap(p, opp)) {
+            if (!netConnected || netMode === 'host') {
+              tagState.itWho = (tagState.itWho === 'local') ? 'remote' : 'local';
+              tagState.cooldown = 1.35;
+              playSound('tag');
+              screenShake = 7;
+              spawnShockwave(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 54);
+              spawnPackParticles('ink', p.x + p.w / 2, p.y + p.h / 2, 16, 220, '#C83E31');
+              showToast(tagState.itWho === 'local' ? '🔴 Ти тепер ВОДА!' : '💨 Ти передав квача!');
+              if (netConnected) sendGameMsg({ type: 'tag_sync', itWho: tagState.itWho, timeLeft: tagState.timeLeft });
+            }
+          }
+
+          if (!doorLock && tagState.timeLeft <= 0) {
+            doorLock = true;
+            const localWon = tagState.itWho !== 'local';
+            if (localWon) localScore++; else remoteScore++;
+            playSound('win');
+            updateLeaderboardUI(localWon ? 'local' : 'remote');
+            showToast(localWon ? '🏆 Ти переміг у Салочках!' : ('Переміг ' + (netConnected ? remoteNick : 'Чорнильний Бот') + '!'));
+            if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
+              lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
+              enterLobbyRoom(true, true);
+            } else {
+              loadRound(resolveNextSeed(), roundNumber + 1, netConnected && netMode === 'host');
+            }
+            return;
+          }
+        }
+
         if (!doorLock && lvl.goal && rectsOverlap(p, lvl.goal)) {
           doorLock = true;
           localScore++;
           playSound('win');
           spawnPackParticles(localCosmetics.particlePack, lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, 24, 260);
+          if (!activeGhostData || roundElapsed < activeGhostData.bestTime) {
+            saveBestGhostForLevel(roundElapsed, ghostRecording);
+            showToast('🏆 Новий рекорд: ' + formatTimer(roundElapsed) + '!');
+          }
           updateLeaderboardUI('local');
 
           if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
@@ -5860,8 +6504,29 @@
         const solids = lvl.platforms.concat(activeMovers);
         for (let i = 0; i < solids.length; i++) {
           const s = solids[i];
+          if (s.erased) continue;
           if (s.x + s.w < visLeft || s.x > visRight) continue;
           const t = s.type || 'solid';
+
+          if (t === 'bridge') {
+            if (!s.bridgeActive) {
+              ctx.save();
+              ctx.setLineDash([7, 6]);
+              ctx.strokeStyle = s.bridgeColor || '#C83E31';
+              ctx.globalAlpha = 0.55;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(s.x, s.y, s.w, s.h);
+              ctx.restore();
+            } else {
+              const sw = lvl.switches && lvl.switches.find((x) => x.id === s.bridgeId);
+              const blink = sw && sw.timer < 1.5 && Math.floor(worldTime * 10) % 2 === 0;
+              ctx.save();
+              if (blink) ctx.globalAlpha = 0.55;
+              drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, s.bridgeColor || '#C83E31', false);
+              ctx.restore();
+            }
+            continue;
+          }
 
           if (s.bState === 'broken') {
             ctx.save();
@@ -5932,9 +6597,9 @@
           }
         }
 
-        // 3a. Jump Pads (Spring Plates)
+        // 3a. Jump Pads (Spring Plates) & Ink Switches
         if (lvl.jumpPads) {
-          lvl.jumpPads.forEach((jp, idx) => {
+          lvl.jumpPads.forEach((jp) => {
             if (jp.x + jp.w < visLeft || jp.x > visRight) return;
             const sq = jp.squish || 0;
             const lift = Math.sin(sq * Math.PI * 3) * sq * 6;
@@ -5954,6 +6619,51 @@
             ctx.stroke();
             ctx.restore();
           });
+        }
+
+        if (lvl.switches) {
+          lvl.switches.forEach((sw) => {
+            if (sw.x + sw.w < visLeft || sw.x > visRight) return;
+            const press = sw.active ? 5 : 0;
+            ctx.save();
+            ctx.fillStyle = sw.color;
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(sw.x + 4, sw.y + press, sw.w - 8, 9 - press * 0.6, 4) : ctx.rect(sw.x + 4, sw.y + press, sw.w - 8, 9 - press * 0.6);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#231F20';
+            ctx.fillRect(sw.x, sw.y + sw.h - 4, sw.w, 4);
+            if (sw.active) {
+              const frac = Math.max(0, sw.timer / (sw.dur || 6.5));
+              ctx.strokeStyle = sw.color;
+              ctx.lineWidth = 2.4;
+              ctx.beginPath();
+              ctx.arc(sw.x + sw.w / 2, sw.y - 10, 6, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
+              ctx.stroke();
+            }
+            ctx.restore();
+          });
+        }
+
+        // 3b. Shared Lobby Wall Pencil Drawings
+        if (lvl.isLobby && lobbyStrokes.length > 0) {
+          ctx.save();
+          ctx.lineWidth = 3.2;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          for (const st of lobbyStrokes) {
+            if (!st.pts || st.pts.length === 0) continue;
+            ctx.strokeStyle = st.color || '#231F20';
+            ctx.beginPath();
+            ctx.moveTo(st.pts[0][0], st.pts[0][1]);
+            for (let pi = 1; pi < st.pts.length; pi++) {
+              ctx.lineTo(st.pts[pi][0], st.pts[pi][1]);
+            }
+            if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] + 0.5, st.pts[0][1] + 0.5);
+            ctx.stroke();
+          }
+          ctx.restore();
         }
 
         // 3b. Winners Podium Pedestals & Medals in Lobby!
@@ -6015,24 +6725,26 @@
           ctx.beginPath(); ctx.moveTo(bx + 20, 136); ctx.lineTo(bx + bw - 20, 136); ctx.stroke();
 
           ctx.textAlign = 'left';
-          ctx.font = '700 19px "Caveat", cursive';
+          ctx.font = '700 18px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
-          ctx.fillText('Раунди:', bx + 20, 166);
-          ctx.fillText('Швидкість:', bx + 20, 196);
-          ctx.fillText('Гравітація:', bx + 20, 226);
-          ctx.fillText('Сід / Розмір:', bx + 20, 256);
-          ctx.fillText('Спавн-кільце:', bx + 20, 286);
+          ctx.fillText('Режим:', bx + 20, 160);
+          ctx.fillText('Раунди:', bx + 20, 186);
+          ctx.fillText('Швидкість:', bx + 20, 212);
+          ctx.fillText('Гравітація:', bx + 20, 238);
+          ctx.fillText('Сід / Розмір:', bx + 20, 264);
+          ctx.fillText('Спавн-кільце:', bx + 20, 290);
           ctx.fillText('Колізія:', bx + 20, 316);
 
           ctx.textAlign = 'right';
           ctx.fillStyle = '#C83E31';
-          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' р.'), bx + bw - 20, 166);
+          ctx.fillText((GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0]).label, bx + bw - 20, 160);
+          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' р.'), bx + bw - 20, 186);
           ctx.fillStyle = '#2952A3';
-          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', bx + bw - 20, 196);
-          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', bx + bw - 20, 226);
+          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', bx + bw - 20, 212);
+          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', bx + bw - 20, 238);
           const seedTxt = roomSettings.lockSeed && roomSettings.seedInput ? roomSettings.seedInput : 'Рандом';
-          ctx.fillText(seedTxt + ' · ' + roomSettings.levelLength + '×' + roomSettings.levelHeight, bx + bw - 20, 256);
-          ctx.fillText((SPAWN_RING_MODES[roomSettings.spawnRingIdx] || SPAWN_RING_MODES[0]).label, bx + bw - 20, 286);
+          ctx.fillText(seedTxt + ' · ' + roomSettings.levelLength + '×' + roomSettings.levelHeight, bx + bw - 20, 264);
+          ctx.fillText((SPAWN_RING_MODES[roomSettings.spawnRingIdx] || SPAWN_RING_MODES[0]).label, bx + bw - 20, 290);
           ctx.fillStyle = roomSettings.playerCollision ? '#2D7A46' : '#6A635A';
           ctx.fillText(roomSettings.playerCollision ? 'Увімкнено' : 'Вимкнено', bx + bw - 20, 316);
 
@@ -6114,11 +6826,88 @@
           }
         }
 
-        // 6. Players
+        // 5b. Speedrun Pencil Ghost Playback
+        if (ghostEnabled && activeGhostData && activeGhostData.frames && activeGhostData.frames.length >= 2 && !lvl.isLobby && !lvl.isTagArena) {
+          const frs = activeGhostData.frames;
+          let gx = frs[frs.length - 1][1], gy = frs[frs.length - 1][2], gf = frs[frs.length - 1][3], gh = frs[frs.length - 1][4];
+          for (let i = 0; i < frs.length - 1; i++) {
+            if (roundElapsed <= frs[i + 1][0]) {
+              const span = Math.max(0.001, frs[i + 1][0] - frs[i][0]);
+              const alpha = Math.max(0, Math.min(1, (roundElapsed - frs[i][0]) / span));
+              gx = frs[i][1] + (frs[i + 1][1] - frs[i][1]) * alpha;
+              gy = frs[i][2] + (frs[i + 1][2] - frs[i][2]) * alpha;
+              gf = frs[i + 1][3];
+              gh = frs[i][4] + (frs[i + 1][4] - frs[i][4]) * alpha;
+              break;
+            }
+          }
+          ctx.save();
+          ctx.globalAlpha = 0.36;
+          ctx.translate(gx + 14, gy + gh);
+          drawCosmeticCharacter(ctx, 28, gh, gf, false, '#E5DAC6', localCosmetics.shape, localCosmetics.face, 'none', 'none', 0, 0, { lookX: gf, lookY: 0 });
+          ctx.fillStyle = '#6A635A';
+          ctx.font = '700 14px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText('Привид', 0, -gh - 6);
+          ctx.restore();
+        }
+
+        // 6. Players & Tag Bot
         if (netConnected) {
           drawSketchPlayer(remotePlayer, '#8FB3E8', remoteNick, false);
+        } else if (tagState.active && tagState.bot) {
+          drawSketchPlayer(tagState.bot, '#8FB3E8', 'Бот', false);
         }
         drawSketchPlayer(localPlayer, '#F29A8E', 'Ти', true);
+
+        // Tag "ВОДА!" Red Ink Aura
+        if (tagState.active) {
+          const itPl = tagState.itWho === 'local' ? localPlayer : (netConnected ? remotePlayer : tagState.bot);
+          if (itPl) {
+            ctx.save();
+            const pulse = 24 + Math.sin(worldTime * 10) * 4;
+            ctx.strokeStyle = '#C83E31';
+            ctx.lineWidth = 2.6;
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            ctx.arc(itPl.x + itPl.w / 2, itPl.y + itPl.h / 2, pulse, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#C83E31';
+            ctx.font = '700 18px "Caveat", cursive';
+            ctx.textAlign = 'center';
+            ctx.fillText('🔴 ВОДА!', itPl.x + itPl.w / 2, itPl.y - 12);
+            ctx.restore();
+          }
+        }
+
+        // Giant Two-Tone School Eraser Chase Visual
+        if (eraserState.active) {
+          const ex = eraserState.x, ey = eraserState.y, ew = eraserState.w, eh = eraserState.h;
+          ctx.save();
+          // Soft rubber trail dust
+          ctx.fillStyle = 'rgba(200, 62, 49, 0.14)';
+          ctx.fillRect(ex, ey, ew, eh);
+          const visY = Math.max(ey, cam.y - 120);
+          const visH = Math.min(eh, h / Math.max(0.4, finalZoom) + 240);
+          const blockY = eraserState.dir === 'up' ? ey : visY;
+          const blockH = eraserState.dir === 'up' ? eh : visH;
+          const blockX = eraserState.dir === 'up' ? Math.max(ex, cam.x - 100) : ex;
+          const blockW = eraserState.dir === 'up' ? Math.min(ew, w / Math.max(0.4, finalZoom) + 200) : ew;
+          // Two-tone school eraser (red/pink half + blue half)
+          ctx.fillStyle = '#E89298';
+          ctx.fillRect(blockX, blockY, blockW * 0.65, blockH);
+          ctx.fillStyle = '#7AA7E0';
+          ctx.fillRect(blockX + blockW * 0.65, blockY, blockW * 0.35, blockH);
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(blockX, blockY, blockW, blockH);
+          ctx.fillStyle = '#231F20';
+          ctx.font = '700 22px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText('ГУМКА!', blockX + blockW / 2, blockY + blockH / 2);
+          ctx.restore();
+        }
 
         // 7a. Ink Shockwave Rings (Dash, Dash-Jump, Wall-Kick)
         for (const sw of shockwaves) {
@@ -6281,11 +7070,39 @@
           ctx.restore();
         }
 
-        // 10b. Smooth Ink-Black Transition Screen
+        // 10b. Smooth Ink-Black Transition Screen & Notebook Page-Flip Animation
         if (blackoutAlpha > 0.01) {
           ctx.save();
           ctx.fillStyle = 'rgba(18, 16, 17, ' + blackoutAlpha.toFixed(3) + ')';
           ctx.fillRect(0, 0, w, h);
+          ctx.restore();
+        }
+
+        if (pageFlipTimer > 0) {
+          const t = 1 - pageFlipTimer / PAGE_FLIP_DUR;
+          const ease = 1 - Math.pow(1 - t, 3);
+          const foldX = w * (1 - ease);
+          ctx.save();
+          // Shadow under turning page
+          const shW = Math.min(90, w * 0.14);
+          const grad = ctx.createLinearGradient(foldX - shW, 0, foldX, 0);
+          grad.addColorStop(0, 'rgba(35, 31, 32, 0)');
+          grad.addColorStop(1, 'rgba(35, 31, 32, 0.22)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(foldX - shW, 0, shW, h);
+          // Curled paper strip sweeping across screen
+          const curlW = Math.sin(t * Math.PI) * Math.min(180, w * 0.25);
+          ctx.fillStyle = '#EFE5D2';
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(foldX, 0);
+          ctx.quadraticCurveTo(foldX + curlW * 1.15, h * 0.5, foldX, h);
+          ctx.lineTo(foldX - curlW * 0.25, h);
+          ctx.quadraticCurveTo(foldX + curlW * 0.65, h * 0.5, foldX - curlW * 0.25, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
           ctx.restore();
         }
 
@@ -6322,6 +7139,7 @@
         }
 
         if (screenShake > 0) screenShake = Math.max(0, screenShake - 28 * dt);
+        if (pageFlipTimer > 0) pageFlipTimer = Math.max(0, pageFlipTimer - dt);
 
         if (gamePhase === 'launching') {
           launchTimer -= dt;
