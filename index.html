@@ -54,6 +54,7 @@
       display: block;
       width: 100%;
       height: 100%;
+      touch-action: none;
     }
 
     /* Diegetic Floating Paper Tabs (No sterile HUD bar!) */
@@ -474,16 +475,16 @@
       margin-top: 2px;
     }
 
-    /* Centered Host Lobby Dock (ONLY visible to Host in Lobby!) */
+    /* Bottom-Center Host Lobby Dock (ONLY visible to Host in Lobby/Launching!) */
     #host-panel {
       position: absolute;
-      top: 50%;
+      bottom: 20px;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       z-index: 24;
       pointer-events: none;
     }
@@ -496,34 +497,57 @@
       pointer-events: auto;
     }
 
+    .host-top-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
     .host-code-pill {
-      background: rgba(251, 247, 238, 0.94);
+      font-family: inherit;
+      background: rgba(251, 247, 238, 0.95);
+      color: var(--ink);
       border: 2px dashed var(--ink);
       border-radius: 5px 9px 4px 8px;
-      padding: 2px 14px;
+      padding: 3px 14px;
       font-size: 20px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       cursor: pointer;
       box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.2);
-      transition: transform 0.12s ease;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .host-code-pill:hover {
-      transform: scale(1.04) rotate(-1deg);
+      transform: translateY(-2px) rotate(-1deg);
     }
 
+    /* Identical dimensions for START and CANCEL buttons — only color & text differ */
     .big-host-btn {
-      font-size: 28px !important;
-      padding: 10px 30px !important;
+      width: 224px !important;
+      height: 54px !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px !important;
+      padding: 0 !important;
       border-width: 3px !important;
       box-shadow: 4px 5px 0 rgba(35, 31, 32, 0.3) !important;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
     }
 
     .big-host-btn.cancelling {
       background: #231F20 !important;
       color: #FBF7EE !important;
-      border-color: #E9C46A !important;
+      border-color: #C83E31 !important;
+      animation: cancelPulse 0.7s ease-in-out infinite alternate;
+    }
+
+    @keyframes cancelPulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.03); }
     }
 
     /* Host Settings Notebook Modal */
@@ -754,9 +778,69 @@
       box-shadow: 0 0 0 var(--ink);
     }
 
-    @media (max-width: 640px) {
-      .sketch-notes { grid-template-columns: 1fr; }
-      .notebook-page { padding: 20px 18px 18px 28px; }
+    @media (max-width: 768px) {
+      #level-scrap {
+        top: 8px;
+        left: 8px;
+        font-size: 15px;
+        padding: 2px 9px;
+      }
+      #leaderboard {
+        top: 40px;
+        left: 8px;
+        width: 154px;
+        padding: 4px 7px 6px;
+      }
+      .lb-head { font-size: 12px; margin-bottom: 3px; }
+      .lb-rows { height: 58px; }
+      .lb-row { height: 26px; padding: 1px 4px; }
+      .lb-name { font-size: 15px; max-width: 68px; }
+      .lb-score { font-size: 16px; }
+      .lb-icon { width: 18px; height: 18px; }
+
+      #corner-tabs {
+        top: 8px;
+        right: 8px;
+        gap: 5px;
+      }
+      #corner-tabs .sketch-btn {
+        font-size: 14px;
+        padding: 3px 7px;
+      }
+
+      #chat-box {
+        bottom: 78px;
+        left: 8px;
+        width: 210px;
+      }
+      .chat-bubble { font-size: 14px; padding: 2px 7px; }
+      #chat-hint { font-size: 12px; }
+
+      #host-panel {
+        bottom: 78px;
+        gap: 6px;
+      }
+      .big-host-btn {
+        width: 176px !important;
+        height: 44px !important;
+        font-size: 21px !important;
+      }
+      .host-code-pill { font-size: 16px; padding: 2px 10px; }
+
+      #touch-controls {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+      }
+      .t-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 14px;
+      }
+      .sketch-notes { grid-template-columns: 1fr; font-size: 16px; }
+      .notebook-page { padding: 18px 16px 16px 26px; max-height: 92vh; overflow-y: auto; }
+      .nb-title { font-size: 26px; }
+      #version-tag { bottom: 4px; right: 8px; font-size: 12px; }
     }
   </style>
 </head>
@@ -858,8 +942,10 @@
       </div>
 
       <div id="host-panel">
-        <button class="sketch-btn" id="hp-open-settings" style="font-size:22px; padding:6px 20px;">⚙ Налаштування</button>
-        <button class="host-code-pill" id="hp-code-copy" title="Натисни, щоб скопіювати лінк">КОД: ------ 📋</button>
+        <div class="host-top-row" id="hp-top-row">
+          <button class="sketch-btn" id="hp-open-settings" style="font-size:20px; padding:4px 14px;">⚙ Налаштування</button>
+          <button class="host-code-pill" id="hp-code-copy" title="Натисни, щоб скопіювати лінк">Код: ------</button>
+        </div>
         <button class="sketch-btn ink-red big-host-btn" id="hp-start-btn">▶ СТАРТ</button>
       </div>
 
@@ -920,7 +1006,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.9.1</div>
+      <div id="version-tag">v0.9.5</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -967,114 +1053,106 @@
         src.start();
       }
 
+      function playPluck(ctx, freq, startTime, dur, vol) {
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, startTime);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(freq * 3.2, startTime);
+        filter.frequency.exponentialRampToValueAtTime(freq * 1.1, startTime + dur);
+        gain.gain.setValueAtTime(0.001, startTime);
+        gain.gain.linearRampToValueAtTime(vol, startTime + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0008, startTime + dur);
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + dur + 0.02);
+      }
+
       function playSound(type) {
         const ctx = ensureAudio();
         if (!ctx || muted) return;
         const now = ctx.currentTime;
 
         if (type === 'paper') {
-          playNoiseBurst(0.06, 2200, 0.05);
+          playNoiseBurst(0.055, 2400, 0.045);
           return;
         }
         if (type === 'click') {
-          playNoiseBurst(0.04, 1400, 0.08);
+          playNoiseBurst(0.03, 1500, 0.06);
+          playPluck(ctx, 290, now, 0.05, 0.06);
           return;
         }
-
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
         if (type === 'jump') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(195, now);
-          osc.frequency.exponentialRampToValueAtTime(420, now + 0.09);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
-          osc.start(now);
-          osc.stop(now + 0.12);
-        } else if (type === 'dashjump') {
-          playNoiseBurst(0.14, 1500, 0.12);
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(240, now);
-          osc.frequency.exponentialRampToValueAtTime(620, now + 0.13);
-          gain.gain.setValueAtTime(0.14, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-          osc.start(now);
-          osc.stop(now + 0.16);
-        } else if (type === 'tick') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(520, now);
-          osc.frequency.exponentialRampToValueAtTime(340, now + 0.08);
-          gain.gain.setValueAtTime(0.14, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-          osc.start(now);
-          osc.stop(now + 0.11);
-        } else if (type === 'go') {
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(523.25, now);
-          osc.frequency.setValueAtTime(659.25, now + 0.07);
-          osc.frequency.setValueAtTime(783.99, now + 0.14);
-          gain.gain.setValueAtTime(0.11, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-          osc.start(now);
-          osc.stop(now + 0.36);
-        } else if (type === 'cancel') {
-          playNoiseBurst(0.14, 1800, 0.12);
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(420, now);
-          osc.frequency.exponentialRampToValueAtTime(140, now + 0.16);
-          gain.gain.setValueAtTime(0.14, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-          osc.start(now);
-          osc.stop(now + 0.19);
-        } else if (type === 'vortex') {
-          playNoiseBurst(0.28, 700, 0.15);
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(95, now);
-          osc.frequency.exponentialRampToValueAtTime(290, now + 0.25);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-          osc.start(now);
-          osc.stop(now + 0.29);
-        } else if (type === 'mantle') {
-          playNoiseBurst(0.07, 1100, 0.09);
+          // Soft organic pop + tiny air puff
+          playNoiseBurst(0.04, 1200, 0.04);
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(260, now);
-          osc.frequency.exponentialRampToValueAtTime(380, now + 0.08);
-          gain.gain.setValueAtTime(0.1, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-          osc.start(now);
-          osc.stop(now + 0.1);
-        } else if (type === 'roll') {
-          playNoiseBurst(0.12, 950, 0.12);
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(160, now);
-          osc.frequency.exponentialRampToValueAtTime(80, now + 0.13);
-          gain.gain.setValueAtTime(0.09, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-          osc.start(now);
-          osc.stop(now + 0.15);
-        } else if (type === 'land') {
-          playNoiseBurst(0.05, 500, 0.09);
-        } else if (type === 'win') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(392, now);
-          osc.frequency.setValueAtTime(493.88, now + 0.09);
-          osc.frequency.setValueAtTime(587.33, now + 0.18);
-          gain.gain.setValueAtTime(0.1, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
-          osc.start(now);
-          osc.stop(now + 0.37);
-        } else if (type === 'die') {
-          osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(175, now);
-          osc.frequency.linearRampToValueAtTime(60, now + 0.22);
+          osc.frequency.exponentialRampToValueAtTime(340, now + 0.085);
           gain.gain.setValueAtTime(0.11, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
-          osc.start(now);
-          osc.stop(now + 0.25);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.11);
+        } else if (type === 'roll') {
+          // Crisp cloth/paper brush whoosh
+          playNoiseBurst(0.13, 950, 0.11);
+          playPluck(ctx, 145, now, 0.09, 0.08);
+        } else if (type === 'dashjump') {
+          playNoiseBurst(0.14, 1600, 0.1);
+          playPluck(ctx, 330, now, 0.14, 0.1);
+          playPluck(ctx, 495, now + 0.035, 0.16, 0.08);
+        } else if (type === 'mantle') {
+          playNoiseBurst(0.05, 1100, 0.07);
+          playPluck(ctx, 240, now, 0.07, 0.07);
+        } else if (type === 'land') {
+          playNoiseBurst(0.045, 420, 0.085);
+          playPluck(ctx, 92, now, 0.06, 0.08);
+        } else if (type === 'tick') {
+          // Warm wooden marimba knock
+          playPluck(ctx, 440, now, 0.11, 0.11);
+          playNoiseBurst(0.02, 1800, 0.04);
+        } else if (type === 'go') {
+          // Warm acoustic major triad chime
+          playPluck(ctx, 523.25, now, 0.28, 0.1);
+          playPluck(ctx, 659.25, now + 0.055, 0.3, 0.1);
+          playPluck(ctx, 783.99, now + 0.11, 0.36, 0.11);
+        } else if (type === 'vortex') {
+          // Deep wind swirl + warm low bass swell
+          playNoiseBurst(0.32, 620, 0.13);
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(82, now);
+          osc.frequency.exponentialRampToValueAtTime(165, now + 0.28);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.33);
+        } else if (type === 'cancel') {
+          // Crisp snap-back swoosh
+          playNoiseBurst(0.11, 1700, 0.09);
+          playPluck(ctx, 360, now, 0.08, 0.09);
+          playPluck(ctx, 220, now + 0.05, 0.12, 0.09);
+        } else if (type === 'win') {
+          playPluck(ctx, 440, now, 0.22, 0.09);
+          playPluck(ctx, 554.37, now + 0.07, 0.25, 0.09);
+          playPluck(ctx, 659.25, now + 0.14, 0.32, 0.1);
+        } else if (type === 'die') {
+          playNoiseBurst(0.14, 520, 0.11);
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(165, now);
+          osc.frequency.exponentialRampToValueAtTime(62, now + 0.2);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.23);
         }
       }
 
@@ -2140,7 +2218,7 @@
               if (netMode === 'host') {
                 lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита!';
                 updateNetUI('Чекаю P2...', 'waiting');
-                document.getElementById('hp-code-copy').textContent = 'КОД: ' + code + ' 📋';
+                document.getElementById('hp-code-copy').textContent = 'Код: ' + code;
                 lobbyModal.classList.add('hidden');
                 enterLobbyRoom(false);
                 showToast('Кімната ' + code + ' створена! Клікни по коду щоб скопіювати лінк.');
@@ -2212,8 +2290,7 @@
         const r = params.get('room');
         if (r) {
           roomInput.value = sanitizeCode(r);
-          lobbyMsg.textContent = 'Код підставлено! Підключаю до друга...';
-          setTimeout(() => connectRoom('client'), 350);
+          lobbyMsg.textContent = 'Код кімнати підставлено! Натисни «Приєднатися (P2)», коли будеш готовий.';
         } else {
           roomInput.value = randomRoomCode();
         }
@@ -2330,21 +2407,19 @@
 
       function syncHostPanelUI() {
         const hp = document.getElementById('host-panel');
-        const showHost = (gamePhase === 'lobby' || gamePhase === 'launching') && netMode === 'host';
+        const canCancel = gamePhase === 'launching' && launchTimer > 0.65;
+        const showHost = (gamePhase === 'lobby' || canCancel) && netMode === 'host';
         hp.classList.toggle('visible', showHost);
         const startBtn = document.getElementById('hp-start-btn');
-        const openSetBtn = document.getElementById('hp-open-settings');
-        const codePill = document.getElementById('hp-code-copy');
+        const topRow = document.getElementById('hp-top-row');
         if (gamePhase === 'launching') {
           startBtn.textContent = '✕ ВІДМІНИТИ';
           startBtn.classList.add('cancelling');
-          openSetBtn.style.display = 'none';
-          codePill.style.display = 'none';
+          topRow.style.display = 'none';
         } else {
           startBtn.textContent = '▶ СТАРТ';
           startBtn.classList.remove('cancelling');
-          openSetBtn.style.display = '';
-          codePill.style.display = '';
+          topRow.style.display = '';
         }
         document.getElementById('hp-rounds-val').textContent = roomSettings.infinite ? '∞' : String(roomSettings.rounds);
         document.getElementById('hp-rounds-inf').checked = !!roomSettings.infinite;
@@ -2435,6 +2510,7 @@
 
       function finishLaunchIntoRound1() {
         gamePhase = 'round_intro';
+        syncHostPanelUI();
         roundIntroTimer = 3.0;
         roundIntroLastSec = 4;
         goBannerTimer = 0;
@@ -3088,25 +3164,26 @@
         const h = canvas.clientHeight;
         const lvl = currentLevel;
 
+        // Responsive base zoom so phones & narrow screens see the full level cleanly!
+        const responsiveScale = w < 820 ? Math.max(0.56, Math.min(0.95, w / 860)) : 1.0;
+
         if (lvl.isLobby) {
-          // Center camera cleanly on the 4-wall lobby room
           const targetCamX = 480 - w * 0.5;
-          const targetCamY = 290 - h * 0.5;
-          cam.x += (targetCamX - cam.x) * 0.09;
-          cam.y += (targetCamY - cam.y) * 0.09;
+          const targetCamY = 285 - h * 0.5;
+          cam.x += (targetCamX - cam.x) * 0.1;
+          cam.y += (targetCamY - cam.y) * 0.1;
         } else if (gamePhase === 'round_intro') {
-          // Cinematic camera sweep from Finish Door back onto the starting players!
-          const targetCamX = localPlayer.x - w * 0.42;
-          const targetCamY = Math.max(-140, Math.min(120, localPlayer.y - h * 0.58));
-          cam.x += (targetCamX - cam.x) * 0.045;
-          cam.y += (targetCamY - cam.y) * 0.045;
+          const targetCamX = localPlayer.x + localPlayer.w / 2 - w * 0.5;
+          const targetCamY = localPlayer.y + localPlayer.h / 2 - h * 0.55;
+          cam.x += (targetCamX - cam.x) * 0.05;
+          cam.y += (targetCamY - cam.y) * 0.05;
         } else {
-          // Smooth velocity-guided camera (turning A/D never jerks the view)
-          const velLeadX = Math.max(-75, Math.min(75, localPlayer.vx * 0.16));
-          const targetCamX = localPlayer.x - w * 0.44 + velLeadX;
-          const targetCamY = Math.max(-140, Math.min(120, localPlayer.y - h * 0.58));
-          cam.x += (targetCamX - cam.x) * 0.065;
-          cam.y += (targetCamY - cam.y) * 0.055;
+          // Smoothly locked on player center (works identically on desktop & phone, zero A/D jerk!)
+          const velLeadX = Math.max(-65, Math.min(65, localPlayer.vx * 0.13));
+          const targetCamX = (localPlayer.x + localPlayer.w / 2) - w * 0.5 + velLeadX;
+          const targetCamY = (localPlayer.y + localPlayer.h / 2) - h * 0.55;
+          cam.x += (targetCamX - cam.x) * 0.085;
+          cam.y += (targetCamY - cam.y) * 0.075;
         }
 
         const sx = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
@@ -3145,9 +3222,10 @@
         const zoomSpeed = targetZoom < camZoom ? 0.22 : 0.08;
         camZoom += (targetZoom - camZoom) * zoomSpeed;
 
+        const finalZoom = camZoom * responsiveScale;
         ctx.save();
         ctx.translate(w / 2, h / 2);
-        ctx.scale(camZoom, camZoom);
+        ctx.scale(finalZoom, finalZoom);
         ctx.translate(-w / 2 - cam.x + sx, -h / 2 - cam.y + sy);
 
         // 2. Handwritten Page Number & Margin Sketch Notes
@@ -3241,7 +3319,7 @@
           const vx = VORTEX_POS.x;
           const vy = VORTEX_POS.y;
           if (gamePhase === 'launching') {
-            const openAmt = launchTimer <= 3.0 ? Math.min(1, (3.0 - launchTimer) / 1.4) : 0.15;
+            const openAmt = launchTimer <= 2.2 ? Math.min(1, (2.2 - launchTimer) / 1.2) : 0.1;
             // Radiant golden/cobalt light beams
             const rays = 12;
             ctx.save();
@@ -3370,13 +3448,13 @@
           ctx.save();
           ctx.translate(w / 2, h * 0.24);
           ctx.scale(pop, pop);
-          ctx.fillStyle = sec <= 3 ? '#C83E31' : '#231F20';
+          ctx.fillStyle = sec <= 2 ? '#C83E31' : '#231F20';
           ctx.font = '700 84px "Caveat", cursive';
           ctx.textAlign = 'center';
           ctx.fillText(String(sec), 0, 0);
           ctx.font = '700 24px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
-          ctx.fillText(sec <= 3 ? 'ЗАТЯГУЄ В ПОРТАЛ!' : 'ПРИГОТУЙТЕСЬ...', 0, 32);
+          ctx.fillText(sec <= 2 ? 'ЗАТЯГУЄ В ПОРТАЛ!' : 'ПРИГОТУЙТЕСЬ...', 0, 32);
           ctx.restore();
         }
 
@@ -3464,17 +3542,21 @@
           const sec = Math.ceil(Math.max(0, launchTimer));
           if (sec < launchLastSec && sec > 0) {
             launchLastSec = sec;
-            playSound(sec <= 3 ? 'vortex' : 'tick');
-            if (sec <= 3) spawnShockwave(VORTEX_POS.x, VORTEX_POS.y, '#D49B27', 85);
+            playSound(sec <= 2 ? 'vortex' : 'tick');
+            if (sec <= 2) spawnShockwave(VORTEX_POS.x, VORTEX_POS.y, '#D49B27', 85);
           }
 
-          if (launchTimer > 3.0) {
-            // 5..4: Players can still walk around freely before suction begins
+          if (launchTimer <= 0.65) {
+            syncHostPanelUI();
+          }
+          if (launchTimer > 2.2) {
+            // 5..3: Players can still walk around; gentle buildup shake at 3s
+            if (launchTimer <= 3.0) screenShake = Math.max(screenShake, 2.5);
             updatePhysics(dt);
           } else {
-            // 3..0: Screen shakes & TORNADO sucks BOTH players into the glowing START button!
-            const pullProg = Math.min(1, (3.0 - launchTimer) / 2.6);
-            screenShake = 5 + pullProg * 18;
+            // 2..1..0: Strong screen shake & TORNADO sucks BOTH players into the glowing portal!
+            const pullProg = Math.min(1, (2.2 - launchTimer) / 1.85);
+            screenShake = 6 + pullProg * 18;
 
             const suckPlayer = (pl) => {
               const cx = pl.x + pl.w / 2;
