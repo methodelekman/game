@@ -50,6 +50,15 @@
       overflow: hidden;
     }
 
+    #stage-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, transparent 62%, rgba(106, 99, 90, 0.14) 100%);
+      z-index: 15;
+    }
+
     canvas {
       display: block;
       width: 100%;
@@ -86,6 +95,18 @@
       pointer-events: none;
     }
 
+    #level-scrap::before {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: 18px;
+      width: 44px;
+      height: 13px;
+      background: rgba(212, 155, 39, 0.36);
+      border: 1px solid rgba(35, 31, 32, 0.2);
+      transform: rotate(-4deg);
+    }
+
     /* Animated Sketchbook Leaderboard */
     #leaderboard {
       position: absolute;
@@ -100,6 +121,18 @@
       transform: rotate(-0.8deg);
       z-index: 19;
       pointer-events: none;
+    }
+
+    #leaderboard::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      right: 16px;
+      width: 48px;
+      height: 12px;
+      background: rgba(212, 155, 39, 0.32);
+      border: 1px solid rgba(35, 31, 32, 0.18);
+      transform: rotate(3deg);
     }
 
     .lb-head {
