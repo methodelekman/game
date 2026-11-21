@@ -4,18 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>index</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <style>
     :root {
-      --paper: #F3EFE6;
-      --paper-dark: #E6E0D3;
-      --grid-line: #DFD9CA;
-      --ink: #16161A;
-      --ink-muted: #5A5962;
-      --red: #E63926;
-      --blue: #1D4ED8;
-      --gold: #EAB308;
-      --white: #FCFBF7;
+      --paper: #F4EDE0;
+      --paper-edge: #E5DAC6;
+      --ink: #231F20;
+      --pencil: #6A635A;
+      --red: #C83E31;
+      --blue: #2952A3;
+      --gold: #D49B27;
+      --sheet: #FBF7EE;
     }
 
     * {
@@ -32,214 +34,19 @@
       overflow: hidden;
       background-color: var(--paper);
       color: var(--ink);
-      font-family: "Helvetica Neue", "Inter", system-ui, -apple-system, sans-serif;
+      font-family: "Caveat", "Comic Sans MS", cursive, sans-serif;
     }
 
     #app {
       position: relative;
       width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* Top Swiss Architectural HUD */
-    #hud {
-      height: 60px;
-      min-height: 60px;
-      background: var(--white);
-      border-bottom: 2px solid var(--ink);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      gap: 12px;
-      z-index: 20;
-    }
-
-    .hud-group {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-tag {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 900;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding-right: 12px;
-      border-right: 2px solid var(--ink);
-    }
-
-    .brand-dot {
-      width: 12px;
-      height: 12px;
-      background: var(--red);
-      box-shadow: 2px 2px 0 var(--ink);
-    }
-
-    /* Limit Meters */
-    .meter-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .meter-label {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .meter-label span.key {
-      color: var(--ink);
-      background: var(--paper-dark);
-      padding: 0 4px;
-      border: 1px solid var(--ink);
-      font-size: 9px;
-    }
-
-    .pips-row {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      height: 14px;
-    }
-
-    .pip {
-      width: 18px;
-      height: 10px;
-      border: 2px solid var(--ink);
-      background: var(--ink);
-      transition: transform 0.12s ease, background-color 0.12s ease;
-    }
-
-    .pip.used {
-      background: transparent;
-      transform: scale(0.9);
-    }
-
-    .bar-track {
-      width: 84px;
-      height: 10px;
-      border: 2px solid var(--ink);
-      background: var(--paper);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .bar-fill {
-      height: 100%;
-      width: 100%;
-      background: var(--ink);
-      transition: width 0.05s linear, background-color 0.15s ease;
-    }
-
-    .bar-fill.dash-ready {
-      background: var(--blue);
-    }
-
-    .bar-fill.exhausted {
-      background: var(--red);
-    }
-
-    /* Level & Net Controls */
-    .level-pill {
-      font-weight: 900;
-      font-size: 13px;
-      letter-spacing: 0.06em;
-      padding: 5px 10px;
-      border: 2px solid var(--ink);
-      background: var(--paper);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn {
-      appearance: none;
-      border: 2px solid var(--ink);
-      background: var(--white);
-      color: var(--ink);
-      font-weight: 800;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      cursor: pointer;
-      box-shadow: 2px 2px 0 var(--ink);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.12s ease;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      background: var(--paper);
-    }
-
-    .btn:active {
-      transform: translate(2px, 2px);
-      box-shadow: 0 0 0 var(--ink);
-    }
-
-    .btn.primary {
-      background: var(--red);
-      color: var(--white);
-    }
-
-    .btn.primary:hover {
-      background: #cf2f1d;
-    }
-
-    .btn.blue {
-      background: var(--blue);
-      color: var(--white);
-    }
-
-    .btn.blue:hover {
-      background: #173fb0;
-    }
-
-    .net-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 5px 9px;
-      border: 2px solid var(--ink);
-      background: var(--paper);
-      cursor: pointer;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--ink-muted);
-    }
-
-    .status-dot.online {
-      background: #16A34A;
-    }
-
-    .status-dot.waiting {
-      background: var(--gold);
-    }
-
-    /* Game Stage */
     #stage-wrap {
       position: relative;
-      flex: 1;
       width: 100%;
+      height: 100%;
       overflow: hidden;
     }
 
@@ -249,106 +56,231 @@
       height: 100%;
     }
 
-    /* Lobby / Multiplayer Modal */
+    /* Diegetic Floating Paper Tabs (No sterile HUD bar!) */
+    #corner-tabs {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    #level-scrap {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      background: var(--sheet);
+      border: 2px solid var(--ink);
+      border-radius: 3px 8px 4px 10px;
+      padding: 4px 14px;
+      font-size: 20px;
+      font-weight: 700;
+      transform: rotate(-1.6deg);
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.2);
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .sketch-btn {
+      appearance: none;
+      position: relative;
+      background: var(--sheet);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 6px 3px 8px 4px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 19px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.25);
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
+    }
+
+    .sketch-btn:hover {
+      transform: translateY(-2px) rotate(-1.5deg);
+      box-shadow: 3px 5px 0 rgba(35, 31, 32, 0.3);
+    }
+
+    .sketch-btn:hover::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 2px;
+      height: 2px;
+      background: var(--red);
+      transform: rotate(-1deg);
+      border-radius: 2px;
+    }
+
+    .sketch-btn:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 1px 1px 0 rgba(35, 31, 32, 0.2);
+    }
+
+    .sketch-btn.ink-red {
+      background: #F9E5E2;
+      border-color: var(--red);
+      color: #8F2218;
+    }
+
+    .sketch-btn.ink-blue {
+      background: #E4ECF9;
+      border-color: var(--blue);
+      color: #1A3978;
+    }
+
+    .net-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 1.5px solid var(--ink);
+      background: var(--pencil);
+    }
+
+    .status-dot.online { background: #3D9956; }
+    .status-dot.waiting { background: var(--gold); }
+
+    /* Physical Sketchbook Notebook Modal */
     #lobby-modal {
       position: absolute;
       inset: 0;
-      background: rgba(243, 239, 230, 0.88);
-      backdrop-filter: blur(2px);
+      background: rgba(35, 31, 32, 0.32);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 30;
-      padding: 16px;
+      padding: 18px;
     }
 
     #lobby-modal.hidden {
       display: none;
     }
 
-    .swiss-card {
+    .notebook-page {
+      position: relative;
       width: 100%;
-      max-width: 480px;
-      background: var(--white);
-      border: 3px solid var(--ink);
-      box-shadow: 8px 8px 0 var(--ink);
-      padding: 24px;
+      max-width: 490px;
+      background: var(--sheet);
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 27px,
+        rgba(41, 82, 163, 0.13) 28px
+      );
+      border: 2.5px solid var(--ink);
+      border-radius: 4px 12px 6px 14px;
+      box-shadow: 7px 9px 0 rgba(35, 31, 32, 0.28);
+      padding: 26px 26px 22px 34px;
+      transform: rotate(-0.7deg);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
     }
 
-    .card-header {
+    /* Red notebook margin line */
+    .notebook-page::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 22px;
+      width: 1.5px;
+      background: rgba(200, 62, 49, 0.35);
+    }
+
+    /* Masking tape strips on corners */
+    .tape {
+      position: absolute;
+      width: 58px;
+      height: 18px;
+      background: rgba(235, 219, 178, 0.85);
+      border: 1px dashed rgba(106, 99, 90, 0.45);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      pointer-events: none;
+    }
+    .tape.tl { top: -8px; left: 26px; transform: rotate(-11deg); }
+    .tape.tr { top: -7px; right: 24px; transform: rotate(9deg); }
+
+    .nb-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 2px solid var(--ink);
-      padding-bottom: 12px;
+      border-bottom: 2px dashed var(--pencil);
+      padding-bottom: 8px;
     }
 
-    .card-title {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      line-height: 1.05;
-      text-transform: uppercase;
-    }
-
-    .card-sub {
-      font-size: 12px;
+    .nb-title {
+      font-size: 32px;
       font-weight: 700;
-      color: var(--ink-muted);
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      line-height: 0.95;
+      letter-spacing: 0.01em;
     }
 
-    .controls-grid {
+    .nb-sub {
+      font-size: 18px;
+      color: var(--pencil);
+      margin-top: 2px;
+    }
+
+    .sketch-notes {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      background: var(--paper);
-      border: 2px solid var(--ink);
-      padding: 12px;
-      font-size: 12px;
-      font-weight: 700;
+      gap: 6px 12px;
+      padding: 8px 12px;
+      border: 1.5px dashed var(--ink);
+      border-radius: 6px 3px 5px 4px;
+      background: rgba(244, 237, 224, 0.7);
+      font-size: 18px;
     }
 
-    .ctrl-item {
+    .note-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 6px;
     }
 
-    .ctrl-key {
-      background: var(--white);
+    .key-doodle {
       border: 1.5px solid var(--ink);
-      padding: 2px 6px;
-      font-size: 10px;
-      font-weight: 900;
+      border-radius: 4px 7px 3px 6px;
+      padding: 0 7px;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--sheet);
+      white-space: nowrap;
     }
 
     .room-row {
       display: flex;
       gap: 8px;
-      align-items: stretch;
+      align-items: center;
     }
 
     .room-input {
       flex: 1;
-      border: 2px solid var(--ink);
-      background: var(--paper);
-      padding: 8px 10px;
-      font-weight: 800;
-      font-size: 13px;
+      border: none;
+      border-bottom: 2.5px solid var(--ink);
+      background: transparent;
+      padding: 4px 6px;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
+      color: var(--ink);
       outline: none;
-    }
-
-    .room-input:focus {
-      background: var(--white);
     }
 
     .actions-row {
@@ -357,61 +289,56 @@
       flex-wrap: wrap;
     }
 
-    .actions-row .btn {
+    .actions-row .sketch-btn {
       flex: 1;
-      padding: 10px 12px;
-      font-size: 12px;
       text-align: center;
     }
 
     .lobby-status {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--ink);
-      min-height: 18px;
+      font-size: 18px;
+      color: var(--pencil);
+      min-height: 22px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 8px;
     }
 
-    /* Toast */
+    /* Subtle Pencil Version Tag */
+    #version-tag {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(35, 31, 32, 0.42);
+      pointer-events: none;
+      z-index: 35;
+      transform: rotate(-2deg);
+    }
+
+    /* Paper Note Toast */
     #toast {
       position: absolute;
       bottom: 20px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--ink);
-      color: var(--white);
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      transform: translateX(-50%) translateY(20px) rotate(-1deg);
+      background: var(--sheet);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 4px 10px 5px 8px;
+      padding: 5px 16px;
+      font-size: 19px;
+      font-weight: 700;
+      box-shadow: 3px 4px 0 rgba(35, 31, 32, 0.25);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease, transform 0.2s ease;
       z-index: 40;
-      border: 2px solid var(--paper);
     }
 
     #toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    #version-tag {
-      position: absolute;
-      bottom: 10px;
-      right: 14px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: rgba(22, 22, 26, 0.48);
-      background: rgba(243, 239, 230, 0.72);
-      padding: 2px 6px;
-      pointer-events: none;
-      z-index: 35;
+      transform: translateX(-50%) translateY(0) rotate(-1deg);
     }
 
     /* Touch Controls */
@@ -426,9 +353,7 @@
       z-index: 25;
     }
 
-    #touch-controls.visible {
-      display: flex;
-    }
+    #touch-controls.visible { display: flex; }
 
     .touch-pad {
       display: flex;
@@ -440,10 +365,12 @@
       width: 52px;
       height: 52px;
       border: 2px solid var(--ink);
-      background: rgba(252, 251, 247, 0.9);
-      box-shadow: 3px 3px 0 var(--ink);
-      font-weight: 900;
-      font-size: 12px;
+      border-radius: 10px 6px 12px 7px;
+      background: rgba(251, 247, 238, 0.9);
+      box-shadow: 2px 3px 0 var(--ink);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 17px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -452,72 +379,32 @@
 
     .t-btn:active, .t-btn.active {
       background: var(--red);
-      color: var(--white);
+      color: var(--sheet);
       transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0 var(--ink);
+      box-shadow: 0 0 0 var(--ink);
     }
 
-    @media (max-width: 820px) {
-      #hud {
-        height: auto;
-        flex-wrap: wrap;
-        padding: 8px 10px;
-        gap: 8px;
-      }
-      .brand-tag {
-        display: none;
-      }
-      .bar-track {
-        width: 64px;
-      }
+    @media (max-width: 640px) {
+      .sketch-notes { grid-template-columns: 1fr; }
+      .notebook-page { padding: 20px 18px 18px 28px; }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <header id="hud">
-      <div class="hud-group">
-        <div class="brand-tag">
-          <div class="brand-dot"></div>
-          <span>GRIDS//01</span>
-        </div>
+    <div id="stage-wrap">
+      <canvas id="game-canvas"></canvas>
 
-        <div class="meter-block">
-          <div class="meter-label"><span>Стрибок</span><span class="key">SPACE</span></div>
-          <div class="pips-row">
-            <div class="pip" id="jump-pip-1"></div>
-            <div class="pip" id="jump-pip-2"></div>
-          </div>
-        </div>
+      <div id="level-scrap">Аркуш 01 / 04 · 0</div>
 
-        <div class="meter-block">
-          <div class="meter-label"><span>Перекат</span><span class="key">CTRL / C</span></div>
-          <div class="bar-track"><div class="bar-fill dash-ready" id="dash-bar"></div></div>
-        </div>
-
-        <div class="meter-block">
-          <div class="meter-label"><span>Прискорення</span><span class="key">SHIFT</span></div>
-          <div class="bar-track"><div class="bar-fill" id="sprint-bar"></div></div>
-        </div>
-      </div>
-
-      <div class="hud-group">
-        <div class="level-pill">
-          <span id="hud-level">01 / 04</span>
-          <span style="color:var(--ink-muted)">|</span>
-          <span id="hud-deaths">0</span>
-        </div>
-        <button class="btn" id="btn-restart" title="Перезапустити рівень (R)">R</button>
-        <button class="btn" id="btn-mute">Звук: ON</button>
-        <button class="net-badge" id="btn-lobby">
+      <div id="corner-tabs">
+        <button class="sketch-btn" id="btn-restart" title="Перемалювати (R)">↺ Заново</button>
+        <button class="sketch-btn" id="btn-mute">Звук: є</button>
+        <button class="sketch-btn net-pill" id="btn-lobby">
           <span class="status-dot" id="net-dot"></span>
           <span id="net-label">Соло</span>
         </button>
       </div>
-    </header>
-
-    <div id="stage-wrap">
-      <canvas id="game-canvas"></canvas>
 
       <div id="touch-controls">
         <div class="touch-pad">
@@ -533,54 +420,55 @@
       </div>
 
       <div id="lobby-modal">
-        <div class="swiss-card">
-          <div class="card-header">
+        <div class="notebook-page">
+          <div class="tape tl"></div>
+          <div class="tape tr"></div>
+
+          <div class="nb-header">
             <div>
-              <div class="card-title">GRIDS // 01</div>
-              <div class="card-sub">Швейцарський кооп-платформер</div>
+              <div class="nb-title">Скетчбук // На двох</div>
+              <div class="nb-sub">живий лайн, туш і кооп без затримок</div>
             </div>
-            <button class="btn" id="btn-close-lobby">Закрити</button>
+            <button class="sketch-btn" id="btn-close-lobby">✕</button>
           </div>
 
-          <div class="controls-grid">
-            <div class="ctrl-item"><span>Рух</span><span class="ctrl-key">W A S D</span></div>
-            <div class="ctrl-item"><span>Стрибок (x2)</span><span class="ctrl-key">SPACE</span></div>
-            <div class="ctrl-item"><span>Перекат (деш)</span><span class="ctrl-key">CTRL / C</span></div>
-            <div class="ctrl-item"><span>Прискорення</span><span class="ctrl-key">SHIFT</span></div>
+          <div class="sketch-notes">
+            <div class="note-row"><span>Кроки</span><span class="key-doodle">W A S D</span></div>
+            <div class="note-row"><span>Стрибок (2 пера)</span><span class="key-doodle">SPACE</span></div>
+            <div class="note-row"><span>Перекат (шарф)</span><span class="key-doodle">CTRL / C</span></div>
+            <div class="note-row"><span>Біг (дихання)</span><span class="key-doodle">SHIFT</span></div>
           </div>
 
           <div>
-            <div class="meter-label" style="margin-bottom:6px;">
-              <span>Кімната для гри вдвох (P2P без затримки)</span>
-            </div>
+            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;">Код сторінки для друга:</div>
             <div class="room-row">
-              <input class="room-input" id="room-code" value="SWISS-01" maxlength="14" aria-label="Код кімнати" />
-              <button class="btn" id="btn-copy-link">Копіювати лінк</button>
+              <input class="room-input" id="room-code" value="SKETCH1" maxlength="14" aria-label="Код кімнати" />
+              <button class="sketch-btn" id="btn-copy-link">Скопіювати лінк</button>
             </div>
           </div>
 
           <div class="actions-row">
-            <button class="btn primary" id="btn-host">Створити (P1)</button>
-            <button class="btn blue" id="btn-join">Приєднатися (P2)</button>
-            <button class="btn" id="btn-solo">Грати соло</button>
+            <button class="sketch-btn ink-red" id="btn-host">Створити (P1)</button>
+            <button class="sketch-btn ink-blue" id="btn-join">Приєднатися (P2)</button>
+            <button class="sketch-btn" id="btn-solo">Грати соло</button>
           </div>
 
           <div class="lobby-status">
-            <span id="lobby-msg">Обери режим або підключи друга за кодом кімнати.</span>
+            <span id="lobby-msg">Стан героя видно прямо на ньому: пера, шарф і втома.</span>
             <span id="ping-readout"></span>
           </div>
         </div>
       </div>
 
-      <div id="version-tag">v0.1.6</div>
-      <div id="toast">Скопійовано</div>
+      <div id="version-tag">v0.2.0</div>
+      <div id="toast">Скопійовано!</div>
     </div>
   </div>
 
   <script>
     (() => {
       // =========================================================
-      // 1. AUDIO SYNTHESIZER (Tactile Minimalist Web Audio)
+      // 1. TACTILE AUDIO (Pencil scratch, paper rustle, ink pop)
       // =========================================================
       let audioCtx = null;
       let muted = false;
@@ -597,10 +485,42 @@
         return audioCtx;
       }
 
+      function playNoiseBurst(dur, filterFreq, vol) {
+        const ctx = ensureAudio();
+        if (!ctx || muted) return;
+        const bufSize = Math.floor(ctx.sampleRate * dur);
+        const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = filterFreq;
+        const gain = ctx.createGain();
+        gain.gain.value = vol;
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        src.start();
+      }
+
       function playSound(type) {
         const ctx = ensureAudio();
         if (!ctx || muted) return;
         const now = ctx.currentTime;
+
+        if (type === 'paper') {
+          playNoiseBurst(0.06, 2200, 0.05);
+          return;
+        }
+        if (type === 'click') {
+          playNoiseBurst(0.04, 1400, 0.08);
+          return;
+        }
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
@@ -608,61 +528,61 @@
 
         if (type === 'jump') {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(210, now);
-          osc.frequency.exponentialRampToValueAtTime(460, now + 0.09);
-          gain.gain.setValueAtTime(0.14, now);
+          osc.frequency.setValueAtTime(195, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.09);
+          gain.gain.setValueAtTime(0.12, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
           osc.start(now);
           osc.stop(now + 0.12);
         } else if (type === 'roll') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(170, now);
-          osc.frequency.exponentialRampToValueAtTime(75, now + 0.14);
-          gain.gain.setValueAtTime(0.11, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-          osc.start(now);
-          osc.stop(now + 0.16);
-        } else if (type === 'land') {
+          playNoiseBurst(0.12, 950, 0.12);
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(110, now);
-          osc.frequency.exponentialRampToValueAtTime(55, now + 0.06);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.13);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
           osc.start(now);
-          osc.stop(now + 0.08);
+          osc.stop(now + 0.15);
+        } else if (type === 'land') {
+          playNoiseBurst(0.05, 500, 0.09);
         } else if (type === 'win') {
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(440, now);
-          osc.frequency.setValueAtTime(554.37, now + 0.08);
-          osc.frequency.setValueAtTime(659.25, now + 0.16);
-          gain.gain.setValueAtTime(0.08, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(392, now);
+          osc.frequency.setValueAtTime(493.88, now + 0.09);
+          osc.frequency.setValueAtTime(587.33, now + 0.18);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
           osc.start(now);
-          osc.stop(now + 0.35);
+          osc.stop(now + 0.37);
         } else if (type === 'die') {
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(190, now);
-          osc.frequency.linearRampToValueAtTime(65, now + 0.22);
-          gain.gain.setValueAtTime(0.14, now);
+          osc.frequency.setValueAtTime(175, now);
+          osc.frequency.linearRampToValueAtTime(60, now + 0.22);
+          gain.gain.setValueAtTime(0.11, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
           osc.start(now);
           osc.stop(now + 0.25);
         }
       }
 
+      document.querySelectorAll('.sketch-btn').forEach((btn) => {
+        btn.addEventListener('mouseenter', () => playSound('paper'));
+        btn.addEventListener('click', () => playSound('click'));
+      });
+
       // =========================================================
-      // 2. LEVELS (Swiss Architectural Modules)
+      // 2. LEVELS (Hand-sketched Notebook Modules)
       // =========================================================
       const LEVELS = [
         {
           id: '01',
-          title: 'МОДУЛЬ 01 // БАЛАНС',
+          title: 'Аркуш 01 · Проба пера',
           spawn: { x: 80, y: 420 },
-          goal: { x: 1450, y: 380, w: 36, h: 60 },
+          goal: { x: 1450, y: 380, w: 38, h: 60 },
           notes: [
-            { x: 70, y: 330, text: 'WASD — РУХ', sub: 'SPACE — СТРИБОК (x2)' },
-            { x: 480, y: 310, text: 'SHIFT — ПРИСКОРЕННЯ', sub: 'СТЕЖ ЗА ВИТРИВАЛІСТЮ' },
-            { x: 960, y: 330, text: 'CTRL / C — ПЕРЕКАТ', sub: 'ПРОЇДЬ ПІД БАРʼЄРОМ' }
+            { x: 70, y: 325, text: 'WASD — кроки', sub: 'SPACE — стрибок (2 пера)' },
+            { x: 480, y: 305, text: 'SHIFT — біг', sub: 'не задихнись!' },
+            { x: 960, y: 325, text: 'CTRL / C — перекат', sub: 'пірнай під балку' }
           ],
           platforms: [
             { x: 0, y: 480, w: 440, h: 120 },
@@ -673,17 +593,17 @@
           ],
           movers: [],
           hazards: [
-            { x: 640, y: 468, w: 50, h: 12 }
+            { x: 640, y: 466, w: 52, h: 14 }
           ]
         },
         {
           id: '02',
-          title: 'МОДУЛЬ 02 // РИТМ',
+          title: 'Аркуш 02 · Чорнильний стрибок',
           spawn: { x: 80, y: 420 },
-          goal: { x: 1580, y: 220, w: 36, h: 60 },
+          goal: { x: 1580, y: 220, w: 38, h: 60 },
           notes: [
-            { x: 80, y: 330, text: 'КОМБО', sub: 'SHIFT + SPACE + CTRL' },
-            { x: 830, y: 260, text: 'ЛІМІТ ПОВІТРЯ', sub: 'ЛИШЕ 1 ПЕРЕКАТ У ПОВІТРІ' }
+            { x: 80, y: 325, text: 'Розгін + Стрибок + Перекат', sub: 'синій шарф — твій деш у повітрі' },
+            { x: 830, y: 255, text: 'Лише 1 деш у повітрі', sub: 'відновиться на землі' }
           ],
           platforms: [
             { x: 0, y: 480, w: 300, h: 120 },
@@ -694,18 +614,18 @@
           ],
           movers: [],
           hazards: [
-            { x: 450, y: 408, w: 46, h: 12 },
-            { x: 1170, y: 348, w: 50, h: 12 }
+            { x: 450, y: 406, w: 46, h: 14 },
+            { x: 1170, y: 346, w: 50, h: 14 }
           ]
         },
         {
           id: '03',
-          title: 'МОДУЛЬ 03 // КІНЕТИКА',
+          title: 'Аркуш 03 · Живі блоки',
           spawn: { x: 70, y: 420 },
-          goal: { x: 1680, y: 300, w: 36, h: 60 },
+          goal: { x: 1680, y: 300, w: 38, h: 60 },
           notes: [
-            { x: 70, y: 330, text: 'РУХОМІ БЛОКИ', sub: 'ЛОВИ ІНЕРЦІЮ' },
-            { x: 1130, y: 240, text: 'НИЗЬКИЙ ПРОХІД', sub: 'ПЕРЕКАТ З РОЗГОНУ' }
+            { x: 70, y: 325, text: 'Рухомі ескізи', sub: 'стрибай у такт' },
+            { x: 1130, y: 235, text: 'Вузька щілина', sub: 'притиснись на CTRL' }
           ],
           platforms: [
             { x: 0, y: 480, w: 250, h: 120 },
@@ -719,17 +639,17 @@
             { x: 1390, y: 360, w: 110, h: 26, ax: 1390, ay: 430, bx: 1390, by: 300, speed: 1.7 }
           ],
           hazards: [
-            { x: 800, y: 398, w: 52, h: 12 },
-            { x: 1295, y: 368, w: 48, h: 12 }
+            { x: 800, y: 396, w: 52, h: 14 },
+            { x: 1295, y: 366, w: 48, h: 14 }
           ]
         },
         {
           id: '04',
-          title: 'МОДУЛЬ 04 // ФІНАЛ',
+          title: 'Аркуш 04 · Остання сторінка',
           spawn: { x: 70, y: 420 },
-          goal: { x: 1820, y: 200, w: 36, h: 60 },
+          goal: { x: 1820, y: 200, w: 38, h: 60 },
           notes: [
-            { x: 70, y: 330, text: 'ФІНАЛЬНИЙ ТЕСТ', sub: 'ВИКОРИСТАЙ УСІ ЛІМІТИ' }
+            { x: 70, y: 325, text: 'Фінал зошита', sub: 'не витрачай дарма дихання' }
           ],
           platforms: [
             { x: 0, y: 480, w: 220, h: 120 },
@@ -744,9 +664,9 @@
             { x: 1360, y: 320, w: 110, h: 26, ax: 1360, ay: 370, bx: 1520, by: 270, speed: 1.6 }
           ],
           hazards: [
-            { x: 355, y: 408, w: 44, h: 12 },
-            { x: 590, y: 338, w: 44, h: 12 },
-            { x: 1240, y: 338, w: 40, h: 12 }
+            { x: 355, y: 406, w: 44, h: 14 },
+            { x: 590, y: 336, w: 44, h: 14 },
+            { x: 1240, y: 336, w: 40, h: 14 }
           ]
         }
       ];
@@ -777,7 +697,7 @@
       };
 
       // =========================================================
-      // 4. GAME STATE & ENTITIES
+      // 4. GAME STATE & SKETCHBOOK TEXTURES
       // =========================================================
       const canvas = document.getElementById('game-canvas');
       const ctx = canvas.getContext('2d');
@@ -787,19 +707,21 @@
       let worldTime = 0;
       let winBannerTimer = 0;
       let screenShake = 0;
+      let boilFrame = 0;
+      let boilTimer = 0;
 
-      // Pre-generate subtle paper grain pattern
+      // Subtle paper fiber texture
       const grainCanvas = document.createElement('canvas');
-      grainCanvas.width = 128;
-      grainCanvas.height = 128;
+      grainCanvas.width = 160;
+      grainCanvas.height = 160;
       const gctx = grainCanvas.getContext('2d');
-      const imgData = gctx.createImageData(128, 128);
+      const imgData = gctx.createImageData(160, 160);
       for (let i = 0; i < imgData.data.length; i += 4) {
-        const v = 225 + Math.floor(Math.random() * 25);
+        const v = 220 + Math.floor(Math.random() * 32);
         imgData.data[i] = v;
-        imgData.data[i + 1] = v - 4;
-        imgData.data[i + 2] = v - 10;
-        imgData.data[i + 3] = 28;
+        imgData.data[i + 1] = v - 6;
+        imgData.data[i + 2] = v - 14;
+        imgData.data[i + 3] = 26;
       }
       gctx.putImageData(imgData, 0, 0);
       let paperPattern = null;
@@ -824,7 +746,6 @@
           stamina: 100,
           exhausted: false,
           sprinting: false,
-          crouching: false,
           scaleX: 1,
           scaleY: 1,
           rot: 0,
@@ -849,7 +770,7 @@
             y,
             vx: Math.cos(ang) * spd,
             vy: Math.sin(ang) * spd - 40,
-            size: 4 + Math.random() * 5,
+            size: 3 + Math.random() * 5,
             life: 0.25 + Math.random() * 0.25,
             maxLife: 0.5,
             color,
@@ -861,13 +782,7 @@
       // =========================================================
       // 5. INPUT HANDLING (WASD + Space + Ctrl/C + Shift)
       // =========================================================
-      const keys = {
-        left: false,
-        right: false,
-        up: false,
-        down: false,
-        sprint: false
-      };
+      const keys = { left: false, right: false, up: false, down: false, sprint: false };
 
       function triggerJump() {
         localPlayer.jumpBufferTimer = CFG.jumpBuffer;
@@ -889,7 +804,7 @@
         p.scaleX = 1.45;
         p.scaleY = 0.62;
         playSound('roll');
-        spawnParticles(p.x + p.w / 2, p.y + p.h, '#1D4ED8', 8, 190);
+        spawnParticles(p.x + p.w / 2, p.y + p.h, '#2952A3', 8, 190);
       }
 
       window.addEventListener('keydown', (e) => {
@@ -905,15 +820,9 @@
         if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.down = true;
         if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.sprint = true;
 
-        if (e.code === 'Space' && !e.repeat) {
-          triggerJump();
-        }
-        if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !e.repeat) {
-          triggerRoll();
-        }
-        if (e.code === 'KeyR' && !e.repeat) {
-          resetPlayerToSpawn(true);
-        }
+        if (e.code === 'Space' && !e.repeat) triggerJump();
+        if ((e.code === 'ControlLeft' || e.code === 'ControlRight' || e.code === 'KeyC') && !e.repeat) triggerRoll();
+        if (e.code === 'KeyR' && !e.repeat) resetPlayerToSpawn(true);
       });
 
       window.addEventListener('keyup', (e) => {
@@ -928,7 +837,6 @@
         }
       });
 
-      // Touch controls setup
       const touchWrap = document.getElementById('touch-controls');
       if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         touchWrap.classList.add('visible');
@@ -1023,7 +931,7 @@
       }
 
       function sanitizeCode(val) {
-        return (val || 'SWISS01').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SWISS01';
+        return (val || 'SKETCH1').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SKETCH1';
       }
 
       function publishMqtt(payload) {
@@ -1036,10 +944,7 @@
 
       function sendGameMsg(payload) {
         if (p2pActive && rtcDc && rtcDc.readyState === 'open') {
-          try {
-            rtcDc.send(JSON.stringify(payload));
-            return;
-          } catch (_) {}
+          try { rtcDc.send(JSON.stringify(payload)); return; } catch (_) {}
         }
         publishMqtt(payload);
       }
@@ -1087,10 +992,10 @@
 
         if (!netConnected) {
           netConnected = true;
-          updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • Онлайн', 'online');
-          lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
+          updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' · Онлайн', 'online');
+          lobbyMsg.textContent = 'Друг на аркуші! Граєте разом.';
           lobbyModal.classList.add('hidden');
-          showToast('Гравець підключився!');
+          showToast('Друг підключився!');
           publishMqtt({ type: 'hello_ack', level: currentLevelIdx });
           sendStatePacket();
           if (netMode === 'host') startWebRtcOffer();
@@ -1112,10 +1017,10 @@
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
           pingMs = Math.max(1, Math.round(performance.now() - data.t));
-          pingReadout.textContent = pingMs + ' ms' + (p2pActive ? ' (P2P)' : ' (Relay)');
+          pingReadout.textContent = pingMs + ' ms' + (p2pActive ? ' (P2P)' : '');
           if (netConnected) {
             const tag = p2pActive ? 'P2P ' : '';
-            updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • ' + tag + pingMs + 'ms', 'online');
+            updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' · ' + tag + pingMs + 'ms', 'online');
           }
         } else if (data.type === 'rtc_offer' && netMode !== 'host') {
           handleWebRtcOffer(data.sdp);
@@ -1130,7 +1035,7 @@
         rtcDc = dc;
         dc.onopen = () => {
           p2pActive = true;
-          showToast('Прямий P2P канал активний!');
+          showToast('Прямий P2P активний!');
           sendStatePacket();
         };
         dc.onclose = () => { p2pActive = false; };
@@ -1173,7 +1078,7 @@
       function connectRoom(mode) {
         ensureAudio();
         if (typeof mqtt === 'undefined') {
-          lobbyMsg.textContent = 'Бібліотека мережі ще не завантажилась. Онови сторінку (F5).';
+          lobbyMsg.textContent = 'Бібліотека мережі ще вантажиться...';
           return;
         }
         cleanupNet();
@@ -1182,8 +1087,8 @@
         roomInput.value = code;
         roomTopic = 'grids01/coop/room/' + code;
 
-        lobbyMsg.textContent = 'Підключення до кімнати ' + code + '...';
-        updateNetUI('Підключення...', 'waiting');
+        lobbyMsg.textContent = 'Шукаю сторінку ' + code + '...';
+        updateNetUI('Пошук...', 'waiting');
 
         connectTimeout = setTimeout(() => {
           if (!mqttClient || !mqttClient.connected) {
@@ -1192,7 +1097,7 @@
               connectRoom(mode);
             } else {
               cleanupNet();
-              lobbyMsg.textContent = 'Сервер не відповідає. Спробуй ще раз або обери Соло.';
+              lobbyMsg.textContent = 'Не вдалося відкрити зʼєднання. Спробуй ще раз.';
               updateNetUI('Помилка', '');
             }
           }
@@ -1210,29 +1115,26 @@
             if (connectTimeout) { clearTimeout(connectTimeout); connectTimeout = null; }
             mqttClient.subscribe(roomTopic, { qos: 0 }, (err) => {
               if (err) {
-                lobbyMsg.textContent = 'Не вдалося увійти в кімнату: ' + err.message;
+                lobbyMsg.textContent = 'Помилка входу: ' + err.message;
                 return;
               }
               publishMqtt({ type: 'hello', level: currentLevelIdx, role: netMode });
               if (netMode === 'host') {
-                lobbyMsg.textContent = 'Кімната ' + code + ' відкрита! Натисни «Копіювати лінк» і скинь другу.';
+                lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита! Копіюй лінк і кидай другу.';
                 updateNetUI('Чекаю P2...', 'waiting');
-                showToast('Кімната ' + code + ' готова');
+                showToast('Код ' + code + ' готовий');
               } else {
-                lobbyMsg.textContent = 'У кімнаті ' + code + '! Очікую сигнал від P1...';
+                lobbyMsg.textContent = 'У кімнаті ' + code + '! Чекаю друга...';
                 updateNetUI('Пошук P1...', 'waiting');
               }
             });
           });
 
-          mqttClient.on('message', (_topic, raw) => {
-            handleGameMessage(raw.toString());
-          });
-
+          mqttClient.on('message', (_topic, raw) => handleGameMessage(raw.toString()));
           mqttClient.on('error', (err) => {
-            lobbyMsg.textContent = 'Помилка мережі: ' + (err && err.message ? err.message : 'збій');
+            lobbyMsg.textContent = 'Збій мережі: ' + (err && err.message ? err.message : 'помилка');
           });
-        } catch (e) {
+        } catch (_) {
           lobbyMsg.textContent = 'Не вдалося підключитися.';
         }
       }
@@ -1276,7 +1178,7 @@
       document.getElementById('btn-restart').addEventListener('click', () => resetPlayerToSpawn(true));
       document.getElementById('btn-mute').addEventListener('click', (e) => {
         muted = !muted;
-        e.target.textContent = 'Звук: ' + (muted ? 'OFF' : 'ON');
+        e.target.textContent = 'Звук: ' + (muted ? 'нема' : 'є');
       });
 
       try {
@@ -1284,7 +1186,7 @@
         const r = params.get('room');
         if (r) {
           roomInput.value = sanitizeCode(r);
-          lobbyMsg.textContent = 'Код кімнати підставлено! Автопідключення...';
+          lobbyMsg.textContent = 'Код підставлено! Підключаю до друга...';
           setTimeout(() => connectRoom('client'), 350);
         } else {
           roomInput.value = randomRoomCode();
@@ -1294,10 +1196,16 @@
       // =========================================================
       // 7. LEVEL & PHYSICS ENGINE
       // =========================================================
+      let activeMovers = [];
+
+      function updateLevelScrap() {
+        document.getElementById('level-scrap').textContent =
+          'Аркуш ' + String(currentLevelIdx + 1).padStart(2, '0') + ' / ' + String(LEVELS.length).padStart(2, '0') + ' · ✕' + deaths;
+      }
+
       function loadLevel(idx, broadcast = true) {
         currentLevelIdx = (idx + LEVELS.length) % LEVELS.length;
-        document.getElementById('hud-level').textContent =
-          String(currentLevelIdx + 1).padStart(2, '0') + ' / ' + String(LEVELS.length).padStart(2, '0');
+        updateLevelScrap();
         resetPlayerToSpawn(false);
         const sp = LEVELS[currentLevelIdx].spawn;
         remotePlayer.x = sp.x;
@@ -1314,10 +1222,10 @@
         const p = localPlayer;
         if (countDeath) {
           deaths++;
-          document.getElementById('hud-deaths').textContent = deaths;
+          updateLevelScrap();
           screenShake = 8;
           playSound('die');
-          spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#E63926', 14, 240);
+          spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 14, 240);
         }
         p.x = sp.x;
         p.y = sp.y;
@@ -1335,8 +1243,6 @@
         p.scaleY = 0.8;
       }
 
-      let activeMovers = [];
-
       function updateMovers(t, dt) {
         const prevT = t - dt;
         activeMovers = LEVELS[currentLevelIdx].movers.map((m, idx) => {
@@ -1350,10 +1256,6 @@
         });
       }
 
-      function getActiveMovers() {
-        return activeMovers;
-      }
-
       function rectsOverlap(a, b) {
         return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
       }
@@ -1365,14 +1267,12 @@
         const movers = activeMovers;
         const allSolids = lvl.platforms.concat(movers);
 
-        // Carry player cleanly with the moving platform they stood on last frame
         if (p.ridingMoverIdx >= 0 && movers[p.ridingMoverIdx]) {
           const rm = movers[p.ridingMoverIdx];
           p.x += rm.dx;
           p.y += rm.dy;
         }
 
-        // Push player out if a moving platform sweeps into them
         for (const rm of movers) {
           if (rectsOverlap(p, rm)) {
             if (rm.dy < 0 && p.y + p.h > rm.y && p.y < rm.y) {
@@ -1401,9 +1301,12 @@
         } else {
           p.sprinting = false;
           p.stamina = Math.min(100, p.stamina + CFG.staminaRegen * dt);
-          if (p.exhausted && p.stamina >= CFG.staminaExhaustThreshold) {
-            p.exhausted = false;
-          }
+          if (p.exhausted && p.stamina >= CFG.staminaExhaustThreshold) p.exhausted = false;
+        }
+
+        // Sweat drops when exhausted
+        if (p.exhausted && Math.random() < 0.2) {
+          spawnParticles(p.x + p.w / 2 + (Math.random() - 0.5) * 14, p.y + 4, '#2952A3', 1, 55);
         }
 
         const targetH = (p.rollTimer > 0 || (keys.down && p.grounded)) ? CFG.rollH : CFG.normalH;
@@ -1426,11 +1329,9 @@
           p.rollTimer -= dt;
           p.rot += p.facing * 18 * dt;
           if (Math.random() < 0.65) {
-            p.ghosts.push({ x: p.x, y: p.y, w: p.w, h: p.h, alpha: 0.45 });
+            p.ghosts.push({ x: p.x, y: p.y, w: p.w, h: p.h, alpha: 0.4 });
           }
-          if (p.rollTimer <= 0) {
-            p.rot = 0;
-          }
+          if (p.rollTimer <= 0) p.rot = 0;
         } else {
           p.rot = 0;
           const maxSpd = p.sprinting ? CFG.sprintSpeed : CFG.walkSpeed;
@@ -1458,7 +1359,7 @@
             p.scaleX = 0.72;
             p.scaleY = 1.32;
             playSound('jump');
-            spawnParticles(p.x + p.w / 2, p.y + p.h, '#16161A', 6, 130);
+            spawnParticles(p.x + p.w / 2, p.y + p.h, '#231F20', 6, 120);
           } else if (p.jumpsLeft > 0) {
             p.vy = -CFG.doubleJumpVel;
             p.jumpsLeft--;
@@ -1466,7 +1367,7 @@
             p.scaleX = 0.75;
             p.scaleY = 1.28;
             playSound('jump');
-            spawnParticles(p.x + p.w / 2, p.y + p.h, '#EAB308', 8, 160);
+            spawnParticles(p.x + p.w / 2, p.y + p.h, '#D49B27', 8, 150);
           }
         }
 
@@ -1494,13 +1395,11 @@
                 p.scaleX = 1.32;
                 p.scaleY = 0.7;
                 playSound('land');
-                spawnParticles(p.x + p.w / 2, p.y + p.h, '#16161A', 5, 100);
+                spawnParticles(p.x + p.w / 2, p.y + p.h, '#6A635A', 5, 95);
               }
               p.vy = 0;
               p.grounded = true;
-              if (typeof s.idx === 'number') {
-                p.ridingMoverIdx = s.idx;
-              }
+              if (typeof s.idx === 'number') p.ridingMoverIdx = s.idx;
             } else if (p.vy < 0) {
               p.y = s.y + s.h;
               p.vy = 0;
@@ -1509,7 +1408,7 @@
         }
 
         if (p.grounded && p.sprinting && Math.random() < 0.35) {
-          spawnParticles(p.x + p.w / 2, p.y + p.h, '#5A5962', 1, 60);
+          spawnParticles(p.x + p.w / 2, p.y + p.h, '#6A635A', 1, 60);
         }
 
         p.scaleX += (1 - p.scaleX) * Math.min(1, 14 * dt);
@@ -1536,7 +1435,7 @@
         if (winBannerTimer <= 0 && rectsOverlap(p, lvl.goal)) {
           winBannerTimer = 1.1;
           playSound('win');
-          spawnParticles(lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, '#EAB308', 22, 260);
+          spawnParticles(lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, '#D49B27', 22, 260);
           setTimeout(() => {
             winBannerTimer = 0;
             loadLevel(currentLevelIdx + 1, true);
@@ -1544,25 +1443,8 @@
         }
       }
 
-      function updateHUD() {
-        const p = localPlayer;
-        document.getElementById('jump-pip-1').classList.toggle('used', p.jumpsLeft < 1);
-        document.getElementById('jump-pip-2').classList.toggle('used', p.jumpsLeft < 2);
-
-        const dashPct = p.rollCooldownTimer > 0
-          ? Math.round((1 - p.rollCooldownTimer / CFG.rollCooldown) * 100)
-          : (p.airRollUsed && !p.grounded ? 0 : 100);
-        const dashBar = document.getElementById('dash-bar');
-        dashBar.style.width = dashPct + '%';
-        dashBar.classList.toggle('dash-ready', dashPct === 100);
-
-        const sprintBar = document.getElementById('sprint-bar');
-        sprintBar.style.width = Math.round(p.stamina) + '%';
-        sprintBar.classList.toggle('exhausted', p.exhausted);
-      }
-
       // =========================================================
-      // 8. RENDERER (Swiss Modular Grid + Risograph Misregistration)
+      // 8. HAND-DRAWN SKETCHBOOK RENDERER (Line Boil + Hatching + Diegetic UI)
       // =========================================================
       const cam = { x: 0, y: 0 };
 
@@ -1573,22 +1455,124 @@
         canvas.height = Math.floor(wrap.clientHeight * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
-
       window.addEventListener('resize', resizeCanvas);
 
-      function drawSwissPlayer(p, color, label) {
+      // Deterministic pseudo-random jitter for 3-frame "line boil"
+      function boilOffset(seed, frame) {
+        const n = Math.sin(seed * 12.9898 + frame * 78.233) * 43758.5453;
+        return ((n - Math.floor(n)) - 0.5) * 2.2;
+      }
+
+      function drawInkedRect(x, y, w, h, seed, fill, hatch = false) {
+        const f = boilFrame;
+        const x1 = x + boilOffset(seed + 1, f);
+        const y1 = y + boilOffset(seed + 2, f);
+        const x2 = x + w + boilOffset(seed + 3, f);
+        const y2 = y + boilOffset(seed + 4, f);
+        const x3 = x + w + boilOffset(seed + 5, f);
+        const y3 = y + h + boilOffset(seed + 6, f);
+        const x4 = x + boilOffset(seed + 7, f);
+        const y4 = y + h + boilOffset(seed + 8, f);
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.quadraticCurveTo((x1 + x2) / 2, y1 + boilOffset(seed + 9, f), x2, y2);
+        ctx.quadraticCurveTo(x2 + boilOffset(seed + 10, f), (y2 + y3) / 2, x3, y3);
+        ctx.quadraticCurveTo((x3 + x4) / 2, y3 + boilOffset(seed + 11, f), x4, y4);
+        ctx.quadraticCurveTo(x4 + boilOffset(seed + 12, f), (y4 + y1) / 2, x1, y1);
+        ctx.closePath();
+
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+
+        // Cross-hatching inside sketched platforms (preserve main path before clipping)
+        if (hatch) {
+          ctx.save();
+          ctx.clip();
+          ctx.strokeStyle = 'rgba(35, 31, 32, 0.18)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          for (let hx = x - h; hx < x + w + h; hx += 14) {
+            ctx.moveTo(hx, y);
+            ctx.lineTo(hx + h * 0.65, y + h);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Rebuild hand-drawn ink outline so it strokes cleanly around the block
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.quadraticCurveTo((x1 + x2) / 2, y1 + boilOffset(seed + 9, f), x2, y2);
+        ctx.quadraticCurveTo(x2 + boilOffset(seed + 10, f), (y2 + y3) / 2, x3, y3);
+        ctx.quadraticCurveTo((x3 + x4) / 2, y3 + boilOffset(seed + 11, f), x4, y4);
+        ctx.quadraticCurveTo(x4 + boilOffset(seed + 12, f), (y4 + y1) / 2, x1, y1);
+        ctx.closePath();
+        ctx.strokeStyle = '#231F20';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        // Slight sketch overshoot marks at corners
+        ctx.strokeStyle = 'rgba(35, 31, 32, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1 - 4, y1); ctx.lineTo(x1 + 5, y1);
+        ctx.moveTo(x2, y2 - 4); ctx.lineTo(x2, y2 + 5);
+        ctx.stroke();
+      }
+
+      function drawSketchPlayer(p, color, label, isLocal) {
+        // Inked motion ghosts during roll
         for (const g of p.ghosts) {
           ctx.save();
-          ctx.globalAlpha = g.alpha * 0.55;
-          ctx.fillStyle = '#1D4ED8';
-          ctx.fillRect(g.x + 3, g.y + 3, g.w, g.h);
+          ctx.globalAlpha = g.alpha * 0.45;
+          ctx.strokeStyle = '#2952A3';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(g.x, g.y, g.w, g.h);
           ctx.restore();
         }
 
         const cx = p.x + p.w / 2;
         const bottom = p.y + p.h;
-        const lean = p.sprinting ? p.facing * 0.12 : 0;
+        const lean = p.sprinting ? p.facing * 0.14 : 0;
 
+        // Diegetic UI 1: Floating Ink Feathers above/behind hero for Jumps Left
+        if (isLocal) {
+          for (let j = 0; j < CFG.maxJumps; j++) {
+            const ready = j < p.jumpsLeft;
+            const fx = cx - 9 + j * 18;
+            const fy = p.y - 16 + Math.sin(worldTime * 5 + j * 1.4) * 2.5;
+            ctx.save();
+            ctx.translate(fx, fy);
+            ctx.rotate(-0.35 + (j === 1 ? 0.5 : 0));
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 3.5, 6.5, 0, 0, Math.PI * 2);
+            ctx.fillStyle = ready ? '#D49B27' : 'rgba(244,237,224,0.4)';
+            ctx.fill();
+            ctx.strokeStyle = ready ? '#231F20' : 'rgba(35,31,32,0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Diegetic UI 2: Pencil Stamina Arc beside character when sprinting or recovering
+          if (p.stamina < 99.5) {
+            const pct = p.stamina / 100;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, p.y + p.h / 2, 26, -Math.PI * 0.75, -Math.PI * 0.75 + Math.PI * 1.5 * pct);
+            ctx.strokeStyle = p.exhausted ? '#C83E31' : '#231F20';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+
+        // Character body with squash/stretch & line boil
         ctx.save();
         ctx.translate(cx, bottom);
         ctx.scale(p.scaleX, p.scaleY);
@@ -1600,24 +1584,84 @@
           ctx.translate(0, p.h / 2);
         }
 
-        ctx.fillStyle = '#16161A';
-        ctx.fillRect(-p.w / 2 + 3, -p.h + 3, p.w, p.h);
+        const jx = boilOffset(101, boilFrame) * 0.6;
+        const jy = boilOffset(102, boilFrame) * 0.6;
 
-        ctx.fillStyle = color;
-        ctx.fillRect(-p.w / 2, -p.h, p.w, p.h);
-
-        ctx.fillStyle = '#FCFBF7';
-        const eyeX = p.facing > 0 ? 3 : -9;
-        ctx.fillRect(eyeX, -p.h + 8, 6, 6);
-
-        ctx.restore();
-
+        // Diegetic UI 3: Fluttering Ink Scarf (Cobalt Blue when Dash/Roll is ready!)
+        const dashReady = p.rollCooldownTimer <= 0 && (p.grounded || !p.airRollUsed);
         ctx.save();
-        ctx.fillStyle = '#16161A';
-        ctx.font = '900 10px "Helvetica Neue", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, cx, p.y - 8);
+        ctx.beginPath();
+        const scarfLen = dashReady ? 17 : 8;
+        const wave = Math.sin(worldTime * 11) * (dashReady ? 4 : 1.5);
+        ctx.moveTo(-p.facing * 6, -p.h + 15);
+        ctx.quadraticCurveTo(
+          -p.facing * (10 + scarfLen * 0.5),
+          -p.h + 14 + wave,
+          -p.facing * (8 + scarfLen),
+          -p.h + 20 - wave * 0.6
+        );
+        ctx.strokeStyle = dashReady ? '#2952A3' : 'rgba(106, 99, 90, 0.45)';
+        ctx.lineWidth = dashReady ? 5 : 3;
+        ctx.lineCap = 'round';
+        ctx.stroke();
         ctx.restore();
+
+        // Sketchy inked character silhouette
+        ctx.beginPath();
+        ctx.moveTo(-p.w / 2 + jx, -p.h + jy);
+        ctx.lineTo(p.w / 2 - jx, -p.h - jy);
+        ctx.lineTo(p.w / 2 + jx, -jy);
+        ctx.lineTo(-p.w / 2 - jx, jy);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#231F20';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+
+        // Expressive Face!
+        const ex = p.facing > 0 ? 4 : -6;
+        ctx.fillStyle = '#231F20';
+        if (p.exhausted) {
+          // Tired / panting eyes
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(ex - 4, -p.h + 11); ctx.lineTo(ex + 2, -p.h + 13);
+          ctx.moveTo(ex + 4, -p.h + 11); ctx.lineTo(ex + 8, -p.h + 13);
+          ctx.stroke();
+          // Open panting mouth
+          ctx.beginPath();
+          ctx.ellipse(ex + 2, -p.h + 20, 3, 2 + Math.sin(worldTime * 16) * 0.9, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Lively expressive eyes
+          ctx.beginPath();
+          ctx.arc(ex - 2, -p.h + 12, 2.2, 0, Math.PI * 2);
+          ctx.arc(ex + 6, -p.h + 12, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          // Smile or determined expression
+          ctx.beginPath();
+          ctx.lineWidth = 1.6;
+          if (p.sprinting) {
+            ctx.moveTo(ex - 1, -p.h + 19); ctx.lineTo(ex + 6, -p.h + 18);
+          } else {
+            ctx.arc(ex + 2, -p.h + 17, 3.2, 0.15, Math.PI - 0.15);
+          }
+          ctx.stroke();
+        }
+
+        ctx.restore();
+
+        // Remote player label
+        if (!isLocal) {
+          ctx.save();
+          ctx.fillStyle = '#2952A3';
+          ctx.font = '700 18px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText(label, cx, p.y - 10);
+          ctx.restore();
+        }
       }
 
       function render() {
@@ -1633,23 +1677,23 @@
         const sx = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
         const sy = screenShake > 0 ? (Math.random() - 0.5) * screenShake : 0;
 
-        ctx.fillStyle = '#F3EFE6';
+        // 1. Warm Sketchbook Paper Background
+        ctx.fillStyle = '#F4EDE0';
         ctx.fillRect(0, 0, w, h);
 
+        // Faint pencil notebook rules & dots
         ctx.save();
-        ctx.strokeStyle = '#DFD9CA';
+        ctx.strokeStyle = 'rgba(106, 99, 90, 0.12)';
         ctx.lineWidth = 1;
-        const gridStep = 60;
-        const offX = ((-cam.x * 0.6) % gridStep + gridStep) % gridStep;
-        const offY = ((-cam.y * 0.6) % gridStep + gridStep) % gridStep;
+        const step = 48;
+        const offX = ((-cam.x * 0.45) % step + step) % step;
+        const offY = ((-cam.y * 0.45) % step + step) % step;
         ctx.beginPath();
-        for (let gx = offX; gx < w; gx += gridStep) {
-          ctx.moveTo(gx, 0);
-          ctx.lineTo(gx, h);
+        for (let gx = offX; gx < w; gx += step) {
+          ctx.moveTo(gx, 0); ctx.lineTo(gx, h);
         }
-        for (let gy = offY; gy < h; gy += gridStep) {
-          ctx.moveTo(0, gy);
-          ctx.lineTo(w, gy);
+        for (let gy = offY; gy < h; gy += step) {
+          ctx.moveTo(0, gy); ctx.lineTo(w, gy);
         }
         ctx.stroke();
         ctx.restore();
@@ -1657,57 +1701,66 @@
         ctx.save();
         ctx.translate(-cam.x + sx, -cam.y + sy);
 
-        ctx.fillStyle = '#DCD5C5';
-        ctx.font = '900 110px "Helvetica Neue", sans-serif';
-        ctx.fillText(lvl.id, 40, 260);
+        // 2. Handwritten Page Number & Margin Sketch Notes
+        ctx.fillStyle = 'rgba(35, 31, 32, 0.09)';
+        ctx.font = '700 120px "Caveat", cursive';
+        ctx.fillText('#' + lvl.id, 38, 255);
 
-        ctx.fillStyle = '#16161A';
-        ctx.font = '900 13px "Helvetica Neue", sans-serif';
+        ctx.fillStyle = '#231F20';
+        ctx.font = '700 24px "Caveat", cursive';
         ctx.fillText(lvl.title, 44, 282);
 
         for (const n of lvl.notes) {
-          ctx.fillStyle = '#16161A';
-          ctx.font = '900 13px "Helvetica Neue", sans-serif';
+          ctx.fillStyle = '#231F20';
+          ctx.font = '700 23px "Caveat", cursive';
           ctx.fillText(n.text, n.x, n.y);
-          ctx.fillStyle = '#5A5962';
-          ctx.font = '700 10px "Helvetica Neue", sans-serif';
-          ctx.fillText(n.sub, n.x, n.y + 15);
+          ctx.fillStyle = '#6A635A';
+          ctx.font = '500 18px "Caveat", cursive';
+          ctx.fillText(n.sub, n.x, n.y + 20);
         }
 
-        const movers = getActiveMovers(worldTime);
-        const solids = lvl.platforms.concat(movers);
+        // 3. Hand-drawn Cross-Hatched Platforms
+        const solids = lvl.platforms.concat(activeMovers);
+        solids.forEach((s, i) => {
+          drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true);
+        });
 
-        for (const s of solids) {
-          ctx.fillStyle = '#D3CCBC';
-          ctx.fillRect(s.x + 5, s.y + 5, s.w, s.h);
-          ctx.fillStyle = '#16161A';
-          ctx.fillRect(s.x, s.y, s.w, s.h);
-          ctx.fillStyle = '#33323B';
-          ctx.fillRect(s.x, s.y, s.w, 3);
-        }
+        // 4. Inked Spikes / Hazards
+        lvl.hazards.forEach((hz, i) => {
+          ctx.save();
+          ctx.fillStyle = '#C83E31';
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 2;
+          const teeth = Math.max(3, Math.floor(hz.w / 10));
+          const tw = hz.w / teeth;
+          ctx.beginPath();
+          ctx.moveTo(hz.x, hz.y + hz.h);
+          for (let t = 0; t < teeth; t++) {
+            const j = boilOffset(i * 31 + t, boilFrame) * 1.1;
+            ctx.lineTo(hz.x + t * tw + tw * 0.5 + j, hz.y - 2 + j);
+            ctx.lineTo(hz.x + (t + 1) * tw, hz.y + hz.h);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        });
 
-        for (const hz of lvl.hazards) {
-          ctx.fillStyle = '#16161A';
-          ctx.fillRect(hz.x + 2, hz.y + 2, hz.w, hz.h);
-          ctx.fillStyle = '#E63926';
-          ctx.fillRect(hz.x, hz.y, hz.w, hz.h);
-        }
-
+        // 5. Hand-drawn Goal Flag
         const g = lvl.goal;
-        ctx.fillStyle = '#16161A';
-        ctx.fillRect(g.x + 4, g.y + 4, g.w, g.h);
-        ctx.fillStyle = '#EAB308';
-        ctx.fillRect(g.x, g.y, g.w, g.h);
-        ctx.fillStyle = '#16161A';
-        ctx.font = '900 10px "Helvetica Neue", sans-serif';
+        drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false);
+        ctx.fillStyle = '#231F20';
+        ctx.font = '700 20px "Caveat", cursive';
         ctx.textAlign = 'center';
-        ctx.fillText('ФІНІШ', g.x + g.w / 2, g.y - 8);
+        ctx.fillText('Фініш ★', g.x + g.w / 2, g.y - 8);
 
+        // 6. Players
         if (netConnected) {
-          drawSwissPlayer(remotePlayer, '#1D4ED8', 'P2');
+          drawSketchPlayer(remotePlayer, '#8FB3E8', 'Друг (P2)', false);
         }
-        drawSwissPlayer(localPlayer, '#E63926', 'P1');
+        drawSketchPlayer(localPlayer, '#F29A8E', 'Ти', true);
 
+        // 7. Ink Splatter Particles
         for (const pt of particles) {
           ctx.save();
           ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
@@ -1720,9 +1773,8 @@
 
         ctx.restore();
 
-        if (!paperPattern) {
-          paperPattern = ctx.createPattern(grainCanvas, 'repeat');
-        }
+        // 8. Paper Fiber Overlay
+        if (!paperPattern) paperPattern = ctx.createPattern(grainCanvas, 'repeat');
         if (paperPattern) {
           ctx.save();
           ctx.fillStyle = paperPattern;
@@ -1730,16 +1782,25 @@
           ctx.restore();
         }
 
+        // 9. Diegetic Fatigue Vignette when Exhausted
+        if (localPlayer.exhausted) {
+          const grad = ctx.createRadialGradient(w / 2, h / 2, w * 0.25, w / 2, h / 2, w * 0.7);
+          grad.addColorStop(0, 'rgba(35, 31, 32, 0)');
+          grad.addColorStop(1, 'rgba(200, 62, 49, 0.26)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, w, h);
+        }
+
+        // 10. Torn Paper Win Stamp
         if (winBannerTimer > 0) {
           ctx.save();
-          ctx.fillStyle = '#16161A';
-          ctx.fillRect(w / 2 - 150, h / 2 - 32, 300, 64);
-          ctx.fillStyle = '#EAB308';
-          ctx.fillRect(w / 2 - 154, h / 2 - 36, 300, 64);
-          ctx.fillStyle = '#16161A';
-          ctx.font = '900 20px "Helvetica Neue", sans-serif';
+          ctx.translate(w / 2, h / 2);
+          ctx.rotate(-0.03);
+          drawInkedRect(-140, -32, 280, 64, 777, '#FBF7EE', false);
+          ctx.fillStyle = '#231F20';
+          ctx.font = '700 30px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('МОДУЛЬ ПРОЙДЕНО', w / 2 - 4, h / 2 + 3);
+          ctx.fillText('Сторінку пройдено!', 0, 9);
           ctx.restore();
         }
       }
@@ -1755,10 +1816,16 @@
         lastTs = ts;
         worldTime += dt;
 
+        // 3-frame hand-drawn line boil (~7.5 fps)
+        boilTimer += dt;
+        if (boilTimer >= 0.13) {
+          boilTimer = 0;
+          boilFrame = (boilFrame + 1) % 3;
+        }
+
         if (screenShake > 0) screenShake = Math.max(0, screenShake - 28 * dt);
 
         updatePhysics(dt);
-        updateHUD();
 
         for (let i = particles.length - 1; i >= 0; i--) {
           const pt = particles[i];
@@ -1771,7 +1838,6 @@
         }
 
         if (netConnected) {
-          // Velocity prediction + smooth error correction (60fps glide even over relay)
           remotePlayer.tx += remotePlayer.vx * dt;
           remotePlayer.ty += remotePlayer.vy * dt;
           remotePlayer.x += remotePlayer.vx * dt;
