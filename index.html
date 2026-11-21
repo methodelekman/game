@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>index</title>
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <style>
     :root {
       --paper: #F3EFE6;
@@ -933,28 +933,23 @@
       });
 
       // =========================================================
-      // 6. MULTIPLAYER P2P (PeerJS — Zero Server Setup)
+      // 6. MULTIPLAYER (MQTT over WSS — Zero NAT Issues)
       // =========================================================
-      let peer = null;
-      let conn = null;
+      let mqttClient = null;
       let netMode = 'solo';
       let netConnected = false;
       let pingMs = 0;
       let lastPingSent = 0;
       let netSyncTimer = 0;
       let connectTimeout = null;
+      let roomTopic = '';
+      const myClientId = 'g_' + Math.random().toString(36).slice(2, 10);
 
-      const PEER_CONFIG = {
-        debug: 1,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun.cloudflare.com:3478' }
-          ]
-        }
-      };
+      const BROKERS = [
+        'wss://broker.emqx.io:8084/mqtt',
+        'wss://broker.hivemq.com:8884/mqtt'
+      ];
+      let brokerIdx = 0;
 
       function randomRoomCode() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -982,191 +977,161 @@
         netDot.className = 'status-dot' + (stateClass ? ' ' + stateClass : '');
       }
 
-      function cleanupPeer() {
+      function cleanupNet() {
         if (connectTimeout) {
           clearTimeout(connectTimeout);
           connectTimeout = null;
         }
-        if (conn) {
-          try { conn.close(); } catch (_) {}
-          conn = null;
-        }
-        if (peer) {
-          try { peer.destroy(); } catch (_) {}
-          peer = null;
+        if (mqttClient) {
+          try { mqttClient.end(true); } catch (_) {}
+          mqttClient = null;
         }
         netConnected = false;
       }
 
       function sanitizeCode(val) {
-        return (val || 'SWISS-01').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SWISS-01';
+        return (val || 'SWISS01').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SWISS01';
       }
 
-      function sendStatePacket() {
-        if (!conn || !netConnected) return;
+      function publishMsg(payload) {
+        if (!mqttClient || !mqttClient.connected || !roomTopic) return;
         try {
-          conn.send({
-            type: 'state',
-            x: Math.round(localPlayer.x),
-            y: Math.round(localPlayer.y),
-            vx: Math.round(localPlayer.vx),
-            vy: Math.round(localPlayer.vy),
-            f: localPlayer.facing,
-            sx: Number(localPlayer.scaleX.toFixed(2)),
-            sy: Number(localPlayer.scaleY.toFixed(2)),
-            rt: Number(localPlayer.rollTimer.toFixed(2)),
-            rot: Number(localPlayer.rot.toFixed(2))
-          });
+          payload.sender = myClientId;
+          mqttClient.publish(roomTopic, JSON.stringify(payload), { qos: 0 });
         } catch (_) {}
       }
 
-      function setupConnection(c) {
-        conn = c;
-        if (connectTimeout) {
-          clearTimeout(connectTimeout);
-          connectTimeout = null;
-        }
-        conn.on('open', () => {
-          if (connectTimeout) {
-            clearTimeout(connectTimeout);
-            connectTimeout = null;
-          }
-          netConnected = true;
-          updateNetUI(netMode === 'host' ? 'P1 • Онлайн' : 'P2 • Онлайн', 'online');
-          lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
-          lobbyModal.classList.add('hidden');
-          showToast('Гравець підключився!');
-          if (netMode === 'host') {
-            conn.send({ type: 'level', idx: currentLevelIdx });
-          }
-          sendStatePacket();
-        });
-        conn.on('error', (err) => {
-          lobbyMsg.textContent = 'Помилка каналу: ' + (err && err.message ? err.message : 'збій зʼєднання');
-          lobbyModal.classList.remove('hidden');
-          updateNetUI('Помилка', '');
-        });
-
-        conn.on('data', (data) => {
-          if (!data || typeof data !== 'object') return;
-          if (data.type === 'state') {
-            remotePlayer.tx = data.x;
-            remotePlayer.ty = data.y;
-            remotePlayer.vx = data.vx;
-            remotePlayer.vy = data.vy;
-            remotePlayer.facing = data.f;
-            remotePlayer.scaleX = data.sx;
-            remotePlayer.scaleY = data.sy;
-            remotePlayer.rollTimer = data.rt;
-            remotePlayer.rot = data.rot;
-          } else if (data.type === 'level') {
-            if (data.idx !== currentLevelIdx) {
-              loadLevel(data.idx, false);
-            }
-          } else if (data.type === 'ping') {
-            conn.send({ type: 'pong', t: data.t });
-          } else if (data.type === 'pong') {
-            pingMs = Math.max(1, Math.round(performance.now() - data.t));
-            pingReadout.textContent = pingMs + ' ms';
-            if (netConnected) {
-              updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • ' + pingMs + 'ms', 'online');
-            }
-          }
-        });
-
-        conn.on('close', () => {
-          netConnected = false;
-          updateNetUI('Відключено', 'waiting');
-          showToast('Друг вийшов');
+      function sendStatePacket() {
+        if (!netConnected) return;
+        publishMsg({
+          type: 'state',
+          x: Math.round(localPlayer.x),
+          y: Math.round(localPlayer.y),
+          vx: Math.round(localPlayer.vx),
+          vy: Math.round(localPlayer.vy),
+          f: localPlayer.facing,
+          sx: Number(localPlayer.scaleX.toFixed(2)),
+          sy: Number(localPlayer.scaleY.toFixed(2)),
+          rt: Number(localPlayer.rollTimer.toFixed(2)),
+          rot: Number(localPlayer.rot.toFixed(2))
         });
       }
 
-      function startHost() {
+      function connectRoom(mode) {
         ensureAudio();
-        if (typeof Peer === 'undefined') {
-          lobbyMsg.textContent = 'PeerJS недоступний у цьому середовищі. Спробуй Соло або відкрий на GitHub Pages.';
+        if (typeof mqtt === 'undefined') {
+          lobbyMsg.textContent = 'Бібліотека мережі ще не завантажилась. Онови сторінку (F5).';
           return;
         }
-        cleanupPeer();
-        netMode = 'host';
-        if (roomInput.value === 'SWISS-01') {
-          roomInput.value = randomRoomCode();
-        }
+        cleanupNet();
+        netMode = mode;
         const code = sanitizeCode(roomInput.value);
         roomInput.value = code;
-        const peerId = 'swiss-plat-' + code;
-        lobbyMsg.textContent = 'Створення кімнати ' + code + '...';
-        updateNetUI('Очікування P2...', 'waiting');
+        roomTopic = 'grids01/coop/room/' + code;
 
-        try {
-          peer = new Peer(peerId, PEER_CONFIG);
-          peer.on('open', () => {
-            lobbyMsg.textContent = 'Кімната ' + code + ' готова! Натисни «Копіювати лінк» і скинь другу.';
-            showToast('Кімната ' + code + ' відкрита');
-          });
-          peer.on('connection', (c) => {
-            setupConnection(c);
-          });
-          peer.on('error', (err) => {
-            if (err.type === 'unavailable-id') {
-              roomInput.value = randomRoomCode();
-              lobbyMsg.textContent = 'Код був зайнятий — згенеровано новий (' + roomInput.value + '). Натисни «Створити (P1)» ще раз.';
-            } else {
-              lobbyMsg.textContent = 'Помилка мережі: ' + (err.message || err.type);
-            }
-            updateNetUI('Помилка', '');
-          });
-        } catch (e) {
-          lobbyMsg.textContent = 'Не вдалося запустити P2P.';
-        }
-      }
-
-      function startJoin() {
-        ensureAudio();
-        if (typeof Peer === 'undefined') {
-          lobbyMsg.textContent = 'PeerJS недоступний у цьому середовищі.';
-          return;
-        }
-        cleanupPeer();
-        netMode = 'client';
-        const code = sanitizeCode(roomInput.value);
-        roomInput.value = code;
-        const targetId = 'swiss-plat-' + code;
-        lobbyMsg.textContent = 'Підключення до ' + code + '...';
+        lobbyMsg.textContent = 'Підключення до кімнати ' + code + '...';
         updateNetUI('Підключення...', 'waiting');
 
         connectTimeout = setTimeout(() => {
-          if (!netConnected) {
-            cleanupPeer();
-            lobbyMsg.textContent = 'Не вдалося зʼєднатися за 10с. Перевір, чи P1 відкрив кімнату ' + code + ' на сайті, або створіть нову.';
-            lobbyModal.classList.remove('hidden');
-            updateNetUI('Таймаут', '');
+          if (!mqttClient || !mqttClient.connected) {
+            if (brokerIdx < BROKERS.length - 1) {
+              brokerIdx++;
+              connectRoom(mode);
+            } else {
+              cleanupNet();
+              lobbyMsg.textContent = 'Сервер не відповідає. Спробуй ще раз або обери Соло.';
+              updateNetUI('Помилка', '');
+            }
           }
-        }, 10000);
+        }, 7000);
 
         try {
-          peer = new Peer(undefined, PEER_CONFIG);
-          peer.on('open', () => {
-            const c = peer.connect(targetId, { reliable: true });
-            setupConnection(c);
+          mqttClient = mqtt.connect(BROKERS[brokerIdx], {
+            clientId: myClientId + '_' + Date.now().toString(36),
+            clean: true,
+            reconnectPeriod: 2000,
+            connectTimeout: 6000
           });
-          peer.on('error', (err) => {
+
+          mqttClient.on('connect', () => {
             if (connectTimeout) { clearTimeout(connectTimeout); connectTimeout = null; }
-            lobbyMsg.textContent = err.type === 'peer-unavailable'
-              ? 'Кімнату ' + code + ' не знайдено. Нехай P1 спочатку натисне «Створити (P1)».'
-              : 'Помилка: ' + (err.message || err.type);
-            updateNetUI('Не знайдено', '');
+            mqttClient.subscribe(roomTopic, { qos: 0 }, (err) => {
+              if (err) {
+                lobbyMsg.textContent = 'Не вдалося увійти в кімнату: ' + err.message;
+                return;
+              }
+              publishMsg({ type: 'hello', level: currentLevelIdx, role: netMode });
+              if (netMode === 'host') {
+                lobbyMsg.textContent = 'Кімната ' + code + ' відкрита! Натисни «Копіювати лінк» і скинь другу.';
+                updateNetUI('Чекаю P2...', 'waiting');
+                showToast('Кімната ' + code + ' готова');
+              } else {
+                lobbyMsg.textContent = 'У кімнаті ' + code + '! Очікую сигнал від P1...';
+                updateNetUI('Пошук P1...', 'waiting');
+              }
+            });
+          });
+
+          mqttClient.on('message', (_topic, raw) => {
+            let data = null;
+            try { data = JSON.parse(raw.toString()); } catch (_) { return; }
+            if (!data || data.sender === myClientId) return;
+
+            if (!netConnected) {
+              netConnected = true;
+              updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • Онлайн', 'online');
+              lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
+              lobbyModal.classList.add('hidden');
+              showToast('Гравець підключився!');
+              publishMsg({ type: 'hello_ack', level: currentLevelIdx });
+              sendStatePacket();
+            }
+
+            if (data.type === 'hello' || data.type === 'hello_ack') {
+              if (netMode === 'host') {
+                publishMsg({ type: 'level', idx: currentLevelIdx });
+              } else if (typeof data.level === 'number' && data.level !== currentLevelIdx) {
+                loadLevel(data.level, false);
+              }
+              sendStatePacket();
+            } else if (data.type === 'state') {
+              remotePlayer.tx = data.x;
+              remotePlayer.ty = data.y;
+              remotePlayer.vx = data.vx;
+              remotePlayer.vy = data.vy;
+              remotePlayer.facing = data.f;
+              remotePlayer.scaleX = data.sx;
+              remotePlayer.scaleY = data.sy;
+              remotePlayer.rollTimer = data.rt;
+              remotePlayer.rot = data.rot;
+            } else if (data.type === 'level') {
+              if (data.idx !== currentLevelIdx) {
+                loadLevel(data.idx, false);
+              }
+            } else if (data.type === 'ping') {
+              publishMsg({ type: 'pong', t: data.t });
+            } else if (data.type === 'pong') {
+              pingMs = Math.max(1, Math.round(performance.now() - data.t));
+              pingReadout.textContent = pingMs + ' ms';
+              if (netConnected) {
+                updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • ' + pingMs + 'ms', 'online');
+              }
+            }
+          });
+
+          mqttClient.on('error', (err) => {
+            lobbyMsg.textContent = 'Помилка мережі: ' + (err && err.message ? err.message : 'збій');
           });
         } catch (e) {
           lobbyMsg.textContent = 'Не вдалося підключитися.';
         }
       }
 
-      document.getElementById('btn-host').addEventListener('click', startHost);
-      document.getElementById('btn-join').addEventListener('click', startJoin);
+      document.getElementById('btn-host').addEventListener('click', () => connectRoom('host'));
+      document.getElementById('btn-join').addEventListener('click', () => connectRoom('client'));
       document.getElementById('btn-solo').addEventListener('click', () => {
         ensureAudio();
-        cleanupPeer();
+        cleanupNet();
         netMode = 'solo';
         updateNetUI('Соло', '');
         lobbyModal.classList.add('hidden');
@@ -1210,7 +1175,7 @@
         if (r) {
           roomInput.value = sanitizeCode(r);
           lobbyMsg.textContent = 'Код кімнати підставлено! Автопідключення...';
-          setTimeout(() => startJoin(), 350);
+          setTimeout(() => connectRoom('client'), 350);
         } else {
           roomInput.value = randomRoomCode();
         }
@@ -1229,8 +1194,8 @@
         remotePlayer.y = sp.y;
         remotePlayer.tx = sp.x;
         remotePlayer.ty = sp.y;
-        if (broadcast && netConnected && conn) {
-          conn.send({ type: 'level', idx: currentLevelIdx });
+        if (broadcast && netConnected) {
+          publishMsg({ type: 'level', idx: currentLevelIdx });
         }
       }
 
@@ -1699,13 +1664,13 @@
           remotePlayer.x += (remotePlayer.tx - remotePlayer.x) * Math.min(1, 18 * dt);
           remotePlayer.y += (remotePlayer.ty - remotePlayer.y) * Math.min(1, 18 * dt);
           netSyncTimer += dt;
-          if (netSyncTimer >= 0.025 && conn) {
+          if (netSyncTimer >= 0.03) {
             netSyncTimer = 0;
             sendStatePacket();
           }
-          if (ts - lastPingSent > 2000 && conn) {
+          if (ts - lastPingSent > 2000) {
             lastPingSent = ts;
-            conn.send({ type: 'ping', t: performance.now() });
+            publishMsg({ type: 'ping', t: performance.now() });
           }
         }
 
