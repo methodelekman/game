@@ -933,9 +933,12 @@
       });
 
       // =========================================================
-      // 6. MULTIPLAYER (MQTT over WSS — Zero NAT Issues)
+      // 6. MULTIPLAYER (Hybrid: MQTT Signaling + Direct WebRTC P2P)
       // =========================================================
       let mqttClient = null;
+      let rtcPc = null;
+      let rtcDc = null;
+      let p2pActive = false;
       let netMode = 'solo';
       let netConnected = false;
       let pingMs = 0;
@@ -950,6 +953,14 @@
         'wss://broker.hivemq.com:8884/mqtt'
       ];
       let brokerIdx = 0;
+
+      const RTC_CONFIG = {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun.cloudflare.com:3478' }
+        ]
+      };
 
       function randomRoomCode() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -977,11 +988,18 @@
         netDot.className = 'status-dot' + (stateClass ? ' ' + stateClass : '');
       }
 
+      function cleanupRtc() {
+        p2pActive = false;
+        if (rtcDc) { try { rtcDc.close(); } catch (_) {} rtcDc = null; }
+        if (rtcPc) { try { rtcPc.close(); } catch (_) {} rtcPc = null; }
+      }
+
       function cleanupNet() {
         if (connectTimeout) {
           clearTimeout(connectTimeout);
           connectTimeout = null;
         }
+        cleanupRtc();
         if (mqttClient) {
           try { mqttClient.end(true); } catch (_) {}
           mqttClient = null;
@@ -993,7 +1011,7 @@
         return (val || 'SWISS01').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SWISS01';
       }
 
-      function publishMsg(payload) {
+      function publishMqtt(payload) {
         if (!mqttClient || !mqttClient.connected || !roomTopic) return;
         try {
           payload.sender = myClientId;
@@ -1001,20 +1019,140 @@
         } catch (_) {}
       }
 
+      function sendGameMsg(payload) {
+        if (p2pActive && rtcDc && rtcDc.readyState === 'open') {
+          try {
+            rtcDc.send(JSON.stringify(payload));
+            return;
+          } catch (_) {}
+        }
+        publishMqtt(payload);
+      }
+
       function sendStatePacket() {
         if (!netConnected) return;
-        publishMsg({
-          type: 'state',
-          x: Math.round(localPlayer.x),
-          y: Math.round(localPlayer.y),
-          vx: Math.round(localPlayer.vx),
-          vy: Math.round(localPlayer.vy),
-          f: localPlayer.facing,
-          sx: Number(localPlayer.scaleX.toFixed(2)),
-          sy: Number(localPlayer.scaleY.toFixed(2)),
-          rt: Number(localPlayer.rollTimer.toFixed(2)),
-          rot: Number(localPlayer.rot.toFixed(2))
-        });
+        const compact = [
+          Math.round(localPlayer.x),
+          Math.round(localPlayer.y),
+          Math.round(localPlayer.vx),
+          Math.round(localPlayer.vy),
+          localPlayer.facing,
+          Number(localPlayer.scaleX.toFixed(2)),
+          Number(localPlayer.scaleY.toFixed(2)),
+          Number(localPlayer.rollTimer.toFixed(2)),
+          Number(localPlayer.rot.toFixed(2))
+        ];
+        if (p2pActive && rtcDc && rtcDc.readyState === 'open') {
+          try { rtcDc.send('S|' + compact.join('|')); return; } catch (_) {}
+        }
+        publishMqtt({ t: 's', d: compact });
+      }
+
+      function applyRemoteStateArr(d) {
+        remotePlayer.tx = d[0];
+        remotePlayer.ty = d[1];
+        remotePlayer.vx = d[2];
+        remotePlayer.vy = d[3];
+        remotePlayer.facing = d[4];
+        remotePlayer.scaleX = d[5];
+        remotePlayer.scaleY = d[6];
+        remotePlayer.rollTimer = d[7];
+        remotePlayer.rot = d[8];
+      }
+
+      function handleGameMessage(raw) {
+        if (typeof raw === 'string' && raw.startsWith('S|')) {
+          const parts = raw.slice(2).split('|').map(Number);
+          if (parts.length >= 9) applyRemoteStateArr(parts);
+          return;
+        }
+        let data = null;
+        try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (_) { return; }
+        if (!data || data.sender === myClientId) return;
+
+        if (!netConnected) {
+          netConnected = true;
+          updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • Онлайн', 'online');
+          lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
+          lobbyModal.classList.add('hidden');
+          showToast('Гравець підключився!');
+          publishMqtt({ type: 'hello_ack', level: currentLevelIdx });
+          sendStatePacket();
+          if (netMode === 'host') startWebRtcOffer();
+        }
+
+        if (data.t === 's' && Array.isArray(data.d)) {
+          applyRemoteStateArr(data.d);
+        } else if (data.type === 'hello' || data.type === 'hello_ack') {
+          if (netMode === 'host') {
+            publishMqtt({ type: 'level', idx: currentLevelIdx });
+            if (!rtcPc) startWebRtcOffer();
+          } else if (typeof data.level === 'number' && data.level !== currentLevelIdx) {
+            loadLevel(data.level, false);
+          }
+          sendStatePacket();
+        } else if (data.type === 'level') {
+          if (data.idx !== currentLevelIdx) loadLevel(data.idx, false);
+        } else if (data.type === 'ping') {
+          sendGameMsg({ type: 'pong', t: data.t });
+        } else if (data.type === 'pong') {
+          pingMs = Math.max(1, Math.round(performance.now() - data.t));
+          pingReadout.textContent = pingMs + ' ms' + (p2pActive ? ' (P2P)' : ' (Relay)');
+          if (netConnected) {
+            const tag = p2pActive ? 'P2P ' : '';
+            updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • ' + tag + pingMs + 'ms', 'online');
+          }
+        } else if (data.type === 'rtc_offer' && netMode !== 'host') {
+          handleWebRtcOffer(data.sdp);
+        } else if (data.type === 'rtc_answer' && netMode === 'host') {
+          if (rtcPc) rtcPc.setRemoteDescription(new RTCSessionDescription(data.sdp)).catch(() => {});
+        } else if (data.type === 'rtc_ice') {
+          if (rtcPc && data.cand) rtcPc.addIceCandidate(new RTCIceCandidate(data.cand)).catch(() => {});
+        }
+      }
+
+      function setupDataChannel(dc) {
+        rtcDc = dc;
+        dc.onopen = () => {
+          p2pActive = true;
+          showToast('Прямий P2P канал активний!');
+          sendStatePacket();
+        };
+        dc.onclose = () => { p2pActive = false; };
+        dc.onmessage = (ev) => handleGameMessage(ev.data);
+      }
+
+      function createRtcPeer() {
+        cleanupRtc();
+        if (typeof RTCPeerConnection === 'undefined') return null;
+        const pc = new RTCPeerConnection(RTC_CONFIG);
+        rtcPc = pc;
+        pc.onicecandidate = (ev) => {
+          if (ev.candidate) publishMqtt({ type: 'rtc_ice', cand: ev.candidate });
+        };
+        pc.ondatachannel = (ev) => setupDataChannel(ev.channel);
+        return pc;
+      }
+
+      function startWebRtcOffer() {
+        const pc = createRtcPeer();
+        if (!pc) return;
+        const dc = pc.createDataChannel('game', { ordered: false, maxRetransmits: 0 });
+        setupDataChannel(dc);
+        pc.createOffer()
+          .then((offer) => pc.setLocalDescription(offer).then(() => offer))
+          .then((offer) => publishMqtt({ type: 'rtc_offer', sdp: offer }))
+          .catch(() => {});
+      }
+
+      function handleWebRtcOffer(sdp) {
+        const pc = createRtcPeer();
+        if (!pc) return;
+        pc.setRemoteDescription(new RTCSessionDescription(sdp))
+          .then(() => pc.createAnswer())
+          .then((ans) => pc.setLocalDescription(ans).then(() => ans))
+          .then((ans) => publishMqtt({ type: 'rtc_answer', sdp: ans }))
+          .catch(() => {});
       }
 
       function connectRoom(mode) {
@@ -1060,7 +1198,7 @@
                 lobbyMsg.textContent = 'Не вдалося увійти в кімнату: ' + err.message;
                 return;
               }
-              publishMsg({ type: 'hello', level: currentLevelIdx, role: netMode });
+              publishMqtt({ type: 'hello', level: currentLevelIdx, role: netMode });
               if (netMode === 'host') {
                 lobbyMsg.textContent = 'Кімната ' + code + ' відкрита! Натисни «Копіювати лінк» і скинь другу.';
                 updateNetUI('Чекаю P2...', 'waiting');
@@ -1073,50 +1211,7 @@
           });
 
           mqttClient.on('message', (_topic, raw) => {
-            let data = null;
-            try { data = JSON.parse(raw.toString()); } catch (_) { return; }
-            if (!data || data.sender === myClientId) return;
-
-            if (!netConnected) {
-              netConnected = true;
-              updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • Онлайн', 'online');
-              lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
-              lobbyModal.classList.add('hidden');
-              showToast('Гравець підключився!');
-              publishMsg({ type: 'hello_ack', level: currentLevelIdx });
-              sendStatePacket();
-            }
-
-            if (data.type === 'hello' || data.type === 'hello_ack') {
-              if (netMode === 'host') {
-                publishMsg({ type: 'level', idx: currentLevelIdx });
-              } else if (typeof data.level === 'number' && data.level !== currentLevelIdx) {
-                loadLevel(data.level, false);
-              }
-              sendStatePacket();
-            } else if (data.type === 'state') {
-              remotePlayer.tx = data.x;
-              remotePlayer.ty = data.y;
-              remotePlayer.vx = data.vx;
-              remotePlayer.vy = data.vy;
-              remotePlayer.facing = data.f;
-              remotePlayer.scaleX = data.sx;
-              remotePlayer.scaleY = data.sy;
-              remotePlayer.rollTimer = data.rt;
-              remotePlayer.rot = data.rot;
-            } else if (data.type === 'level') {
-              if (data.idx !== currentLevelIdx) {
-                loadLevel(data.idx, false);
-              }
-            } else if (data.type === 'ping') {
-              publishMsg({ type: 'pong', t: data.t });
-            } else if (data.type === 'pong') {
-              pingMs = Math.max(1, Math.round(performance.now() - data.t));
-              pingReadout.textContent = pingMs + ' ms';
-              if (netConnected) {
-                updateNetUI((netMode === 'host' ? 'P1' : 'P2') + ' • ' + pingMs + 'ms', 'online');
-              }
-            }
+            handleGameMessage(raw.toString());
           });
 
           mqttClient.on('error', (err) => {
@@ -1195,7 +1290,7 @@
         remotePlayer.tx = sp.x;
         remotePlayer.ty = sp.y;
         if (broadcast && netConnected) {
-          publishMsg({ type: 'level', idx: currentLevelIdx });
+          sendGameMsg({ type: 'level', idx: currentLevelIdx });
         }
       }
 
@@ -1661,16 +1756,31 @@
         }
 
         if (netConnected) {
-          remotePlayer.x += (remotePlayer.tx - remotePlayer.x) * Math.min(1, 18 * dt);
-          remotePlayer.y += (remotePlayer.ty - remotePlayer.y) * Math.min(1, 18 * dt);
+          // Velocity prediction + smooth error correction (60fps glide even over relay)
+          remotePlayer.tx += remotePlayer.vx * dt;
+          remotePlayer.ty += remotePlayer.vy * dt;
+          remotePlayer.x += remotePlayer.vx * dt;
+          remotePlayer.y += remotePlayer.vy * dt;
+
+          const errX = remotePlayer.tx - remotePlayer.x;
+          const errY = remotePlayer.ty - remotePlayer.y;
+          if (Math.abs(errX) > 130 || Math.abs(errY) > 130) {
+            remotePlayer.x = remotePlayer.tx;
+            remotePlayer.y = remotePlayer.ty;
+          } else {
+            remotePlayer.x += errX * Math.min(1, 15 * dt);
+            remotePlayer.y += errY * Math.min(1, 15 * dt);
+          }
+
           netSyncTimer += dt;
-          if (netSyncTimer >= 0.03) {
+          const syncInterval = p2pActive ? 0.025 : 0.075;
+          if (netSyncTimer >= syncInterval) {
             netSyncTimer = 0;
             sendStatePacket();
           }
           if (ts - lastPingSent > 2000) {
             lastPingSent = ts;
-            publishMsg({ type: 'ping', t: performance.now() });
+            sendGameMsg({ type: 'ping', t: performance.now() });
           }
         }
 
