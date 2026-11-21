@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>GRIDS // 01 — Швейцарський P2P Платформер</title>
+  <title>index</title>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
@@ -814,6 +814,7 @@
           scaleY: 1,
           rot: 0,
           ghosts: [],
+          ridingMoverIdx: -1,
           isRemote,
           tx: sp.x,
           ty: sp.y
@@ -1169,6 +1170,7 @@
         p.y = sp.y;
         p.vx = 0;
         p.vy = 0;
+        p.ridingMoverIdx = -1;
         p.h = CFG.normalH;
         p.jumpsLeft = CFG.maxJumps;
         p.rollTimer = 0;
@@ -1180,16 +1182,23 @@
         p.scaleY = 0.8;
       }
 
-      function getActiveMovers(t) {
-        return LEVELS[currentLevelIdx].movers.map((m) => {
+      let activeMovers = [];
+
+      function updateMovers(t, dt) {
+        const prevT = t - dt;
+        activeMovers = LEVELS[currentLevelIdx].movers.map((m, idx) => {
           const s = (Math.sin(t * m.speed) + 1) * 0.5;
-          const prevS = (Math.sin((t - 0.016) * m.speed) + 1) * 0.5;
+          const prevS = (Math.sin(prevT * m.speed) + 1) * 0.5;
           const x = m.ax + (m.bx - m.ax) * s;
           const y = m.ay + (m.by - m.ay) * s;
           const px = m.ax + (m.bx - m.ax) * prevS;
           const py = m.ay + (m.by - m.ay) * prevS;
-          return { x, y, w: m.w, h: m.h, dx: x - px, dy: y - py };
+          return { idx, x, y, w: m.w, h: m.h, dx: x - px, dy: y - py };
         });
+      }
+
+      function getActiveMovers() {
+        return activeMovers;
       }
 
       function rectsOverlap(a, b) {
@@ -1199,8 +1208,31 @@
       function updatePhysics(dt) {
         const p = localPlayer;
         const lvl = LEVELS[currentLevelIdx];
-        const movers = getActiveMovers(worldTime);
+        updateMovers(worldTime, dt);
+        const movers = activeMovers;
         const allSolids = lvl.platforms.concat(movers);
+
+        // Carry player cleanly with the moving platform they stood on last frame
+        if (p.ridingMoverIdx >= 0 && movers[p.ridingMoverIdx]) {
+          const rm = movers[p.ridingMoverIdx];
+          p.x += rm.dx;
+          p.y += rm.dy;
+        }
+
+        // Push player out if a moving platform sweeps into them
+        for (const rm of movers) {
+          if (rectsOverlap(p, rm)) {
+            if (rm.dy < 0 && p.y + p.h > rm.y && p.y < rm.y) {
+              p.y = rm.y - p.h;
+              p.vy = Math.min(p.vy, 0);
+              p.grounded = true;
+            } else if (rm.dx > 0) {
+              p.x = rm.x + rm.w;
+            } else if (rm.dx < 0) {
+              p.x = rm.x - p.w;
+            }
+          }
+        }
 
         if (p.rollCooldownTimer > 0) p.rollCooldownTimer = Math.max(0, p.rollCooldownTimer - dt);
         if (p.jumpBufferTimer > 0) p.jumpBufferTimer = Math.max(0, p.jumpBufferTimer - dt);
@@ -1299,10 +1331,11 @@
 
         const wasGrounded = p.grounded;
         p.grounded = false;
+        p.ridingMoverIdx = -1;
         p.y += p.vy * dt;
         for (const s of allSolids) {
           if (rectsOverlap(p, s)) {
-            if (p.vy > 0) {
+            if (p.vy >= 0) {
               p.y = s.y - p.h;
               if (!wasGrounded && p.vy > 220) {
                 p.scaleX = 1.32;
@@ -1312,7 +1345,9 @@
               }
               p.vy = 0;
               p.grounded = true;
-              if (s.dx) p.x += s.dx;
+              if (typeof s.idx === 'number') {
+                p.ridingMoverIdx = s.idx;
+              }
             } else if (p.vy < 0) {
               p.y = s.y + s.h;
               p.vy = 0;
