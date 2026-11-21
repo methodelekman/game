@@ -414,6 +414,213 @@
       gap: 8px;
     }
 
+    /* Fortnite-style 8-Slice Sketchbook Taunt Wheel */
+    #taunt-wheel {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 28;
+      pointer-events: auto;
+      background: rgba(35, 31, 32, 0.14);
+    }
+
+    #taunt-wheel.open {
+      display: flex;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: 310px;
+      height: 310px;
+      animation: wheelPop 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes wheelPop {
+      0% { transform: scale(0.75); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--sheet);
+      border: 2.5px solid var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6px;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.25);
+      pointer-events: none;
+    }
+
+    .wheel-center-name {
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.05;
+    }
+
+    .wheel-center-hint {
+      font-size: 13px;
+      color: var(--pencil);
+      margin-top: 2px;
+    }
+
+    /* Host Lobby Controls Strip (bottom center while in Lobby Room) */
+    #host-panel {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-0.4deg);
+      background: var(--sheet);
+      border: 2.5px solid var(--ink);
+      border-radius: 6px 10px 5px 9px;
+      box-shadow: 4px 5px 0 rgba(35, 31, 32, 0.25);
+      padding: 10px 14px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 24;
+      max-width: calc(100% - 28px);
+    }
+
+    #host-panel.visible {
+      display: flex;
+    }
+
+    .hp-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 17px;
+      font-weight: 700;
+      padding-right: 8px;
+      border-right: 1.5px dashed rgba(35, 31, 32, 0.28);
+    }
+
+    .hp-item:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .hp-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Animated Bottom-Up Push Chat */
+    #chat-box {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+      z-index: 26;
+      pointer-events: none;
+    }
+
+    #chat-messages {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      max-height: 210px;
+    }
+
+    .chat-msg-wrap {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(22px);
+      transition: max-height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.28s ease,
+                  transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                  margin-top 0.32s ease;
+      margin-top: 0;
+    }
+
+    .chat-msg-wrap.in {
+      max-height: 76px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 5px;
+    }
+
+    .chat-msg-wrap.faded {
+      opacity: 0.42;
+    }
+
+    .chat-bubble {
+      display: inline-block;
+      max-width: 100%;
+      background: rgba(251, 247, 238, 0.92);
+      border: 1.8px solid var(--ink);
+      border-radius: 5px 10px 8px 4px;
+      padding: 3px 9px;
+      font-size: 17px;
+      line-height: 1.18;
+      box-shadow: 2px 2px 0 rgba(35, 31, 32, 0.16);
+      word-break: break-word;
+    }
+
+    .chat-nick {
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    #chat-input-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    #chat-input-row.open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: var(--sheet);
+      border: 2px solid var(--ink);
+      border-radius: 5px 8px 4px 7px;
+      padding: 4px 9px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      outline: none;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.2);
+    }
+
+    #chat-hint {
+      font-size: 14px;
+      color: rgba(35, 31, 32, 0.48);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
     /* Subtle Pencil Version Tag */
     #version-tag {
       position: absolute;
@@ -531,6 +738,7 @@
       </div>
 
       <div id="corner-tabs">
+        <button class="sketch-btn" id="btn-taunt" title="Колесо таунтів (B)">★ Таунти (B)</button>
         <button class="sketch-btn" id="btn-restart" title="Перемалювати (R)">↺ Заново</button>
         <button class="sketch-btn" id="btn-mute">Звук: є</button>
         <button class="sketch-btn net-pill" id="btn-lobby">
@@ -597,7 +805,51 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.7.0</div>
+      <div id="host-panel">
+        <div class="hp-item">
+          <span>Раунди:</span>
+          <button class="sketch-btn" id="hp-rounds-minus" style="padding:1px 7px;">−</button>
+          <span id="hp-rounds-val" style="min-width:22px; text-align:center;">5</span>
+          <button class="sketch-btn" id="hp-rounds-plus" style="padding:1px 7px;">+</button>
+          <label class="hp-check"><input type="checkbox" id="hp-rounds-inf" checked /> ∞</label>
+        </div>
+        <div class="hp-item">
+          <span>Швидкість:</span>
+          <button class="sketch-btn" id="hp-speed-btn" style="padding:2px 9px;">Норма</button>
+        </div>
+        <div class="hp-item">
+          <span>Гравітація:</span>
+          <button class="sketch-btn" id="hp-grav-btn" style="padding:2px 9px;">Норма</button>
+        </div>
+        <div class="hp-item">
+          <span>Колізія:</span>
+          <button class="sketch-btn" id="hp-coll-btn" style="padding:2px 9px;">Увімк</button>
+        </div>
+        <div class="hp-item">
+          <button class="sketch-btn ink-red" id="hp-start-btn" style="padding:3px 14px;">Почати гру ▶</button>
+        </div>
+      </div>
+
+      <div id="chat-box">
+        <div id="chat-messages"></div>
+        <div id="chat-input-row">
+          <input id="chat-input" type="text" maxlength="90" placeholder="Написати в чат..." autocomplete="off" />
+          <button class="sketch-btn" id="chat-send-btn" style="padding:3px 10px;">↵</button>
+        </div>
+        <div id="chat-hint">[Enter] Чат · [B] Таунти</div>
+      </div>
+
+      <div id="taunt-wheel">
+        <div class="wheel-wrap" id="wheel-wrap">
+          <svg id="wheel-svg" viewBox="-160 -160 320 320" width="310" height="310"></svg>
+          <div class="wheel-center">
+            <div class="wheel-center-name" id="wheel-label">Таунти</div>
+            <div class="wheel-center-hint">Наведи мишку</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="version-tag">v0.8.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -747,6 +999,60 @@
         'Свіжий аркуш', 'Чорнильний ривок', 'Перегони на полях',
         'Штрихований паркур', 'Кінетичний ескіз', 'Лабіринт туші'
       ];
+
+      const SPEED_MODES = [
+        { id: 'slow', label: 'Повільно', mult: 0.75 },
+        { id: 'normal', label: 'Норма', mult: 1.0 },
+        { id: 'fast', label: 'Швидко', mult: 1.3 },
+        { id: 'hyper', label: 'Гіпер', mult: 1.65 }
+      ];
+      const GRAV_MODES = [
+        { id: 'moon', label: 'Місяць', mult: 0.68 },
+        { id: 'normal', label: 'Норма', mult: 1.0 },
+        { id: 'heavy', label: 'Важка', mult: 1.35 }
+      ];
+
+      const roomSettings = {
+        rounds: 5,
+        infinite: true,
+        speedIdx: 1,
+        gravIdx: 1,
+        playerCollision: true
+      };
+
+      let gamePhase = 'playing'; // 'lobby' | 'playing'
+      let lastMatchWinner = '';
+
+      const TAUNTS = [
+        { id: 'wave', name: 'Махає', emoji: '👋', dur: 2.0 },
+        { id: 'flip', name: 'Сальто', emoji: '🌀', dur: 1.1 },
+        { id: 'dance', name: 'Танець', emoji: '♪', dur: 2.6 },
+        { id: 'laugh', name: 'Сміх', emoji: '😆', dur: 2.0 },
+        { id: 'hype', name: 'Хайп', emoji: '⚡', dur: 2.0 },
+        { id: 'chill', name: 'Чіл', emoji: '☕', dur: 2.8 },
+        { id: 'salute', name: 'Респект', emoji: '★', dur: 1.8 },
+        { id: 'facepalm', name: 'Фейспалм', emoji: '🤦', dur: 2.0 }
+      ];
+
+      function generateLobbyLevel() {
+        return {
+          id: 'ЛОБІ',
+          isLobby: true,
+          title: 'Кімната очікування · Налаштування на стіні',
+          spawn: { x: 220, y: 420 },
+          goal: null,
+          notes: [],
+          platforms: [
+            { x: 0, y: 480, w: 960, h: 140 },
+            { x: -40, y: 120, w: 40, h: 500 },
+            { x: 960, y: 120, w: 40, h: 500 },
+            { x: 110, y: 375, w: 120, h: 24 },
+            { x: 730, y: 375, w: 120, h: 24 }
+          ],
+          movers: [],
+          hazards: []
+        };
+      }
 
       function generateRandomLevel(seed, roundNum) {
         const rng = mulberry32(seed);
@@ -947,6 +1253,8 @@
           sliding: false,
           dashJumpWindow: 0,
           highSpeedTimer: 0,
+          tauntId: '',
+          tauntTimer: 0,
           isRemote,
           tx: sp.x,
           ty: sp.y
@@ -1013,12 +1321,231 @@
         spawnParticles(p.x + p.w / 2, p.y + p.h, '#2952A3', 9, 200);
       }
 
+      // Chat helpers
+      let chatOpen = false;
+      const chatInputRow = document.getElementById('chat-input-row');
+      const chatInput = document.getElementById('chat-input');
+      const chatMessagesEl = document.getElementById('chat-messages');
+
+      function openChat() {
+        chatOpen = true;
+        chatInputRow.classList.add('open');
+        setTimeout(() => chatInput.focus(), 10);
+      }
+
+      function closeChat() {
+        chatOpen = false;
+        chatInputRow.classList.remove('open');
+        chatInput.blur();
+      }
+
+      function appendChatMessage(nick, text, color) {
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-msg-wrap';
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        const nickSpan = document.createElement('span');
+        nickSpan.className = 'chat-nick';
+        nickSpan.style.color = color;
+        nickSpan.textContent = nick + ':';
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        bubble.appendChild(nickSpan);
+        bubble.appendChild(textSpan);
+        wrap.appendChild(bubble);
+        chatMessagesEl.appendChild(wrap);
+
+        // Keep last 7 messages cleanly
+        while (chatMessagesEl.children.length > 7) {
+          chatMessagesEl.removeChild(chatMessagesEl.firstChild);
+        }
+
+        // Trigger smooth push-up entrance
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            wrap.classList.add('in');
+          });
+        });
+
+        setTimeout(() => {
+          if (!chatOpen) wrap.classList.add('faded');
+        }, 9000);
+      }
+
+      function sendChatText() {
+        const txt = (chatInput.value || '').trim();
+        chatInput.value = '';
+        closeChat();
+        if (!txt) return;
+        playSound('paper');
+        appendChatMessage(localNick, txt, '#A83226');
+        if (netConnected) {
+          sendGameMsg({ type: 'chat', nick: localNick, text: txt });
+        }
+      }
+
+      document.getElementById('chat-send-btn').addEventListener('click', sendChatText);
+      document.getElementById('chat-hint').addEventListener('click', openChat);
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.code === 'Enter') {
+          e.preventDefault();
+          sendChatText();
+        } else if (e.code === 'Escape') {
+          e.preventDefault();
+          closeChat();
+        }
+      });
+
+      // Taunt Wheel (Fortnite-style 8 slices)
+      const wheelOverlay = document.getElementById('taunt-wheel');
+      const wheelSvg = document.getElementById('wheel-svg');
+      const wheelLabel = document.getElementById('wheel-label');
+      let wheelOpen = false;
+      let wheelHoveredIdx = -1;
+
+      function buildTauntWheelSvg() {
+        wheelSvg.innerHTML = '';
+        const ns = 'http://www.w3.org/2000/svg';
+        const rOuter = 148;
+        const rInner = 52;
+        for (let i = 0; i < 8; i++) {
+          const a0 = (i * 45 - 112.5) * Math.PI / 180;
+          const a1 = ((i + 1) * 45 - 112.5) * Math.PI / 180;
+          const x1 = Math.cos(a0) * rInner, y1 = Math.sin(a0) * rInner;
+          const x2 = Math.cos(a0) * rOuter, y2 = Math.sin(a0) * rOuter;
+          const x3 = Math.cos(a1) * rOuter, y3 = Math.sin(a1) * rOuter;
+          const x4 = Math.cos(a1) * rInner, y4 = Math.sin(a1) * rInner;
+
+          const path = document.createElementNS(ns, 'path');
+          path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2} A ${rOuter} ${rOuter} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${rInner} ${rInner} 0 0 0 ${x1} ${y1} Z`);
+          path.setAttribute('fill', '#FBF7EE');
+          path.setAttribute('stroke', '#231F20');
+          path.setAttribute('stroke-width', '2.4');
+          path.setAttribute('data-idx', String(i));
+          path.style.cursor = 'pointer';
+          path.style.transition = 'fill 0.1s ease, transform 0.1s ease';
+          wheelSvg.appendChild(path);
+
+          const mid = (a0 + a1) / 2;
+          const lx = Math.cos(mid) * 102;
+          const ly = Math.sin(mid) * 102;
+
+          const em = document.createElementNS(ns, 'text');
+          em.setAttribute('x', String(lx));
+          em.setAttribute('y', String(ly - 2));
+          em.setAttribute('text-anchor', 'middle');
+          em.setAttribute('font-size', '22');
+          em.style.pointerEvents = 'none';
+          em.textContent = TAUNTS[i].emoji;
+          wheelSvg.appendChild(em);
+
+          const tx = document.createElementNS(ns, 'text');
+          tx.setAttribute('x', String(lx));
+          tx.setAttribute('y', String(ly + 16));
+          tx.setAttribute('text-anchor', 'middle');
+          tx.setAttribute('font-size', '14');
+          tx.setAttribute('font-weight', '700');
+          tx.setAttribute('fill', '#231F20');
+          tx.style.pointerEvents = 'none';
+          tx.textContent = TAUNTS[i].name;
+          wheelSvg.appendChild(tx);
+        }
+      }
+      buildTauntWheelSvg();
+
+      function highlightWheelSlice(idx) {
+        wheelHoveredIdx = idx;
+        wheelSvg.querySelectorAll('path').forEach((p) => {
+          const i = Number(p.getAttribute('data-idx'));
+          p.setAttribute('fill', i === idx ? '#F2D388' : '#FBF7EE');
+        });
+        wheelLabel.textContent = idx >= 0 ? TAUNTS[idx].name : 'Таунти';
+      }
+
+      function openTauntWheel() {
+        if (chatOpen || !lobbyModal.classList.contains('hidden')) return;
+        wheelOpen = true;
+        wheelHoveredIdx = -1;
+        highlightWheelSlice(-1);
+        wheelOverlay.classList.add('open');
+        playSound('paper');
+      }
+
+      function triggerTauntOnPlayer(p, tauntId) {
+        const t = TAUNTS.find((x) => x.id === tauntId);
+        if (!t) return;
+        p.tauntId = t.id;
+        p.tauntTimer = t.dur;
+        spawnParticles(p.x + p.w / 2, p.y, '#D49B27', 7, 130);
+      }
+
+      function closeTauntWheel(triggerSelected) {
+        if (!wheelOpen) return;
+        wheelOpen = false;
+        wheelOverlay.classList.remove('open');
+        if (triggerSelected && wheelHoveredIdx >= 0) {
+          const p = localPlayer;
+          if (!p.grounded || Math.abs(p.vx) > 35 || p.rollTimer > 0) {
+            showToast('Зупинись на місці для таунту!');
+            return;
+          }
+          const t = TAUNTS[wheelHoveredIdx];
+          triggerTauntOnPlayer(p, t.id);
+          playSound('jump');
+          if (netConnected) sendVfxEvent('taunt', p.x + p.w / 2, p.y, wheelHoveredIdx);
+        }
+      }
+
+      wheelOverlay.addEventListener('mousemove', (e) => {
+        if (!wheelOpen) return;
+        const rect = wheelSvg.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 42) {
+          highlightWheelSlice(-1);
+          return;
+        }
+        let deg = (Math.atan2(dy, dx) * 180 / Math.PI) + 112.5;
+        deg = ((deg % 360) + 360) % 360;
+        const idx = Math.floor(deg / 45) % 8;
+        if (idx !== wheelHoveredIdx) {
+          highlightWheelSlice(idx);
+          playSound('paper');
+        }
+      });
+
+      wheelOverlay.addEventListener('click', () => closeTauntWheel(true));
+      document.getElementById('btn-taunt').addEventListener('click', () => {
+        if (wheelOpen) closeTauntWheel(false);
+        else openTauntWheel();
+      });
+
       window.addEventListener('keydown', (e) => {
+        const tag = document.activeElement && document.activeElement.tagName;
+        if (tag === 'INPUT') return;
+
+        if (e.code === 'Enter' && !e.repeat) {
+          e.preventDefault();
+          openChat();
+          return;
+        }
+        if ((e.code === 'KeyB' || e.code === 'KeyT') && !e.repeat) {
+          e.preventDefault();
+          openTauntWheel();
+          return;
+        }
+        if (e.code === 'Escape' && wheelOpen) {
+          e.preventDefault();
+          closeTauntWheel(false);
+          return;
+        }
+
         if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
           e.preventDefault();
         }
-        const tag = document.activeElement && document.activeElement.tagName;
-        if (tag === 'INPUT') return;
 
         if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true;
         if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = true;
@@ -1032,6 +1559,9 @@
       });
 
       window.addEventListener('keyup', (e) => {
+        if ((e.code === 'KeyB' || e.code === 'KeyT') && wheelOpen) {
+          closeTauntWheel(true);
+        }
         if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false;
         if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false;
         if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.up = false;
@@ -1207,6 +1737,9 @@
           spawnParticles(x, y, '#6A635A', 5, 110);
         } else if (ev === 'die') {
           spawnParticles(x, y, '#C83E31', 14, 240);
+        } else if (ev === 'taunt') {
+          const t = TAUNTS[extra] || TAUNTS[0];
+          if (t) triggerTauntOnPlayer(rp, t.id);
         }
       }
 
@@ -1309,20 +1842,28 @@
           if (typeof data.score === 'number') remoteScore = data.score;
           updateLeaderboardUI(null);
           if (netMode === 'host') {
-            sendGameMsg({
-              type: 'sync_round',
-              seed: currentSeed,
-              round: roundNumber,
-              hostScore: localScore,
-              clientScore: remoteScore,
-              nick: localNick
-            });
+            if (gamePhase === 'lobby') {
+              sendGameMsg({ type: 'enter_lobby', settings: roomSettings, winner: lastMatchWinner });
+            } else {
+              sendGameMsg({
+                type: 'sync_round',
+                seed: currentSeed,
+                round: roundNumber,
+                hostScore: localScore,
+                clientScore: remoteScore,
+                nick: localNick,
+                settings: roomSettings
+              });
+            }
             if (!rtcPc || rtcPc.connectionState === 'failed') startWebRtcOffer();
           } else if (typeof data.seed === 'number' && data.seed !== currentSeed) {
             loadRound(data.seed, data.round || 1, false);
           }
           sendStatePacket(true);
         } else if (data.type === 'sync_round') {
+          if (data.settings) Object.assign(roomSettings, data.settings);
+          gamePhase = 'playing';
+          syncHostPanelUI();
           if (data.nick) remoteNick = String(data.nick).slice(0, 12);
           if (typeof data.hostScore === 'number') remoteScore = data.hostScore;
           if (typeof data.clientScore === 'number') localScore = data.clientScore;
@@ -1344,6 +1885,27 @@
         } else if (data.type === 'nick' && data.nick) {
           remoteNick = String(data.nick).slice(0, 12);
           updateLeaderboardUI(null);
+        } else if (data.type === 'chat' && data.text) {
+          playSound('paper');
+          appendChatMessage(String(data.nick || remoteNick).slice(0, 12), String(data.text).slice(0, 90), '#2952A3');
+        } else if (data.type === 'lobby_settings' && data.settings) {
+          Object.assign(roomSettings, data.settings);
+          syncHostPanelUI();
+          playSound('paper');
+        } else if (data.type === 'enter_lobby') {
+          if (data.settings) Object.assign(roomSettings, data.settings);
+          if (data.winner) lastMatchWinner = data.winner;
+          enterLobbyRoom(false);
+        } else if (data.type === 'start_match') {
+          if (data.settings) Object.assign(roomSettings, data.settings);
+          localScore = 0;
+          remoteScore = 0;
+          prevLeader = 'tie';
+          gamePhase = 'playing';
+          syncHostPanelUI();
+          updateLeaderboardUI(null);
+          loadRound(data.seed, 1, false);
+          showToast('Матч почався!');
         } else if (data.type === 'ping') {
           sendGameMsg({ type: 'pong', t: data.t });
         } else if (data.type === 'pong') {
@@ -1465,8 +2027,10 @@
               if (netMode === 'host') {
                 lobbyMsg.textContent = 'Сторінка ' + code + ' відкрита! Копіюй лінк і кидай другу.';
                 updateNetUI('Чекаю P2...', 'waiting');
-                showToast('Код ' + code + ' готовий');
+                enterLobbyRoom(false);
+                showToast('Кімната лобі ' + code + ' відкрита');
               } else {
+                enterLobbyRoom(false);
                 lobbyMsg.textContent = 'У кімнаті ' + code + '! Чекаю друга...';
                 updateNetUI('Пошук P1...', 'waiting');
               }
@@ -1488,7 +2052,10 @@
         ensureAudio();
         cleanupNet();
         netMode = 'solo';
+        gamePhase = 'playing';
+        syncHostPanelUI();
         updateNetUI('Соло', '');
+        if (currentLevel && currentLevel.isLobby) loadRound(currentSeed, 1, false);
         lobbyModal.classList.add('hidden');
       });
       document.getElementById('btn-close-lobby').addEventListener('click', () => {
@@ -1645,6 +2212,82 @@
         }
       }
 
+      function syncHostPanelUI() {
+        const hp = document.getElementById('host-panel');
+        hp.classList.toggle('visible', gamePhase === 'lobby' && netMode === 'host');
+        document.getElementById('hp-rounds-val').textContent = roomSettings.infinite ? '∞' : String(roomSettings.rounds);
+        document.getElementById('hp-rounds-inf').checked = !!roomSettings.infinite;
+        document.getElementById('hp-speed-btn').textContent = SPEED_MODES[roomSettings.speedIdx].label;
+        document.getElementById('hp-grav-btn').textContent = GRAV_MODES[roomSettings.gravIdx].label;
+        document.getElementById('hp-coll-btn').textContent = roomSettings.playerCollision ? 'Увімк' : 'Вимк';
+      }
+
+      function broadcastLobbySettings() {
+        syncHostPanelUI();
+        if (netConnected && netMode === 'host') {
+          sendGameMsg({ type: 'lobby_settings', settings: roomSettings });
+        }
+      }
+
+      function enterLobbyRoom(broadcast = false) {
+        gamePhase = 'lobby';
+        currentLevel = generateLobbyLevel();
+        doorLock = false;
+        document.getElementById('level-scrap').textContent = 'Лобі кімнати';
+        resetPlayerToSpawn(false);
+        remotePlayer.x = 270;
+        remotePlayer.y = 420;
+        remotePlayer.tx = 270;
+        remotePlayer.ty = 420;
+        remoteSnapshots.length = 0;
+        syncHostPanelUI();
+        if (broadcast && netConnected) {
+          sendGameMsg({ type: 'enter_lobby', settings: roomSettings, winner: lastMatchWinner });
+        }
+      }
+
+      document.getElementById('hp-rounds-minus').addEventListener('click', () => {
+        roomSettings.infinite = false;
+        roomSettings.rounds = Math.max(1, roomSettings.rounds - 1);
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-rounds-plus').addEventListener('click', () => {
+        roomSettings.infinite = false;
+        roomSettings.rounds = Math.min(20, roomSettings.rounds + 1);
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-rounds-inf').addEventListener('change', (e) => {
+        roomSettings.infinite = e.target.checked;
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-speed-btn').addEventListener('click', () => {
+        roomSettings.speedIdx = (roomSettings.speedIdx + 1) % SPEED_MODES.length;
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-grav-btn').addEventListener('click', () => {
+        roomSettings.gravIdx = (roomSettings.gravIdx + 1) % GRAV_MODES.length;
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-coll-btn').addEventListener('click', () => {
+        roomSettings.playerCollision = !roomSettings.playerCollision;
+        broadcastLobbySettings();
+      });
+      document.getElementById('hp-start-btn').addEventListener('click', () => {
+        localScore = 0;
+        remoteScore = 0;
+        prevLeader = 'tie';
+        lastMatchWinner = '';
+        gamePhase = 'playing';
+        syncHostPanelUI();
+        updateLeaderboardUI(null);
+        const startSeed = Math.floor(Math.random() * 900000) + 100000;
+        loadRound(startSeed, 1, false);
+        if (netConnected) {
+          sendGameMsg({ type: 'start_match', seed: startSeed, settings: roomSettings });
+        }
+        showToast('Погнали!');
+      });
+
       function resetPlayerToSpawn(countDeath = false) {
         const sp = currentLevel ? currentLevel.spawn : { x: 80, y: 420 };
         const p = localPlayer;
@@ -1722,6 +2365,15 @@
         if (p.dashJumpWindow > 0) p.dashJumpWindow = Math.max(0, p.dashJumpWindow - dt);
 
         const moveDir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+        if (p.tauntTimer > 0) {
+          if (moveDir !== 0 || p.jumpBufferTimer > 0 || p.rollTimer > 0 || keys.down) {
+            p.tauntTimer = 0;
+            p.tauntId = '';
+          } else {
+            p.tauntTimer = Math.max(0, p.tauntTimer - dt);
+            if (p.tauntTimer <= 0) p.tauntId = '';
+          }
+        }
         if (moveDir !== 0 && p.rollTimer <= 0 && p.wallJumpLock <= 0) p.facing = moveDir;
 
         p.sprinting = keys.sprint && moveDir !== 0 && p.rollTimer <= 0;
@@ -1776,7 +2428,8 @@
           }
         } else {
           p.rot = 0;
-          const maxSpd = p.sprinting ? CFG.sprintSpeed : CFG.walkSpeed;
+          const spdMult = SPEED_MODES[roomSettings.speedIdx].mult;
+          const maxSpd = (p.sprinting ? CFG.sprintSpeed : CFG.walkSpeed) * spdMult;
           const targetVx = moveDir * maxSpd;
           const turning = moveDir !== 0 && Math.sign(p.vx) !== 0 && Math.sign(p.vx) !== moveDir;
           const accel = p.grounded
@@ -1869,7 +2522,7 @@
         }
 
         // Apex hang-time + gentle max fall speed + wall slide
-        let grav = CFG.gravity;
+        let grav = CFG.gravity * GRAV_MODES[roomSettings.gravIdx].mult;
         if (p.rollTimer > 0) grav *= 0.35;
         else if (keys.down && !p.grounded) grav *= 1.45;
         else if (!p.grounded && Math.abs(p.vy) < CFG.apexVelThreshold) grav *= CFG.apexGravityMult;
@@ -1962,7 +2615,7 @@
         }
 
         // Player-to-Player Collision (stand on friend's head, reset jumps, or gently bump shoulders!)
-        if (netConnected) {
+        if (netConnected && roomSettings.playerCollision) {
           const rp = remotePlayer;
           if (rectsOverlap(p, rp)) {
             const pBottom = p.y + p.h;
@@ -1999,14 +2652,21 @@
           }
         }
 
-        if (!doorLock && rectsOverlap(p, lvl.goal)) {
+        if (!doorLock && lvl.goal && rectsOverlap(p, lvl.goal)) {
           doorLock = true;
           localScore++;
           playSound('win');
           spawnParticles(lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, '#D49B27', 22, 260);
           updateLeaderboardUI('local');
-          const nextSeed = Math.floor(Math.random() * 900000) + 100000;
-          loadRound(nextSeed, roundNumber + 1, true);
+
+          if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
+            lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
+            showToast('Матч завершено! Переміг: ' + lastMatchWinner);
+            enterLobbyRoom(true);
+          } else {
+            const nextSeed = Math.floor(Math.random() * 900000) + 100000;
+            loadRound(nextSeed, roundNumber + 1, true);
+          }
         }
       }
 
@@ -2116,6 +2776,33 @@
           ctx.translate(0, -p.h / 2);
           ctx.rotate(p.rot);
           ctx.translate(0, p.h / 2);
+        } else if (p.tauntTimer > 0) {
+          const tt = worldTime * 9;
+          if (p.tauntId === 'wave') {
+            ctx.rotate(Math.sin(tt * 1.4) * 0.16);
+          } else if (p.tauntId === 'flip') {
+            const prog = 1 - p.tauntTimer / 1.1;
+            ctx.translate(0, -Math.sin(prog * Math.PI) * 38 - p.h / 2);
+            ctx.rotate(prog * Math.PI * 2 * p.facing);
+            ctx.translate(0, p.h / 2);
+          } else if (p.tauntId === 'dance') {
+            ctx.scale(1 + Math.sin(tt * 1.6) * 0.14, 1 - Math.sin(tt * 1.6) * 0.14);
+            ctx.rotate(Math.cos(tt * 0.8) * 0.14);
+          } else if (p.tauntId === 'laugh') {
+            ctx.translate(0, -Math.abs(Math.sin(tt * 2.2)) * 6);
+            ctx.scale(1.06, 0.94);
+          } else if (p.tauntId === 'hype') {
+            ctx.translate(0, -Math.abs(Math.sin(tt * 2.6)) * 16);
+            ctx.scale(0.92, 1.12);
+          } else if (p.tauntId === 'chill') {
+            ctx.rotate(-0.18 * p.facing);
+            ctx.scale(1.08, 0.92);
+          } else if (p.tauntId === 'salute') {
+            ctx.rotate(0.22 * p.facing);
+          } else if (p.tauntId === 'facepalm') {
+            ctx.rotate(0.14 * p.facing);
+            ctx.scale(1.05, 0.9);
+          }
         }
 
         const jx = boilOffset(101, boilFrame) * 0.6;
@@ -2167,6 +2854,20 @@
         }
 
         ctx.restore();
+
+        // Floating Sketchbook Taunt Doodle above character
+        if (p.tauntTimer > 0) {
+          const tObj = TAUNTS.find((x) => x.id === p.tauntId);
+          if (tObj) {
+            const bob = Math.sin(worldTime * 8) * 4;
+            ctx.save();
+            ctx.font = '700 22px "Caveat", cursive';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#231F20';
+            ctx.fillText(tObj.emoji + ' ' + tObj.name, cx, p.y - 16 + bob);
+            ctx.restore();
+          }
+        }
 
         // Remote player label
         if (!isLocal) {
@@ -2263,18 +2964,59 @@
           ctx.restore();
         });
 
+        // 4b. Diegetic Settings Wall Board in Lobby Room (visible to BOTH Host & Friend!)
+        if (lvl.isLobby) {
+          drawInkedRect(295, 170, 370, 235, 555, '#FBF7EE', false);
+          ctx.save();
+          ctx.fillStyle = '#231F20';
+          ctx.textAlign = 'center';
+          ctx.font = '700 28px "Caveat", cursive';
+          ctx.fillText('НАЛАШТУВАННЯ КІМНАТИ', 480, 206);
+          ctx.strokeStyle = 'rgba(35,31,32,0.35)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(320, 218); ctx.lineTo(640, 218); ctx.stroke();
+
+          ctx.textAlign = 'left';
+          ctx.font = '700 22px "Caveat", cursive';
+          ctx.fillStyle = '#6A635A';
+          ctx.fillText('Раунди:', 328, 254);
+          ctx.fillText('Швидкість:', 328, 290);
+          ctx.fillText('Гравітація:', 328, 326);
+          ctx.fillText('Колізія гравців:', 328, 362);
+
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#C83E31';
+          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' раунд(ів)'), 632, 254);
+          ctx.fillStyle = '#2952A3';
+          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', 632, 290);
+          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', 632, 326);
+          ctx.fillStyle = roomSettings.playerCollision ? '#2D7A46' : '#6A635A';
+          ctx.fillText(roomSettings.playerCollision ? 'Увімкнено' : 'Вимкнено', 632, 362);
+
+          ctx.textAlign = 'center';
+          ctx.font = '700 18px "Caveat", cursive';
+          ctx.fillStyle = '#6A635A';
+          const statusLine = lastMatchWinner
+            ? ('Останній переможець: ' + lastMatchWinner + ' ★')
+            : (netMode === 'host' ? 'Налаштуй внизу і тисни «Почати гру»' : 'Чекаємо, поки хост запустить матч...');
+          ctx.fillText(statusLine, 480, 392);
+          ctx.restore();
+        }
+
         // 5. Hand-drawn Goal Door
-        const g = lvl.goal;
-        drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false);
-        ctx.strokeStyle = '#231F20';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(g.x + g.w - 10, g.y + g.h * 0.55, 3, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.fillStyle = '#231F20';
-        ctx.font = '700 20px "Caveat", cursive';
-        ctx.textAlign = 'center';
-        ctx.fillText('Двері ★', g.x + g.w / 2, g.y - 8);
+        if (lvl.goal) {
+          const g = lvl.goal;
+          drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false);
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(g.x + g.w - 10, g.y + g.h * 0.55, 3, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = '#231F20';
+          ctx.font = '700 20px "Caveat", cursive';
+          ctx.textAlign = 'center';
+          ctx.fillText('Двері ★', g.x + g.w / 2, g.y - 8);
+        }
 
         // 6. Players
         if (netConnected) {
@@ -2433,6 +3175,10 @@
           }
 
           // Remote squash & stretch spring-back + roll/high-speed ghosts & dust!
+          if (remotePlayer.tauntTimer > 0) {
+            remotePlayer.tauntTimer = Math.max(0, remotePlayer.tauntTimer - dt);
+            if (remotePlayer.tauntTimer <= 0) remotePlayer.tauntId = '';
+          }
           remotePlayer.scaleX += (1 - remotePlayer.scaleX) * Math.min(1, 14 * dt);
           remotePlayer.scaleY += (1 - remotePlayer.scaleY) * Math.min(1, 14 * dt);
           if (remotePlayer.rollTimer > 0 || Math.abs(remotePlayer.vx) > 490) {
