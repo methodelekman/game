@@ -1006,7 +1006,7 @@
         </div>
       </div>
 
-      <div id="version-tag">v0.9.5</div>
+      <div id="version-tag">v0.10.0</div>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -1155,6 +1155,93 @@
           osc.start(now); osc.stop(now + 0.23);
         }
       }
+
+      function playTauntSound(tauntId) {
+        const ctx = ensureAudio();
+        if (!ctx || muted) return;
+        const now = ctx.currentTime;
+        if (tauntId === 'wave') {
+          playPluck(ctx, 523.25, now, 0.14, 0.08);
+          playPluck(ctx, 659.25, now + 0.09, 0.18, 0.09);
+        } else if (tauntId === 'flip') {
+          playNoiseBurst(0.16, 1500, 0.09);
+          playPluck(ctx, 392, now, 0.12, 0.08);
+          playPluck(ctx, 587.33, now + 0.08, 0.14, 0.08);
+          playPluck(ctx, 783.99, now + 0.16, 0.22, 0.09);
+        } else if (tauntId === 'dance') {
+          const notes = [440, 523.25, 587.33, 523.25, 659.25];
+          notes.forEach((n, idx) => playPluck(ctx, n, now + idx * 0.11, 0.14, 0.08));
+        } else if (tauntId === 'laugh') {
+          const pops = [560, 490, 540, 440, 480];
+          pops.forEach((f, idx) => playPluck(ctx, f, now + idx * 0.09, 0.07, 0.08));
+        } else if (tauntId === 'hype') {
+          playNoiseBurst(0.08, 1900, 0.08);
+          playPluck(ctx, 440, now, 0.12, 0.09);
+          playPluck(ctx, 554.37, now + 0.06, 0.14, 0.09);
+          playPluck(ctx, 659.25, now + 0.12, 0.16, 0.1);
+          playPluck(ctx, 880, now + 0.18, 0.26, 0.1);
+        } else if (tauntId === 'chill') {
+          playPluck(ctx, 261.63, now, 0.45, 0.07);
+          playPluck(ctx, 329.63, now + 0.04, 0.45, 0.06);
+          playPluck(ctx, 392.0, now + 0.08, 0.45, 0.06);
+          playPluck(ctx, 493.88, now + 0.12, 0.5, 0.06);
+        } else if (tauntId === 'salute') {
+          playPluck(ctx, 392.0, now, 0.18, 0.09);
+          playPluck(ctx, 587.33, now + 0.11, 0.34, 0.1);
+        } else if (tauntId === 'facepalm') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(310, now);
+          osc.frequency.exponentialRampToValueAtTime(195, now + 0.18);
+          osc.frequency.exponentialRampToValueAtTime(145, now + 0.38);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.44);
+        }
+      }
+
+      // Cozy Procedural Sketchbook Music Sequencer (Lobby/Menu + Gameplay)
+      let musicStep = 0;
+      let musicAccum = 0;
+
+      const LOBBY_ARP = [261.63, 329.63, 392.0, 493.88, 220.0, 329.63, 392.0, 440.0, 174.61, 261.63, 329.63, 349.23, 196.0, 293.66, 392.0, 329.63];
+      const GAME_MELODY = [329.63, 0, 392.0, 440.0, 523.25, 0, 440.0, 392.0, 293.66, 0, 349.23, 392.0, 440.0, 392.0, 329.63, 0];
+      const GAME_BASS = [130.81, 0, 130.81, 0, 110.0, 0, 110.0, 0, 87.31, 0, 87.31, 0, 98.0, 0, 110.0, 0];
+
+      function updateMusic(dt) {
+        if (muted || !audioCtx || audioCtx.state !== 'running') return;
+        if (gamePhase === 'launching') return; // let countdown & vortex breathe
+
+        const inMenuOrLobby = !lobbyModal.classList.contains('hidden') || gamePhase === 'lobby';
+        const stepDur = inMenuOrLobby ? 0.34 : 0.21;
+        musicAccum += dt;
+        if (musicAccum < stepDur) return;
+        musicAccum -= stepDur;
+
+        const now = audioCtx.currentTime;
+        const idx = musicStep % 16;
+        musicStep++;
+
+        if (inMenuOrLobby) {
+          // Warm lo-fi acoustic sketchbook arpeggio
+          const note = LOBBY_ARP[idx];
+          if (note) playPluck(audioCtx, note, now, 0.42, 0.032);
+          if (idx % 4 === 0) playPluck(audioCtx, note * 0.5, now, 0.6, 0.028);
+        } else {
+          // Upbeat bouncy indie-platformer groove
+          const mel = GAME_MELODY[idx];
+          const bass = GAME_BASS[idx];
+          if (mel) playPluck(audioCtx, mel, now, 0.22, 0.036);
+          if (bass) playPluck(audioCtx, bass, now, 0.24, 0.042);
+          if (idx % 4 === 2) playNoiseBurst(0.03, 2100, 0.018); // soft brush hi-hat
+        }
+      }
+
+      // Unlock audio cleanly on first click or keypress so music starts immediately
+      window.addEventListener('pointerdown', () => ensureAudio(), { once: true });
+      window.addEventListener('keydown', () => ensureAudio(), { once: true });
 
       document.querySelectorAll('.sketch-btn').forEach((btn) => {
         btn.addEventListener('mouseenter', () => playSound('paper'));
@@ -1506,7 +1593,7 @@
 
         const dir = keys.left ? -1 : keys.right ? 1 : p.facing;
         p.facing = dir;
-        p.vx = dir * CFG.rollSpeed;
+        p.vx = dir * Math.max(CFG.rollSpeed * (p.grounded ? 1.0 : 1.08), Math.abs(p.vx) + 120);
         p.vy = Math.min(p.vy, 30);
         p.scaleX = 1.45;
         p.scaleY = 0.62;
@@ -1672,6 +1759,7 @@
         if (!t) return;
         p.tauntId = t.id;
         p.tauntTimer = t.dur;
+        playTauntSound(t.id);
         spawnParticles(p.x + p.w / 2, p.y, '#D49B27', 7, 130);
       }
 
@@ -1687,7 +1775,6 @@
           }
           const t = TAUNTS[wheelHoveredIdx];
           triggerTauntOnPlayer(p, t.id);
-          playSound('jump');
           if (netConnected) sendVfxEvent('taunt', p.x + p.w / 2, p.y, wheelHoveredIdx);
         }
       }
@@ -2715,10 +2802,16 @@
             ? (turning ? CFG.turnAccelGround : CFG.accelGround)
             : CFG.accelAir;
           if (p.wallJumpLock <= 0) {
-            // Preserve high Dash-Jump / Slide-Jump momentum in air!
-            if (!p.grounded && Math.abs(p.vx) > maxSpd && Math.sign(p.vx) === moveDir) {
-              // Gentle air drag only
-              p.vx *= (1 - 0.35 * dt);
+            const opposingAir = !p.grounded && moveDir !== 0 && Math.sign(p.vx) !== 0 && moveDir === -Math.sign(p.vx);
+            // In air: preserve high dash/slide inertia smoothly until landing or braking in the opposite direction!
+            if (!p.grounded && Math.abs(p.vx) > maxSpd * 0.92 && !opposingAir) {
+              // Gentle aerodynamic decay so you glide far after an air-dash
+              p.vx *= Math.pow(0.52, dt);
+            } else if (opposingAir) {
+              // Crisp air brake when pressing the opposite direction
+              const brake = CFG.accelAir * 1.45;
+              if (p.vx < targetVx) p.vx = Math.min(targetVx, p.vx + brake * dt);
+              else if (p.vx > targetVx) p.vx = Math.max(targetVx, p.vx - brake * dt);
             } else {
               if (p.vx < targetVx) p.vx = Math.min(targetVx, p.vx + accel * dt);
               else if (p.vx > targetVx) p.vx = Math.max(targetVx, p.vx - accel * dt);
@@ -3461,23 +3554,23 @@
         if (gamePhase === 'round_intro' && roundIntroTimer > 0) {
           const sec = Math.ceil(roundIntroTimer);
           const frac = roundIntroTimer - Math.floor(roundIntroTimer);
-          const pop = 1 + frac * 0.45;
+          const pop = 1 + frac * 0.42;
           ctx.save();
           ctx.translate(w / 2, h * 0.38);
           ctx.scale(pop, pop);
-          // Bright sketchbook burst behind number
-          ctx.fillStyle = 'rgba(233, 196, 106, 0.35)';
+          ctx.fillStyle = 'rgba(233, 196, 106, 0.38)';
           ctx.beginPath();
-          ctx.arc(0, -18, 62, 0, Math.PI * 2);
+          ctx.arc(0, 0, 62, 0, Math.PI * 2);
           ctx.fill();
           ctx.strokeStyle = '#231F20';
           ctx.lineWidth = 3;
           ctx.stroke();
 
           ctx.fillStyle = sec === 1 ? '#C83E31' : '#231F20';
-          ctx.font = '700 96px "Caveat", cursive';
+          ctx.font = '700 92px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText(String(sec), 0, 14);
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(sec), 0, 4);
           ctx.restore();
         }
 
@@ -3718,6 +3811,7 @@
           }
         }
 
+        updateMusic(dt);
         updateLeaderboardIcons();
         render();
         requestAnimationFrame(loop);
