@@ -1,1 +1,927 @@
-asdasf
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cel-Animation Мультиплеєр Платформер</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Patrick Hand', 'Inter', cursive, sans-serif;
+      background-color: #f4efe6;
+      color: #1c1917;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+    /* Легка текстура паперу та кальки */
+    .paper-grain {
+      background-image: radial-gradient(rgba(28, 25, 23, 0.06) 1px, transparent 0);
+      background-size: 16px 16px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    /* Стиль картки-кальки з чорнильним контуром */
+    .cel-panel {
+      background: rgba(252, 249, 242, 0.92);
+      border: 2.5px solid #1c1917;
+      box-shadow: 3px 3px 0px #1c1917;
+    }
+    .cel-input {
+      background: #fffdf9;
+      border: 2px solid #1c1917;
+      outline: none;
+    }
+    .cel-input:focus {
+      background: #fef3c7;
+    }
+    .cel-btn {
+      background: #fde047;
+      border: 2px solid #1c1917;
+      box-shadow: 2px 2px 0px #1c1917;
+      transition: transform 0.06s ease, box-shadow 0.06s ease;
+    }
+    .cel-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #1c1917;
+    }
+    .touch-btn {
+      background: rgba(252, 249, 242, 0.88);
+      border: 2.5px solid #1c1917;
+      box-shadow: 3px 3px 0px #1c1917;
+      transition: transform 0.06s ease;
+    }
+    .touch-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #1c1917;
+      background: #fde047;
+    }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-between relative paper-grain">
+
+  <!-- Ігровий Canvas -->
+  <div id="canvas-container" class="absolute inset-0 w-full h-full z-0">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <!-- Верхня панель HUD у стилі розкадровки -->
+  <header class="relative z-10 flex flex-wrap items-center justify-between gap-2 p-2.5 sm:p-4 pointer-events-none">
+    
+    <!-- Статус підключення, кімната та лічильник -->
+    <div class="cel-panel rounded-xl px-3 py-1.5 flex flex-wrap items-center gap-2.5 pointer-events-auto">
+      <div class="flex items-center gap-1.5">
+        <span id="status-dot" class="w-3 h-3 rounded-full border-2 border-stone-900 bg-amber-400 animate-pulse"></span>
+        <span id="status-text" class="text-sm sm:text-base font-bold text-stone-900">З'єднання...</span>
+      </div>
+
+      <div class="h-4 w-[2px] bg-stone-900/20"></div>
+
+      <!-- Поле вибору кімнати (Room ID) -->
+      <form id="room-form" class="flex items-center gap-1.5">
+        <label for="room-input" class="text-xs sm:text-sm font-bold text-stone-700">Кімната:</label>
+        <input id="room-input" type="text" maxlength="16" value="arena-1" placeholder="код..."
+               class="cel-input rounded-lg px-2 py-0.5 text-sm font-bold text-stone-900 w-24 sm:w-28" />
+        <button type="submit" class="cel-btn rounded-lg px-2.5 py-0.5 text-xs sm:text-sm font-bold text-stone-900 cursor-pointer">
+          Вхід
+        </button>
+      </form>
+
+      <div class="h-4 w-[2px] bg-stone-900/20"></div>
+
+      <div class="text-sm sm:text-base font-bold text-stone-900">
+        Гравців: <span id="player-count" class="text-rose-600">1</span>
+      </div>
+    </div>
+
+    <!-- Нікнейм та шкала дешу -->
+    <div class="cel-panel rounded-xl px-3 py-1.5 flex items-center gap-3 pointer-events-auto">
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs sm:text-sm font-bold text-stone-700">Ім'я:</span>
+        <input id="name-input" type="text" maxlength="12" placeholder="Аніматор"
+               class="cel-input rounded-lg px-2 py-0.5 text-sm font-bold text-stone-900 w-24 sm:w-28" />
+      </div>
+
+      <div class="h-4 w-[2px] bg-stone-900/20"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-xs sm:text-sm font-bold uppercase tracking-wide text-stone-800">Деш (Ctrl)</span>
+        <div class="w-20 sm:w-28 h-3.5 bg-stone-200 rounded-md overflow-hidden border-2 border-stone-900">
+          <div id="dash-bar" class="h-full bg-rose-500 transition-all duration-75" style="width: 100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Підказка керування -->
+    <div class="hidden lg:flex cel-panel rounded-xl px-3 py-1.5 items-center gap-3 text-sm font-bold text-stone-800">
+      <span><kbd class="px-1.5 py-0.5 bg-amber-100 border-2 border-stone-900 rounded">WASD</kbd> Рух</span>
+      <span><kbd class="px-1.5 py-0.5 bg-emerald-100 border-2 border-stone-900 rounded">Space</kbd> Стрибок</span>
+      <span><kbd class="px-1.5 py-0.5 bg-rose-100 border-2 border-stone-900 rounded">Ctrl</kbd> / <kbd class="px-1.5 py-0.5 bg-rose-100 border-2 border-stone-900 rounded">Shift</kbd> Деш</span>
+    </div>
+  </header>
+
+  <!-- Повідомлення про помилки / сповіщення -->
+  <div id="toast-box" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-30 cel-panel bg-rose-100 text-rose-900 px-4 py-2 rounded-xl text-sm font-bold"></div>
+
+  <!-- Нижня панель: Мобільне керування та інформація про кадр -->
+  <footer class="relative z-10 p-3 sm:p-4 flex items-end justify-between pointer-events-none">
+    <!-- Сенсорні кнопки зліва -->
+    <div class="flex lg:hidden gap-3 pointer-events-auto">
+      <button id="btn-left" class="touch-btn w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold text-stone-900" aria-label="Вліво">◀</button>
+      <button id="btn-right" class="touch-btn w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold text-stone-900" aria-label="Вправо">▶</button>
+    </div>
+
+    <!-- Індикатор FPS / ID кадру в стилі анімаційної студії -->
+    <div class="cel-panel rounded-xl px-3 py-1 text-xs sm:text-sm font-bold text-stone-700 pointer-events-auto truncate max-w-[60vw]">
+      CEL-12FPS • ID: <span id="my-id-display" class="text-stone-900">...</span>
+    </div>
+
+    <!-- Сенсорні кнопки справа -->
+    <div class="flex lg:hidden gap-3 pointer-events-auto">
+      <button id="btn-dash" class="touch-btn px-4 h-14 rounded-2xl flex items-center justify-center text-sm font-bold uppercase text-rose-700">Деш</button>
+      <button id="btn-jump" class="touch-btn px-4 h-14 rounded-2xl flex items-center justify-center text-sm font-bold uppercase text-emerald-800">Стрибок</button>
+    </div>
+  </footer>
+
+  <!-- Логіка гри, Cel-Animation рендер та мультиплеєр -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ==========================================
+    // 1. НАЛАШТУВАННЯ CANVAS ТА ПАПЕРОВОЇ АРЕНИ
+    // ==========================================
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvas-container');
+
+    const WORLD_WIDTH = 1200;
+    const WORLD_HEIGHT = 700;
+
+    // Платформи у стилі акварельних/гуашевих плашок з чорнильним обведенням
+    const platforms = [
+      { x: 0, y: 650, w: 1200, h: 50, fill: '#e7e0d2' },
+      { x: 0, y: 0, w: 22, h: 700, fill: '#dfd6c5' },
+      { x: 1178, y: 0, w: 22, h: 700, fill: '#dfd6c5' },
+      // Нижні бічні
+      { x: 120, y: 520, w: 240, h: 20, fill: '#fde68a' },
+      { x: 840, y: 520, w: 240, h: 20, fill: '#fde68a' },
+      // Центральна середня
+      { x: 450, y: 410, w: 300, h: 20, fill: '#bae6fd' },
+      // Високі бічні
+      { x: 160, y: 280, w: 220, h: 20, fill: '#fecdd3' },
+      { x: 820, y: 280, w: 220, h: 20, fill: '#fecdd3' },
+      // Найвища центральна
+      { x: 500, y: 170, w: 200, h: 20, fill: '#bbf7d0' }
+    ];
+
+    function resizeCanvas() {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ==========================================
+    // 2. СТАН ГРАВЦЯ, ФІЗИКА ТА ПОКАДРОВА АНІМАЦІЯ
+    // ==========================================
+    // Класична палітра фарб для Cel-Animation (гуаш на целулоїді)
+    const CEL_COLORS = [
+      '#ef4444', // Кіновар (червоний)
+      '#3b82f6', // Кобальт (синій)
+      '#10b981', // Смарагдовий
+      '#f59e0b', // Вохра (жовто-помаранчевий)
+      '#8b5cf6', // Фіолетовий
+      '#ec4899', // Кармін (рожевий)
+      '#06b6d4', // Бірюзовий
+      '#ea580c'  // Теракотовий
+    ];
+
+    const myColor = CEL_COLORS[Math.floor(Math.random() * CEL_COLORS.length)];
+    let myUserId = null;
+    let myNickname = `Герой-${Math.floor(100 + Math.random() * 900)}`;
+
+    const nameInput = document.getElementById('name-input');
+    nameInput.value = myNickname;
+    nameInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      myNickname = val || `Герой-${(myUserId || '000').slice(0, 3)}`;
+    });
+
+    const player = {
+      x: 580 + (Math.random() * 120 - 60),
+      y: 300,
+      w: 36,
+      h: 44,
+      vx: 0,
+      vy: 0,
+      facing: 1,
+      grounded: false,
+      wasGrounded: false,
+      color: myColor,
+      state: 'idle', // 'idle' | 'run' | 'jump' | 'fall' | 'dash' | 'land'
+      isDashing: false,
+      dashTimer: 0,
+      dashCooldown: 0,
+      landTimer: 0,
+      smearFrames: [] // Кадри розмазування руху (Smear frames)
+    };
+
+    const GRAVITY = 1650;
+    const MOVE_SPEED = 360;
+    const JUMP_FORCE = -690;
+    const DASH_SPEED = 1080;
+    const DASH_DURATION = 0.16;
+    const DASH_COOLDOWN = 1.05;
+
+    // Інші гравці: Map<userId, playerData>
+    const remotePlayers = new Map();
+
+    // ==========================================
+    // 3. КЕРУВАННЯ (WASD + SPACE + CTRL/SHIFT + TOUCH)
+    // ==========================================
+    const keys = { left: false, right: false, up: false, down: false, jump: false, dash: false };
+
+    function triggerJump() {
+      if (player.grounded && !player.isDashing) {
+        player.vy = JUMP_FORCE;
+        player.grounded = false;
+        player.state = 'jump';
+      }
+    }
+
+    function triggerDash() {
+      if (player.dashCooldown <= 0 && !player.isDashing) {
+        player.isDashing = true;
+        player.dashTimer = DASH_DURATION;
+        player.dashCooldown = DASH_COOLDOWN;
+        player.state = 'dash';
+
+        let dirX = 0;
+        let dirY = 0;
+        if (keys.left) dirX -= 1;
+        if (keys.right) dirX += 1;
+        if (keys.up) dirY -= 0.65;
+        if (keys.down) dirY += 0.65;
+
+        if (dirX === 0 && dirY === 0) {
+          dirX = player.facing;
+        } else {
+          const len = Math.hypot(dirX, dirY);
+          dirX /= len;
+          dirY /= len;
+        }
+
+        player.vx = dirX * DASH_SPEED;
+        player.vy = dirY * DASH_SPEED;
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      // Не перехоплюємо клавіші, коли користувач друкує ім'я або код кімнати
+      if (document.activeElement === nameInput || document.activeElement === document.getElementById('room-input')) {
+        return;
+      }
+
+      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        e.preventDefault();
+      }
+
+      switch (e.code) {
+        case 'KeyA': case 'ArrowLeft': keys.left = true; break;
+        case 'KeyD': case 'ArrowRight': keys.right = true; break;
+        case 'KeyW': case 'ArrowUp': keys.up = true; break;
+        case 'KeyS': case 'ArrowDown': keys.down = true; break;
+        case 'Space':
+          if (!keys.jump) triggerJump();
+          keys.jump = true;
+          break;
+        case 'ControlLeft': case 'ControlRight':
+        case 'ShiftLeft': case 'ShiftRight':
+          if (!keys.dash) triggerDash();
+          keys.dash = true;
+          break;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      switch (e.code) {
+        case 'KeyA': case 'ArrowLeft': keys.left = false; break;
+        case 'KeyD': case 'ArrowRight': keys.right = false; break;
+        case 'KeyW': case 'ArrowUp': keys.up = false; break;
+        case 'KeyS': case 'ArrowDown': keys.down = false; break;
+        case 'Space': keys.jump = false; break;
+        case 'ControlLeft': case 'ControlRight':
+        case 'ShiftLeft': case 'ShiftRight': keys.dash = false; break;
+      }
+    });
+
+    function bindTouchButton(id, onDown, onUp) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); onDown(); }, { passive: false });
+      btn.addEventListener('touchend', (e) => { e.preventDefault(); onUp(); }, { passive: false });
+      btn.addEventListener('mousedown', onDown);
+      btn.addEventListener('mouseup', onUp);
+      btn.addEventListener('mouseleave', onUp);
+    }
+
+    bindTouchButton('btn-left', () => { keys.left = true; }, () => { keys.left = false; });
+    bindTouchButton('btn-right', () => { keys.right = true; }, () => { keys.right = false; });
+    bindTouchButton('btn-jump', () => { triggerJump(); }, () => {});
+    bindTouchButton('btn-dash', () => { triggerDash(); }, () => {});
+
+    // ==========================================
+    // 4. ОНОВЛЕННЯ ФІЗИКИ ТА ВИЗНАЧЕННЯ КАДРУ АНІМАЦІЇ
+    // ==========================================
+    function checkAABB(a, b) {
+      return a.x < b.x + b.w &&
+             a.x + a.w > b.x &&
+             a.y < b.y + b.h &&
+             a.y + a.h > b.y;
+    }
+
+    function updatePhysics(dt) {
+      if (player.dashCooldown > 0) {
+        player.dashCooldown = Math.max(0, player.dashCooldown - dt);
+      }
+      const dashPercent = ((DASH_COOLDOWN - player.dashCooldown) / DASH_COOLDOWN) * 100;
+      document.getElementById('dash-bar').style.width = `${dashPercent}%`;
+
+      if (player.landTimer > 0) {
+        player.landTimer = Math.max(0, player.landTimer - dt);
+      }
+
+      if (player.isDashing) {
+        player.dashTimer -= dt;
+        // Додаємо штриховий Smear-кадр
+        player.smearFrames.push({ x: player.x, y: player.y, facing: player.facing, life: 0.14 });
+        if (player.dashTimer <= 0) {
+          player.isDashing = false;
+          player.vx *= 0.42;
+          player.vy *= 0.42;
+        }
+      } else {
+        let moveDir = 0;
+        if (keys.left) moveDir -= 1;
+        if (keys.right) moveDir += 1;
+
+        if (moveDir !== 0) {
+          player.facing = moveDir;
+          player.vx = moveDir * MOVE_SPEED;
+        } else {
+          player.vx *= Math.pow(0.001, dt);
+          if (Math.abs(player.vx) < 6) player.vx = 0;
+        }
+
+        player.vy += GRAVITY * dt;
+        if (player.vy > 1100) player.vy = 1100;
+      }
+
+      // Оновлення Smear-кадрів
+      for (let i = player.smearFrames.length - 1; i >= 0; i--) {
+        player.smearFrames[i].life -= dt;
+        if (player.smearFrames[i].life <= 0) {
+          player.smearFrames.splice(i, 1);
+        }
+      }
+
+      // Колізії по X
+      player.x += player.vx * dt;
+      for (const plat of platforms) {
+        if (checkAABB(player, plat)) {
+          if (player.vx > 0) player.x = plat.x - player.w;
+          else if (player.vx < 0) player.x = plat.x + plat.w;
+          player.vx = 0;
+        }
+      }
+
+      // Колізії по Y
+      player.wasGrounded = player.grounded;
+      player.y += player.vy * dt;
+      player.grounded = false;
+      for (const plat of platforms) {
+        if (checkAABB(player, plat)) {
+          if (player.vy > 0) {
+            player.y = plat.y - player.h;
+            player.vy = 0;
+            player.grounded = true;
+            if (!player.wasGrounded) {
+              player.landTimer = 0.12; // Кадр приземлення (Squash)
+            }
+          } else if (player.vy < 0) {
+            player.y = plat.y + plat.h;
+            player.vy = 0;
+          }
+        }
+      }
+
+      // Визначення поточного стану анімації персонажа
+      if (player.isDashing) {
+        player.state = 'dash';
+      } else if (!player.grounded) {
+        player.state = player.vy < 0 ? 'jump' : 'fall';
+      } else if (player.landTimer > 0) {
+        player.state = 'land';
+      } else if (Math.abs(player.vx) > 25) {
+        player.state = 'run';
+      } else {
+        player.state = 'idle';
+      }
+
+      if (player.y > WORLD_HEIGHT + 100) {
+        player.x = 580;
+        player.y = 200;
+        player.vx = 0;
+        player.vy = 0;
+      }
+    }
+
+    // ==========================================
+    // 5. FRAME-BY-FRAME 2D CEL ANIMATION РЕНДЕР
+    // ==========================================
+    // Дискретний лічильник кадрів (12 FPS - класична анімація "на двійках")
+    let celTimeAccumulator = 0;
+    let celFrameTick = 0;
+
+    // Допоміжна функція для малювання "живого" чорнильного прямокутника з легким тремтінням ліній
+    function drawInkedBox(x, y, w, h, fillColor, jitterSeed) {
+      const j1 = Math.sin(jitterSeed * 12.9898) * 1.1;
+      const j2 = Math.cos(jitterSeed * 78.233) * 1.1;
+
+      // Заливка кольором (трохи зміщена як при ручному розфарбовуванні целулоїду)
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(x + 1.5, y + 1.5, w - 2, h - 2);
+
+      // Чорнильний контур ручної роботи
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 2.6;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(x + j1, y + j2);
+      ctx.lineTo(x + w - j2, y + j1);
+      ctx.lineTo(x + w + j1, y + h - j2);
+      ctx.lineTo(x - j2, y + h + j1);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    // Малювання покадрового персонажа (Cel-Animation Character)
+    function drawCelCharacter(p, label, isLocal, frameTick) {
+      ctx.save();
+
+      const cx = p.x + p.w / 2;
+      const bottomY = p.y + p.h;
+      const state = p.state || 'idle';
+
+      // Squash & Stretch (стиснення та розтягнення) залежно від кадру
+      let scaleX = 1;
+      let scaleY = 1;
+      let bobY = 0;
+      let leanAngle = 0;
+
+      // Тремтіння контуру (line boil) на кожному 12-fps кадрі
+      const boilX = Math.sin(frameTick * 3.1 + cx) * 0.8;
+      const boilY = Math.cos(frameTick * 4.7 + bottomY) * 0.8;
+
+      if (state === 'idle') {
+        // 4-кадровий цикл дихання
+        const cycle = frameTick % 4;
+        if (cycle === 1 || cycle === 2) {
+          scaleX = 1.04;
+          scaleY = 0.96;
+        }
+      } else if (state === 'run') {
+        // 4-кадровий цикл бігу
+        const cycle = frameTick % 4;
+        leanAngle = p.facing * 0.14;
+        if (cycle === 0 || cycle === 2) {
+          bobY = -4;
+          scaleX = 0.95;
+          scaleY = 1.05;
+        } else {
+          bobY = 0;
+          scaleX = 1.06;
+          scaleY = 0.94;
+        }
+      } else if (state === 'jump') {
+        // Витягування вгору при стрибку (Stretch)
+        scaleX = 0.82;
+        scaleY = 1.22;
+      } else if (state === 'fall') {
+        scaleX = 0.9;
+        scaleY = 1.1;
+      } else if (state === 'land') {
+        // Приплющення при приземленні (Squash)
+        scaleX = 1.26;
+        scaleY = 0.76;
+      } else if (state === 'dash') {
+        // Горизонтальний Smear-кадр при ривку
+        scaleX = 1.48;
+        scaleY = 0.65;
+        leanAngle = p.facing * 0.22;
+      }
+
+      ctx.translate(cx + boilX, bottomY + bobY + boilY);
+      ctx.rotate(leanAngle);
+      ctx.scale(scaleX, scaleY);
+
+      const bodyW = 28;
+      const bodyH = 30;
+      const legSwing = state === 'run' ? Math.sin((frameTick % 4) * (Math.PI / 2)) * 7 : 0;
+
+      // 1. Ноги (чорнильні штрихи, що рухаються покадрово)
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 3.2;
+      ctx.lineCap = 'round';
+
+      if (state !== 'dash') {
+        // Ліва нога
+        ctx.beginPath();
+        ctx.moveTo(-6, -12);
+        ctx.lineTo(-7 - legSwing, state === 'jump' ? -4 : 0);
+        ctx.stroke();
+
+        // Права нога
+        ctx.beginPath();
+        ctx.moveTo(6, -12);
+        ctx.lineTo(7 + legSwing, state === 'jump' ? -6 : 0);
+        ctx.stroke();
+      } else {
+        // Швидкі лінії швидкості замість ніг під час дешу
+        ctx.beginPath();
+        ctx.moveTo(-14 * p.facing, -14);
+        ctx.lineTo(-32 * p.facing, -14);
+        ctx.moveTo(-10 * p.facing, -6);
+        ctx.lineTo(-26 * p.facing, -6);
+        ctx.stroke();
+      }
+
+      // 2. Тіло / Голова персонажа (заливка + чорнильний контур)
+      const bx = -bodyW / 2;
+      const by = -bodyH - 10;
+
+      ctx.fillStyle = p.color;
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 2.8;
+
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bodyW, bodyH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Штрихування тіні з одного боку (ефект ручної анімації)
+      ctx.fillStyle = 'rgba(28, 25, 23, 0.14)';
+      ctx.beginPath();
+      ctx.roundRect(bx + (p.facing === 1 ? 0 : bodyW - 7), by + 2, 7, bodyH - 4, 4);
+      ctx.fill();
+
+      // 3. Очі (виразні чорнильні крапки/рисочки)
+      ctx.fillStyle = '#1c1917';
+      const eyeBaseX = p.facing === 1 ? 3 : -11;
+      if (state === 'dash') {
+        // Примружені очі при деші (> <)
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(eyeBaseX, by + 11);
+        ctx.lineTo(eyeBaseX + 5, by + 14);
+        ctx.lineTo(eyeBaseX, by + 17);
+        ctx.stroke();
+      } else {
+        // Класичні овальні очі з бліком
+        ctx.beginPath();
+        ctx.ellipse(eyeBaseX + 2, by + 13, 2.3, 3.4, 0, 0, Math.PI * 2);
+        ctx.ellipse(eyeBaseX + 9, by + 13, 2.3, 3.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // 4. Підпис імені над персонажем (без спотворення масштабу)
+      ctx.save();
+      ctx.font = 'bold 15px "Patrick Hand", Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = isLocal ? '#1c1917' : '#44403c';
+      ctx.fillText(label, cx, p.y - 12);
+      ctx.restore();
+    }
+
+    function render(dt) {
+      // Оновлюємо 12-FPS таймер для покадрової анімації
+      celTimeAccumulator += dt;
+      if (celTimeAccumulator >= 1 / 12) {
+        celFrameTick++;
+        celTimeAccumulator %= (1 / 12);
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scaleX = canvas.width / WORLD_WIDTH;
+      const scaleY = canvas.height / WORLD_HEIGHT;
+      const scale = Math.min(scaleX, scaleY);
+      const offsetX = (canvas.width - WORLD_WIDTH * scale) / 2;
+      const offsetY = (canvas.height - WORLD_HEIGHT * scale) / 2;
+
+      ctx.save();
+      ctx.translate(offsetX, offsetY);
+      ctx.scale(scale, scale);
+
+      // Легка розмітка аркуша аніматора (Registration grid & Peg bar)
+      ctx.strokeStyle = 'rgba(28, 25, 23, 0.06)';
+      ctx.lineWidth = 1;
+      for (let gx = 0; gx <= WORLD_WIDTH; gx += 60) {
+        ctx.beginPath();
+        ctx.moveTo(gx, 0);
+        ctx.lineTo(gx, WORLD_HEIGHT);
+        ctx.stroke();
+      }
+      for (let gy = 0; gy <= WORLD_HEIGHT; gy += 60) {
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(WORLD_WIDTH, gy);
+        ctx.stroke();
+      }
+
+      // Отвори перфорації анімаційного паперу зверху по центру (Peg holes)
+      ctx.strokeStyle = 'rgba(28, 25, 23, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(WORLD_WIDTH / 2 - 140, 14, 42, 12, 6);
+      ctx.arc(WORLD_WIDTH / 2, 20, 7, 0, Math.PI * 2);
+      ctx.roundRect(WORLD_WIDTH / 2 + 98, 14, 42, 12, 6);
+      ctx.stroke();
+
+      // Малюємо платформи з чорнильними контурами та легким тремтінням
+      platforms.forEach((plat, idx) => {
+        drawInkedBox(plat.x, plat.y, plat.w, plat.h, plat.fill, celFrameTick + idx * 17);
+      });
+
+      // Малюємо Smear-штрихи локального гравця
+      for (const s of player.smearFrames) {
+        ctx.save();
+        ctx.strokeStyle = '#1c1917';
+        ctx.fillStyle = player.color + '55';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(s.x, s.y + 8, player.w, player.h - 14, 10);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Малюємо інших гравців у кімнаті
+      remotePlayers.forEach((rp, id) => {
+        rp.renderX += (rp.x - rp.renderX) * Math.min(1, dt * 16);
+        rp.renderY += (rp.y - rp.renderY) * Math.min(1, dt * 16);
+
+        drawCelCharacter(
+          {
+            x: rp.renderX,
+            y: rp.renderY,
+            w: 36,
+            h: 44,
+            color: rp.color,
+            facing: rp.facing,
+            state: rp.state || 'idle'
+          },
+          rp.name || `Гравець ${id.slice(0, 4)}`,
+          false,
+          celFrameTick
+        );
+      });
+
+      // Малюємо локального гравця
+      drawCelCharacter(player, `${myNickname} (Ти)`, true, celFrameTick);
+
+      ctx.restore();
+    }
+
+    // ==========================================
+    // 6. МУЛЬТИПЛЕЄР З ПІДТРИМКОЮ КІМНАТ (ROOM ID)
+    // ==========================================
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const playerCountEl = document.getElementById('player-count');
+    const myIdDisplay = document.getElementById('my-id-display');
+    const toastBox = document.getElementById('toast-box');
+    const roomInput = document.getElementById('room-input');
+    const roomForm = document.getElementById('room-form');
+
+    // Читаємо кімнату з URL (?room=...) якщо друг перейшов за посиланням з параметром
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentRoom = (urlParams.get('room') || 'arena-1').trim().toLowerCase().replace(/[^a-z0-9-_]/g, '') || 'arena-1';
+    roomInput.value = currentRoom;
+
+    let db = null;
+    let auth = null;
+    let appId = 'cel-platformer-mp';
+    let unsubscribeRoom = null;
+    let currentMyDocRef = null;
+
+    function showToast(msg) {
+      toastBox.textContent = msg;
+      toastBox.classList.remove('hidden');
+      setTimeout(() => toastBox.classList.add('hidden'), 4500);
+    }
+
+    async function joinRoom(newRoomId) {
+      if (!db || !auth || !auth.currentUser) return;
+
+      const cleanRoom = newRoomId.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '') || 'arena-1';
+      roomInput.value = cleanRoom;
+
+      // Виходимо зі старої кімнати, якщо були в ній
+      if (unsubscribeRoom) {
+        unsubscribeRoom();
+        unsubscribeRoom = null;
+      }
+      if (currentMyDocRef) {
+        deleteDoc(currentMyDocRef).catch(() => {});
+      }
+
+      remotePlayers.clear();
+      currentRoom = cleanRoom;
+
+      // Оновлюємо URL без перезавантаження сторінки, щоб зручно скопіювати
+      try {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('room', currentRoom);
+        window.history.replaceState({}, '', nextUrl);
+      } catch (e) {}
+
+      // Правило 1: Шлях /artifacts/{appId}/public/data/{collectionName}
+      const collectionName = `cel_room_${currentRoom}`;
+      const playersColRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+      currentMyDocRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, myUserId);
+
+      // Записуємо себе в нову кімнату
+      await syncMyState();
+
+      // Слухаємо гравців у цій кімнаті (Правило 2: простий collection запит)
+      unsubscribeRoom = onSnapshot(playersColRef, (snapshot) => {
+        const now = Date.now();
+        const activeIds = new Set();
+
+        snapshot.forEach((docSnap) => {
+          const id = docSnap.id;
+          const data = docSnap.data();
+
+          if (now - (data.updatedAt || 0) > 15000) return;
+          activeIds.add(id);
+
+          if (id !== myUserId) {
+            if (!remotePlayers.has(id)) {
+              remotePlayers.set(id, {
+                x: data.x || 500,
+                y: data.y || 300,
+                renderX: data.x || 500,
+                renderY: data.y || 300,
+                facing: data.facing || 1,
+                color: data.color || '#3b82f6',
+                state: data.state || 'idle',
+                name: data.name || `Гравець ${id.slice(0, 4)}`
+              });
+            } else {
+              const rp = remotePlayers.get(id);
+              rp.x = data.x;
+              rp.y = data.y;
+              rp.facing = data.facing;
+              rp.color = data.color;
+              rp.state = data.state || 'idle';
+              rp.name = data.name || rp.name;
+            }
+          }
+        });
+
+        for (const id of remotePlayers.keys()) {
+          if (!activeIds.has(id)) {
+            remotePlayers.delete(id);
+          }
+        }
+
+        playerCountEl.textContent = Math.max(1, activeIds.size);
+      }, (error) => {
+        showToast('Помилка кімнати: ' + error.message);
+      });
+    }
+
+    async function syncMyState() {
+      if (!auth || !auth.currentUser || !currentMyDocRef) return;
+      try {
+        await setDoc(currentMyDocRef, {
+          x: Math.round(player.x),
+          y: Math.round(player.y),
+          facing: player.facing,
+          color: player.color,
+          state: player.state,
+          name: myNickname,
+          updatedAt: Date.now()
+        });
+      } catch (err) {}
+    }
+
+    roomForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      joinRoom(roomInput.value);
+      roomInput.blur();
+    });
+
+    async function initMultiplayer() {
+      try {
+        if (typeof __firebase_config === 'undefined') {
+          statusDot.className = 'w-3 h-3 rounded-full border-2 border-stone-900 bg-amber-400';
+          statusText.textContent = 'Локальний режим';
+          myIdDisplay.textContent = 'local-cel';
+          return;
+        }
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'cel-platformer-mp';
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // Правило 3: Спочатку автентифікація
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        myUserId = user.uid;
+        myIdDisplay.textContent = myUserId;
+
+        statusDot.className = 'w-3 h-3 rounded-full border-2 border-stone-900 bg-emerald-400';
+        statusText.textContent = 'Онлайн';
+
+        await joinRoom(currentRoom);
+
+        let lastSentX = -1;
+        let lastSentY = -1;
+        let lastSentState = '';
+        let lastSentName = '';
+        let lastSentTime = 0;
+
+        setInterval(() => {
+          const now = Date.now();
+          const changed =
+            Math.abs(player.x - lastSentX) > 1 ||
+            Math.abs(player.y - lastSentY) > 1 ||
+            player.state !== lastSentState ||
+            myNickname !== lastSentName;
+
+          if (changed || now - lastSentTime > 4000) {
+            lastSentX = player.x;
+            lastSentY = player.y;
+            lastSentState = player.state;
+            lastSentName = myNickname;
+            lastSentTime = now;
+            syncMyState();
+          }
+        }, 85);
+
+        window.addEventListener('beforeunload', () => {
+          if (currentMyDocRef) {
+            deleteDoc(currentMyDocRef).catch(() => {});
+          }
+        });
+
+      } catch (err) {
+        statusDot.className = 'w-3 h-3 rounded-full border-2 border-stone-900 bg-rose-500';
+        statusText.textContent = 'Помилка мережі';
+        showToast('Не вдалося підключитися до сервера.');
+      }
+    }
+
+    // ==========================================
+    // 7. ГОЛОВНИЙ ЦИКЛ ГРИ
+    // ==========================================
+    let lastTime = performance.now();
+
+    function gameLoop(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      updatePhysics(dt);
+      render(dt);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.onload = () => {
+      initMultiplayer();
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>
