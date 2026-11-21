@@ -942,6 +942,26 @@
       let pingMs = 0;
       let lastPingSent = 0;
       let netSyncTimer = 0;
+      let connectTimeout = null;
+
+      const PEER_CONFIG = {
+        debug: 1,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun.cloudflare.com:3478' }
+          ]
+        }
+      };
+
+      function randomRoomCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let out = '';
+        for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+        return out;
+      }
 
       const lobbyModal = document.getElementById('lobby-modal');
       const roomInput = document.getElementById('room-code');
@@ -963,6 +983,10 @@
       }
 
       function cleanupPeer() {
+        if (connectTimeout) {
+          clearTimeout(connectTimeout);
+          connectTimeout = null;
+        }
         if (conn) {
           try { conn.close(); } catch (_) {}
           conn = null;
@@ -978,9 +1002,35 @@
         return (val || 'SWISS-01').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 14) || 'SWISS-01';
       }
 
+      function sendStatePacket() {
+        if (!conn || !netConnected) return;
+        try {
+          conn.send({
+            type: 'state',
+            x: Math.round(localPlayer.x),
+            y: Math.round(localPlayer.y),
+            vx: Math.round(localPlayer.vx),
+            vy: Math.round(localPlayer.vy),
+            f: localPlayer.facing,
+            sx: Number(localPlayer.scaleX.toFixed(2)),
+            sy: Number(localPlayer.scaleY.toFixed(2)),
+            rt: Number(localPlayer.rollTimer.toFixed(2)),
+            rot: Number(localPlayer.rot.toFixed(2))
+          });
+        } catch (_) {}
+      }
+
       function setupConnection(c) {
         conn = c;
+        if (connectTimeout) {
+          clearTimeout(connectTimeout);
+          connectTimeout = null;
+        }
         conn.on('open', () => {
+          if (connectTimeout) {
+            clearTimeout(connectTimeout);
+            connectTimeout = null;
+          }
           netConnected = true;
           updateNetUI(netMode === 'host' ? 'P1 • Онлайн' : 'P2 • Онлайн', 'online');
           lobbyMsg.textContent = 'Друг підключився! Граєте в реальному часі.';
@@ -989,6 +1039,12 @@
           if (netMode === 'host') {
             conn.send({ type: 'level', idx: currentLevelIdx });
           }
+          sendStatePacket();
+        });
+        conn.on('error', (err) => {
+          lobbyMsg.textContent = 'Помилка каналу: ' + (err && err.message ? err.message : 'збій зʼєднання');
+          lobbyModal.classList.remove('hidden');
+          updateNetUI('Помилка', '');
         });
 
         conn.on('data', (data) => {
@@ -1033,24 +1089,31 @@
         }
         cleanupPeer();
         netMode = 'host';
+        if (roomInput.value === 'SWISS-01') {
+          roomInput.value = randomRoomCode();
+        }
         const code = sanitizeCode(roomInput.value);
         roomInput.value = code;
         const peerId = 'swiss-plat-' + code;
-        lobbyMsg.textContent = 'Створення кімнати...';
+        lobbyMsg.textContent = 'Створення кімнати ' + code + '...';
         updateNetUI('Очікування P2...', 'waiting');
 
         try {
-          peer = new Peer(peerId);
+          peer = new Peer(peerId, PEER_CONFIG);
           peer.on('open', () => {
-            lobbyMsg.textContent = 'Кімната готова! Чекаємо друга (' + code + '). Можеш вже бігати.';
-            lobbyModal.classList.add('hidden');
+            lobbyMsg.textContent = 'Кімната ' + code + ' готова! Натисни «Копіювати лінк» і скинь другу.';
             showToast('Кімната ' + code + ' відкрита');
           });
           peer.on('connection', (c) => {
             setupConnection(c);
           });
           peer.on('error', (err) => {
-            lobbyMsg.textContent = 'Помилка: ' + (err.type === 'unavailable-id' ? 'Цей код вже зайнятий. Введи інший або натисни Приєднатися.' : err.message);
+            if (err.type === 'unavailable-id') {
+              roomInput.value = randomRoomCode();
+              lobbyMsg.textContent = 'Код був зайнятий — згенеровано новий (' + roomInput.value + '). Натисни «Створити (P1)» ще раз.';
+            } else {
+              lobbyMsg.textContent = 'Помилка мережі: ' + (err.message || err.type);
+            }
             updateNetUI('Помилка', '');
           });
         } catch (e) {
@@ -1072,14 +1135,26 @@
         lobbyMsg.textContent = 'Підключення до ' + code + '...';
         updateNetUI('Підключення...', 'waiting');
 
+        connectTimeout = setTimeout(() => {
+          if (!netConnected) {
+            cleanupPeer();
+            lobbyMsg.textContent = 'Не вдалося зʼєднатися за 10с. Перевір, чи P1 відкрив кімнату ' + code + ' на сайті, або створіть нову.';
+            lobbyModal.classList.remove('hidden');
+            updateNetUI('Таймаут', '');
+          }
+        }, 10000);
+
         try {
-          peer = new Peer();
+          peer = new Peer(undefined, PEER_CONFIG);
           peer.on('open', () => {
-            const c = peer.connect(targetId, { reliable: false });
+            const c = peer.connect(targetId, { reliable: true });
             setupConnection(c);
           });
           peer.on('error', (err) => {
-            lobbyMsg.textContent = 'Не вдалося знайти кімнату ' + code + '. Перевір, чи P1 вже створив її.';
+            if (connectTimeout) { clearTimeout(connectTimeout); connectTimeout = null; }
+            lobbyMsg.textContent = err.type === 'peer-unavailable'
+              ? 'Кімнату ' + code + ' не знайдено. Нехай P1 спочатку натисне «Створити (P1)».'
+              : 'Помилка: ' + (err.message || err.type);
             updateNetUI('Не знайдено', '');
           });
         } catch (e) {
@@ -1134,7 +1209,10 @@
         const r = params.get('room');
         if (r) {
           roomInput.value = sanitizeCode(r);
-          lobbyMsg.textContent = 'Код кімнати підставлено! Натисни «Приєднатися (P2)».';
+          lobbyMsg.textContent = 'Код кімнати підставлено! Автопідключення...';
+          setTimeout(() => startJoin(), 350);
+        } else {
+          roomInput.value = randomRoomCode();
         }
       } catch (_) {}
 
@@ -1623,18 +1701,7 @@
           netSyncTimer += dt;
           if (netSyncTimer >= 0.025 && conn) {
             netSyncTimer = 0;
-            conn.send({
-              type: 'state',
-              x: Math.round(localPlayer.x),
-              y: Math.round(localPlayer.y),
-              vx: Math.round(localPlayer.vx),
-              vy: Math.round(localPlayer.vy),
-              f: localPlayer.facing,
-              sx: Number(localPlayer.scaleX.toFixed(2)),
-              sy: Number(localPlayer.scaleY.toFixed(2)),
-              rt: Number(localPlayer.rollTimer.toFixed(2)),
-              rot: Number(localPlayer.rot.toFixed(2))
-            });
+            sendStatePacket();
           }
           if (ts - lastPingSent > 2000 && conn) {
             lastPingSent = ts;
