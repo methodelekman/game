@@ -87,6 +87,20 @@
       justify-content: flex-end;
     }
 
+    #corner-tabs .sketch-btn {
+      height: 38px;
+      min-width: 38px;
+      padding: 0 11px;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    #corner-tabs .sketch-btn .ico {
+      width: 18px;
+      height: 18px;
+      vertical-align: 0;
+    }
+
     #level-scrap {
       position: absolute;
       top: 12px;
@@ -101,6 +115,8 @@
       box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.2);
       z-index: 20;
       pointer-events: none;
+      animation: sketchBoil 0.68s steps(2, end) infinite;
+      will-change: transform;
     }
 
     #level-scrap::before {
@@ -129,6 +145,8 @@
       transform: rotate(-0.8deg);
       z-index: 19;
       pointer-events: none;
+      animation: sketchBoil 0.72s steps(2, end) infinite;
+      will-change: transform;
     }
 
     #leaderboard::before {
@@ -256,14 +274,20 @@
       flex-shrink: 0;
     }
 
+    /* GPU-only stepped hand-drawn boil (zero border-radius software repaints = rock-solid 60fps even at 100% opacity!) */
     @keyframes sketchBoil {
-      0%, 100% { border-radius: 7px 4px 9px 5px; }
-      50% { border-radius: 5px 8px 6px 9px; }
+      0%, 100% { transform: rotate(-0.55deg) scale(1, 1); }
+      50% { transform: rotate(0.55deg) scale(1.01, 0.992); }
     }
 
-    @keyframes sketchWobble {
-      0%, 100% { transform: rotate(-0.7deg) translateY(0px); }
-      50% { transform: rotate(0.65deg) translateY(-0.5px); }
+    @keyframes valPop {
+      0% { transform: scale(1); color: var(--ink); }
+      45% { transform: scale(1.24) rotate(-2.5deg); color: var(--red); }
+      100% { transform: scale(1); color: var(--ink); }
+    }
+    .val-pop {
+      display: inline-block;
+      animation: valPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .sketch-btn {
@@ -284,7 +308,15 @@
       cursor: pointer;
       box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.28), inset 0 -2px 0 rgba(106, 99, 90, 0.14);
       animation: sketchBoil 0.62s steps(2, end) infinite;
+      will-change: transform;
       transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
+    }
+
+    .host-code-pill,
+    .item-chip,
+    #lobby-draw-bar {
+      animation: sketchBoil 0.68s steps(2, end) infinite;
+      will-change: transform;
     }
 
     .sketch-btn:hover {
@@ -1025,14 +1057,96 @@
     .range-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 16px;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
     }
 
+    /* Custom Smooth Hand-Inked Sketchbook Range Sliders */
     .range-wrap input[type="range"] {
-      width: 110px;
-      accent-color: var(--red);
+      -webkit-appearance: none;
+      appearance: none;
+      width: 126px;
+      height: 10px;
+      background: linear-gradient(180deg, #EFE5D1 0%, #E3D5BA 100%);
+      border: 2px solid var(--ink);
+      border-radius: 7px 4px 8px 5px;
+      outline: none;
       cursor: pointer;
+      box-shadow: 1.5px 2px 0 rgba(35, 31, 32, 0.18);
+      touch-action: pan-y;
+    }
+    .range-wrap input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50% 45% 52% 48%;
+      background: var(--red);
+      border: 2.2px solid var(--ink);
+      box-shadow: 1.5px 2px 0 var(--ink);
+      cursor: grab;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.12s ease;
+    }
+    .range-wrap input[type="range"]::-webkit-slider-thumb:active {
+      cursor: grabbing;
+      transform: scale(1.2) rotate(-8deg);
+      background: var(--blue);
+    }
+    .range-wrap input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50% 45% 52% 48%;
+      background: var(--red);
+      border: 2.2px solid var(--ink);
+      box-shadow: 1.5px 2px 0 var(--ink);
+      cursor: grab;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Custom Animated Hand-Inked Checkboxes (Lock / Infinite) */
+    .hp-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+    }
+    .hp-check input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      position: relative;
+      width: 22px;
+      height: 22px;
+      background: var(--sheet);
+      border: 2.2px solid var(--ink);
+      border-radius: 6px 4px 7px 4px;
+      box-shadow: 1.5px 2px 0 rgba(35, 31, 32, 0.24);
+      cursor: pointer;
+      animation: sketchBoil 0.65s steps(2, end) infinite;
+      transition: background-color 0.18s ease, transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .hp-check input[type="checkbox"]::after {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 1px;
+      width: 6px;
+      height: 12px;
+      border-right: 3px solid var(--sheet);
+      border-bottom: 3px solid var(--sheet);
+      transform: rotate(42deg) scale(0);
+      opacity: 0;
+      transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.16s ease;
+    }
+    .hp-check input[type="checkbox"]:checked {
+      background: var(--blue);
+      transform: scale(1.08) rotate(-3deg);
+    }
+    .hp-check input[type="checkbox"]:checked::after {
+      transform: rotate(42deg) scale(1);
+      opacity: 1;
     }
 
     /* Clickable Pencil Version & Changelog Tag (ONLY shown in Main Menu / Lobby!) */
@@ -1131,6 +1245,8 @@
       align-items: flex-end;
       pointer-events: none;
       z-index: 25;
+      transform: translateZ(0);
+      will-change: transform, opacity;
       transform-origin: bottom center;
     }
 
@@ -1230,12 +1346,11 @@
       box-shadow: 0 0 0 var(--ink);
     }
 
-    #touch-controls.repositioning .touch-pad {
+    #touch-controls.repositioning .t-btn {
       outline: 2.5px dashed var(--red);
-      outline-offset: 6px;
-      background: rgba(242, 211, 136, 0.25);
-      border-radius: 14px;
+      outline-offset: 4px;
       cursor: grab;
+      animation: none;
     }
 
     #touch-edit-bar {
@@ -1289,9 +1404,9 @@
       outline-offset: 1px;
     }
 
-    @media (max-width: 1180px) {
+    @media (max-width: 1360px) {
       #lobby-draw-bar {
-        top: 56px;
+        top: 58px;
         left: auto;
         right: 14px;
         transform: none;
@@ -1457,7 +1572,8 @@
         <button class="draw-swatch" data-dcol="#2952A3" style="background:#2952A3;" title="Blue / Синій"></button>
         <button class="draw-swatch" data-dcol="#D49B27" style="background:#D49B27;" title="Gold / Золотий"></button>
         <button class="draw-swatch" data-dcol="#2D7A46" style="background:#2D7A46;" title="Green / Зелений"></button>
-        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" data-i18n-title="clearDrawTip" title="Очистити малюнки"><svg class="ico" viewBox="0 0 24 24"><path d="M7 21h13M16.2 3.8a2.2 2.2 0 0 1 3.1 3.1L9.5 16.7a2.2 2.2 0 0 1-3.1 0L3.3 13.6a2.2 2.2 0 0 1 0-3.1l10.2-6.7z"/><path d="M6.5 10.5l7 7"/></svg></button>
+        <button class="sketch-btn" id="btn-draw-eraser" style="font-size:15px; padding:2px 8px;" data-i18n-title="eraserToolTip" title="Ластик"><svg class="ico" viewBox="0 0 24 24"><path d="M7 21h13M16.2 3.8a2.2 2.2 0 0 1 3.1 3.1L9.5 16.7a2.2 2.2 0 0 1-3.1 0L3.3 13.6a2.2 2.2 0 0 1 0-3.1l10.2-6.7z"/><path d="M6.5 10.5l7 7"/></svg></button>
+        <button class="sketch-btn ink-red" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" data-i18n-title="clearDrawTip" title="Очистити все"><svg class="ico" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
       </div>
 
       <div id="touch-edit-bar">
@@ -1792,6 +1908,17 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.23.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Оновлений портал у лобі:</b> висока деталізація вихору, звук засмоктування стартує раніше, персонаж та всі його ефекти повністю зникають усередині порталу з кінематографічною паузою, а на старті рівня персонаж завжди дивиться вперед.</li>
+                <li><b>«Живий» скетчбук-інтерфейс усюди:</b> дьоргання (`sketchBoil`) додано на лідерборд, таймер, кнопку «Код», косметику, стрілку на двері й навіть ваші малюнки в лобі! Кастомні мальовані повзунки (Довжина / Висота) з анімацією цифр і мальовані галочки.</li>
+                <li><b>Нескінченні чорнила + Ластик у лобі:</b> можна безперервно малювати по стінах лобі скільки завгодно й стирати зайве ластиком.</li>
+                <li><b>Мобільна оптимізація й роздільне налаштування кнопок:</b> виправлено фрізи при 100% прозорості кнопок (GPU-анімація), а кожну кнопку (Вліво, Вправо, Деш, Стрибок) тепер можна перетягувати окремо! На ПК усі кнопки верхньої панелі одного розміру.</li>
+                <li><b>Нові текстури + фізика стрічок косметики:</b> покращено лід, слиз, шипи й фіолетові батути; червона катапульта тепер рівно вертикальна; виправлено кут синього порталу; бандана, шарф і ніндзя-повʼязка тепер деталізовані й розвіваються саме від твоєї швидкості!</li>
+                <li><b>Нові мелодії + потужні барабани у фіналі рівня:</b> додано свіжі саундтреки й драйвовий барабанний фінал при наближенні до дверей.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.22.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Чітке High-DPI зображення й повноекранний режим:</b> прибрано розмиття на телефонах і моніторах (чіткий рендер до 2.5× DPR + універсальна перспектива для всіх екранів) і додано кнопку <b>На весь екран</b> (⛶).</li>
@@ -1906,6 +2033,17 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.23.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>High-Detail Lobby Vortex &amp; Clean Launch:</b> richer hand-inked vortex portal, earlier suction audio, player and all trails vanish completely inside with a dramatic pause, and always spawn facing right.</li>
+                <li><b>Living Sketchbook UI Everywhere:</b> GPU-accelerated hand-drawn boil on leaderboard, timer, Code pill, wardrobe items, goal arrow, and lobby drawings, plus custom sketch sliders with animated numbers and animated checkmarks!</li>
+                <li><b>Infinite Lobby Ink + Eraser Tool:</b> draw continuously forever without running out of stroke points, and rub out strokes with the new Eraser tool.</li>
+                <li><b>Mobile 100% Opacity Fix &amp; Per-Button Dragging:</b> fixed 100% opacity stutter (GPU-composited animation), and each touch button (Left, Right, Dash, Jump) can now be positioned independently! Uniform desktop top-bar button sizing.</li>
+                <li><b>Richer Block Art &amp; Velocity-Driven Cosmetics:</b> upgraded Slime, Ice, Spikes &amp; Purple Trampolines; upright non-tilted Red Catapult pads; fixed blue portal pit corner; redesigned Ninja Headband &amp; Scarf with velocity-driven ribbon physics!</li>
+                <li><b>New Melodies &amp; Finale Climax Drums:</b> added fresh sketchbook melodies and driving finale percussion near the goal door.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.22.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Razor-Sharp High-DPI &amp; Fullscreen Mode:</b> eliminated blurry mobile scaling (up to 2.5× DPR + aspect-aware framing) and added a native Fullscreen toggle (⛶).</li>
@@ -2001,7 +2139,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.22.0 · Changelog</button>
+      <button id="version-tag">v0.23.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2101,6 +2239,7 @@
           fullscreenTip: 'На весь екран',
           menuTip: 'Меню / Онлайн',
           hideHudTip: 'Сховати / показати меню',
+          eraserToolTip: 'Ластик (стирати лінії)',
           wParticles: 'Партікли (8)',
           saveLookBtn: 'Зберегти образ',
           onFull: 'Увімкнено',
@@ -2281,6 +2420,7 @@
           fullscreenTip: 'Fullscreen',
           menuTip: 'Menu / Online',
           hideHudTip: 'Toggle HUD',
+          eraserToolTip: 'Eraser tool',
           wParticles: 'Particles (8)',
           saveLookBtn: 'Save Look',
           onFull: 'On',
@@ -2992,6 +3132,24 @@
           mel:  [440.0, 523.25, 587.33, 659.25, 0, 587.33, 523.25, 440.0, 392.0, 440.0, 523.25, 587.33, 523.25, 493.88, 440.0, 392.0],
           bass: [110.0, 0, 146.83, 0, 130.81, 0, 110.0, 0, 98.0, 0, 130.81, 0, 98.0, 110.0, 123.47, 0],
           harm: [0, 0, 0, 783.99, 0, 0, 659.25, 0, 0, 0, 0, 698.46, 0, 0, 659.25, 0]
+        },
+        // 4: Sunny Ragtime Paper-Plane Bounce (NEW!)
+        {
+          mel:  [392.0, 0, 523.25, 493.88, 523.25, 659.25, 0, 587.33, 523.25, 440.0, 0, 493.88, 523.25, 392.0, 329.63, 0],
+          bass: [130.81, 0, 196.0, 0, 110.0, 0, 164.81, 0, 146.83, 0, 174.61, 0, 98.0, 123.47, 146.83, 0],
+          harm: [0, 0, 783.99, 0, 0, 880.0, 0, 0, 0, 659.25, 0, 0, 783.99, 0, 0, 0]
+        },
+        // 5: Blueprint Jazz-Hop Stroll (NEW!)
+        {
+          mel:  [329.63, 392.0, 0, 493.88, 587.33, 0, 523.25, 493.88, 440.0, 0, 392.0, 329.63, 293.66, 329.63, 392.0, 0],
+          bass: [164.81, 0, 123.47, 0, 146.83, 0, 110.0, 0, 130.81, 0, 98.0, 0, 110.0, 0, 123.47, 146.83],
+          harm: [0, 659.25, 0, 0, 783.99, 0, 0, 659.25, 0, 0, 587.33, 0, 0, 0, 659.25, 0]
+        },
+        // 6: Sky-Sprint Adventure Theme (NEW!)
+        {
+          mel:  [523.25, 587.33, 659.25, 0, 783.99, 659.25, 587.33, 0, 523.25, 493.88, 440.0, 523.25, 587.33, 0, 659.25, 0],
+          bass: [130.81, 0, 164.81, 130.81, 98.0, 0, 146.83, 98.0, 110.0, 0, 164.81, 110.0, 146.83, 130.81, 123.47, 98.0],
+          harm: [0, 0, 880.0, 0, 0, 783.99, 0, 0, 659.25, 0, 0, 783.99, 0, 0, 880.0, 0]
         }
       ];
 
@@ -3052,11 +3210,11 @@
           const remDist = Math.hypot(gx - localPlayer.x, gy - localPlayer.y);
           const progress = Math.max(0, Math.min(1, 1 - remDist / totalDist));
 
-          // Calm at start; drums enter at 20%, bells/funk at 55%, climax wave in final 20% or < 340px!
+          // Calm at start; drums enter at 20%, bells/funk at 50%, HYPE FINALE DRUMS in final 32% or < 480px!
           let st = 0;
-          if (progress >= 0.80 || remDist < 340) st = 3;
-          else if (progress >= 0.52) st = 2;
-          else if (progress >= 0.18 || roundElapsed > 5.0) st = 1;
+          if (progress >= 0.68 || remDist < 480) st = 3;
+          else if (progress >= 0.45) st = 2;
+          else if (progress >= 0.16 || roundElapsed > 4.5) st = 1;
           else st = 0;
 
           // Close Co-op neck-and-neck rivalry bumps excitement by +1!
@@ -3153,12 +3311,17 @@
             if (bass && (idx === 2 || idx === 10)) playPluck(audioCtx, bass * 2, now, 0.14, 0.022 * m2, true);
           }
 
-          // Stage 3 (Final Push / Climax Wave): soaring warm lead + extra kick drive + deep sub-bass!
+          // Stage 3 (Final Push / Climax Finale Drums!): soaring lead + driving double-kick, snare rolls, 16th hats & tom fills!
           const m3 = stemMix[3];
           if (m3 > 0.04) {
             if (harm) playLead(audioCtx, harm, now, 0.34, 0.026 * m3);
             else if (mel && (idx === 0 || idx === 6 || idx === 12)) playLead(audioCtx, mel * 1.5, now, 0.28, 0.02 * m3);
-            if (idx === 10 || idx === 14) playDrum(audioCtx, 'kick', now, 0.05 * m3);
+            if (idx === 0 || idx === 2 || idx === 8 || idx === 10 || idx === 14) playDrum(audioCtx, 'kick', now, 0.068 * m3);
+            if (idx === 4 || idx === 12) playDrum(audioCtx, 'snare', now, 0.056 * m3);
+            playDrum(audioCtx, (idx === 6 || idx === 14) ? 'openhat' : 'hat', now, 0.022 * m3);
+            if (idx === 13) playDrum(audioCtx, 'tom_hi', now, 0.052 * m3);
+            if (idx === 14) playDrum(audioCtx, 'tom_lo', now, 0.058 * m3);
+            if (idx === 15) playDrum(audioCtx, 'snare', now, 0.052 * m3);
             if (idx === 0 && bass) playPluck(audioCtx, bass * 0.5, now, 0.3, 0.032 * m3, true);
           }
         }
@@ -4065,8 +4228,9 @@
               const pitX = px + entryW;
               const pitY = py + 145;
               const pitW = 140;
+              // Flush L-corner: pit floor extends left under the drop wall so computeSeamlessEdges fuses them cleanly!
               platforms.push(makePlatform(px + entryW - 34, py + 38, 34, 107, 'solid'));
-              platforms.push(makePlatform(pitX, pitY, pitW, 38, 'solid'));
+              platforms.push(makePlatform(px + entryW - 34, pitY, pitW + 34, 38, 'solid'));
               const wallX = pitX + pitW;
               const wallTop = py - 240;
               platforms.push(makePlatform(wallX, wallTop, 42, (pitY + 38) - wallTop, 'solid'));
@@ -4951,9 +5115,21 @@
         mirror: false,
         forceShow: false,
         leftOffset: { x: 0, y: 0 },
-        rightOffset: { x: 0, y: 0 }
+        rightOffset: { x: 0, y: 0 },
+        btnOffsets: {
+          left: { x: 0, y: 0 },
+          right: { x: 0, y: 0 },
+          roll: { x: 0, y: 0 },
+          jump: { x: 0, y: 0 }
+        }
       };
-      let mobileCtrl = { ...DEFAULT_MOBILE_CTRL, leftOffset: { x: 0, y: 0 }, rightOffset: { x: 0, y: 0 } };
+      const cloneBtnOffsets = (src) => ({
+        left: { x: (src && src.left && src.left.x) || 0, y: (src && src.left && src.left.y) || 0 },
+        right: { x: (src && src.right && src.right.x) || 0, y: (src && src.right && src.right.y) || 0 },
+        roll: { x: (src && src.roll && src.roll.x) || 0, y: (src && src.roll && src.roll.y) || 0 },
+        jump: { x: (src && src.jump && src.jump.x) || 0, y: (src && src.jump && src.jump.y) || 0 }
+      });
+      let mobileCtrl = { ...DEFAULT_MOBILE_CTRL, leftOffset: { x: 0, y: 0 }, rightOffset: { x: 0, y: 0 }, btnOffsets: cloneBtnOffsets(null) };
       try {
         const savedMob = JSON.parse(localStorage.getItem('sketch_mobile_ctrl') || 'null');
         if (savedMob && typeof savedMob === 'object') {
@@ -4961,10 +5137,18 @@
             ...DEFAULT_MOBILE_CTRL,
             ...savedMob,
             leftOffset: savedMob.leftOffset || { x: 0, y: 0 },
-            rightOffset: savedMob.rightOffset || { x: 0, y: 0 }
+            rightOffset: savedMob.rightOffset || { x: 0, y: 0 },
+            btnOffsets: cloneBtnOffsets(savedMob.btnOffsets)
           };
         }
       } catch (_) {}
+
+      function popValEl(el) {
+        if (!el) return;
+        el.classList.remove('val-pop');
+        void el.offsetWidth;
+        el.classList.add('val-pop');
+      }
 
       function saveMobileCtrl() {
         try { localStorage.setItem('sketch_mobile_ctrl', JSON.stringify(mobileCtrl)); } catch (_) {}
@@ -4976,9 +5160,16 @@
         touchWrap.classList.toggle('visible', showTouch);
         touchWrap.classList.toggle('mirrored', !!mobileCtrl.mirror);
         touchWrap.style.bottom = mobileCtrl.bottomOffset + 'px';
-        touchWrap.style.opacity = String(mobileCtrl.opacity);
-        touchLeftPad.style.transform = `translate(${mobileCtrl.leftOffset.x}px, ${mobileCtrl.leftOffset.y}px) scale(${mobileCtrl.scale})`;
-        touchRightPad.style.transform = `translate(${mobileCtrl.rightOffset.x}px, ${mobileCtrl.rightOffset.y}px) scale(${mobileCtrl.scale})`;
+        // Clamp opacity cleanly at 0.999 so mobile browsers ALWAYS keep the GPU compositor layer active (0 lag at 100%!)
+        touchWrap.style.opacity = String(mobileCtrl.opacity >= 0.995 ? 0.999 : mobileCtrl.opacity);
+        touchLeftPad.style.transform = `translate3d(${mobileCtrl.leftOffset.x}px, ${mobileCtrl.leftOffset.y}px, 0) scale(${mobileCtrl.scale})`;
+        touchRightPad.style.transform = `translate3d(${mobileCtrl.rightOffset.x}px, ${mobileCtrl.rightOffset.y}px, 0) scale(${mobileCtrl.scale})`;
+        if (!mobileCtrl.btnOffsets) mobileCtrl.btnOffsets = cloneBtnOffsets(null);
+        touchWrap.querySelectorAll('.t-btn').forEach((btn) => {
+          const k = btn.dataset.key;
+          const off = mobileCtrl.btnOffsets[k] || { x: 0, y: 0 };
+          btn.style.translate = `${off.x}px ${off.y}px`;
+        });
 
         // Update Settings tab controls
         const asb = document.getElementById('mob-autosprint-btn');
@@ -5128,12 +5319,32 @@
       });
       canvas.addEventListener('touchcancel', () => { zoomPinchDist = 0; zoomSwipeY = null; });
 
-      // Shared Lobby Pencil Wall Drawing
+      // Shared Lobby Pencil Wall Drawing (Infinite continuous ink + Eraser tool!)
       let lobbyDrawMode = false;
+      let lobbyEraserMode = false;
       let lobbyDrawColor = '#231F20';
       const lobbyStrokes = [];
       let activeDrawStroke = null;
+      let erasingActive = false;
       let soloLobbyActive = false;
+
+      function eraseAtWorldPt(wx, wy) {
+        const r = 20;
+        let removed = false;
+        for (let i = lobbyStrokes.length - 1; i >= 0; i--) {
+          const st = lobbyStrokes[i];
+          if (!st.pts) continue;
+          let hit = false;
+          for (let j = 0; j < st.pts.length; j++) {
+            if (Math.hypot(st.pts[j][0] - wx, st.pts[j][1] - wy) <= r) { hit = true; break; }
+          }
+          if (hit) {
+            lobbyStrokes.splice(i, 1);
+            removed = true;
+          }
+        }
+        return removed;
+      }
 
       function screenToWorld(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
@@ -5154,21 +5365,45 @@
         e.preventDefault();
         canvas.setPointerCapture(e.pointerId);
         const pt = screenToWorld(e.clientX, e.clientY);
+        if (lobbyEraserMode) {
+          erasingActive = true;
+          if (eraseAtWorldPt(pt.x, pt.y) && netConnected) {
+            sendGameMsg({ type: 'draw_erase', x: Math.round(pt.x), y: Math.round(pt.y) });
+          }
+          return;
+        }
         activeDrawStroke = { color: lobbyDrawColor, pts: [[Math.round(pt.x), Math.round(pt.y)]] };
         lobbyStrokes.push(activeDrawStroke);
-        if (lobbyStrokes.length > 85) lobbyStrokes.shift();
+        if (lobbyStrokes.length > 420) lobbyStrokes.shift();
       });
 
       canvas.addEventListener('pointermove', (e) => {
+        if (erasingActive && lobbyEraserMode) {
+          const pt = screenToWorld(e.clientX, e.clientY);
+          if (eraseAtWorldPt(pt.x, pt.y) && netConnected) {
+            sendGameMsg({ type: 'draw_erase', x: Math.round(pt.x), y: Math.round(pt.y) });
+          }
+          return;
+        }
         if (!activeDrawStroke) return;
         const pt = screenToWorld(e.clientX, e.clientY);
         const last = activeDrawStroke.pts[activeDrawStroke.pts.length - 1];
-        if (Math.hypot(pt.x - last[0], pt.y - last[1]) >= 4 && activeDrawStroke.pts.length < 180) {
-          activeDrawStroke.pts.push([Math.round(pt.x), Math.round(pt.y)]);
+        if (Math.hypot(pt.x - last[0], pt.y - last[1]) >= 4) {
+          const nx = Math.round(pt.x), ny = Math.round(pt.y);
+          activeDrawStroke.pts.push([nx, ny]);
+          // Seamless infinite ink chunking: never stop drawing mid-drag!
+          if (activeDrawStroke.pts.length >= 90) {
+            const done = activeDrawStroke;
+            if (netConnected) sendGameMsg({ type: 'draw_stroke', stroke: done });
+            activeDrawStroke = { color: lobbyDrawColor, pts: [[nx, ny]] };
+            lobbyStrokes.push(activeDrawStroke);
+            if (lobbyStrokes.length > 420) lobbyStrokes.shift();
+          }
         }
       });
 
       const finishDrawStroke = () => {
+        erasingActive = false;
         if (!activeDrawStroke) return;
         const st = activeDrawStroke;
         activeDrawStroke = null;
@@ -5180,18 +5415,38 @@
       canvas.addEventListener('pointercancel', finishDrawStroke);
 
       const btnDrawToggle = document.getElementById('btn-draw-toggle');
+      const btnDrawEraser = document.getElementById('btn-draw-eraser');
       const drawToggleLabel = document.getElementById('draw-toggle-label');
       btnDrawToggle.addEventListener('click', () => {
         lobbyDrawMode = !lobbyDrawMode;
+        if (!lobbyDrawMode) {
+          lobbyEraserMode = false;
+          if (btnDrawEraser) btnDrawEraser.classList.remove('ink-red');
+        }
         if (drawToggleLabel) drawToggleLabel.textContent = lobbyDrawMode ? tr('drawOn') : tr('drawOff');
         btnDrawToggle.classList.toggle('ink-blue', lobbyDrawMode);
         canvas.style.cursor = lobbyDrawMode ? 'crosshair' : '';
       });
+      if (btnDrawEraser) {
+        btnDrawEraser.addEventListener('click', () => {
+          lobbyEraserMode = !lobbyEraserMode;
+          if (lobbyEraserMode && !lobbyDrawMode) {
+            lobbyDrawMode = true;
+            if (drawToggleLabel) drawToggleLabel.textContent = tr('drawOn');
+            btnDrawToggle.classList.add('ink-blue');
+          }
+          btnDrawEraser.classList.toggle('ink-red', lobbyEraserMode);
+          canvas.style.cursor = lobbyEraserMode ? 'cell' : (lobbyDrawMode ? 'crosshair' : '');
+        });
+      }
       document.querySelectorAll('.draw-swatch').forEach((sw) => {
         sw.addEventListener('click', () => {
           lobbyDrawColor = sw.dataset.dcol;
+          lobbyEraserMode = false;
+          if (btnDrawEraser) btnDrawEraser.classList.remove('ink-red');
           document.querySelectorAll('.draw-swatch').forEach((s) => s.classList.toggle('active', s === sw));
           if (!lobbyDrawMode) btnDrawToggle.click();
+          else canvas.style.cursor = 'crosshair';
         });
       });
       document.getElementById('btn-draw-clear').addEventListener('click', () => {
@@ -5206,32 +5461,33 @@
         syncTouchVisualButtons();
       });
 
-      // Drag-to-reposition touch pads
-      [
-        { el: touchLeftPad, key: 'leftOffset' },
-        { el: touchRightPad, key: 'rightOffset' }
-      ].forEach(({ el, key }) => {
+      // Drag-to-reposition EACH touch button independently (Left, Right, Dash, Jump)!
+      touchWrap.querySelectorAll('.t-btn').forEach((btn) => {
+        const key = btn.dataset.key;
         let dragStart = null;
-        el.addEventListener('pointerdown', (e) => {
+        btn.addEventListener('pointerdown', (e) => {
           if (!touchRepositionMode) return;
           e.preventDefault();
           e.stopPropagation();
-          el.setPointerCapture(e.pointerId);
+          btn.setPointerCapture(e.pointerId);
+          if (!mobileCtrl.btnOffsets) mobileCtrl.btnOffsets = cloneBtnOffsets(null);
+          if (!mobileCtrl.btnOffsets[key]) mobileCtrl.btnOffsets[key] = { x: 0, y: 0 };
           dragStart = {
             x: e.clientX,
             y: e.clientY,
-            ox: mobileCtrl[key].x,
-            oy: mobileCtrl[key].y
+            ox: mobileCtrl.btnOffsets[key].x,
+            oy: mobileCtrl.btnOffsets[key].y
           };
         });
-        el.addEventListener('pointermove', (e) => {
+        btn.addEventListener('pointermove', (e) => {
           if (!touchRepositionMode || !dragStart) return;
-          mobileCtrl[key].x = Math.round(Math.max(-180, Math.min(180, dragStart.ox + (e.clientX - dragStart.x))));
-          mobileCtrl[key].y = Math.round(Math.max(-240, Math.min(40, dragStart.oy + (e.clientY - dragStart.y))));
+          const sc = Math.max(0.5, mobileCtrl.scale || 1);
+          mobileCtrl.btnOffsets[key].x = Math.round(Math.max(-240, Math.min(240, dragStart.ox + (e.clientX - dragStart.x) / sc)));
+          mobileCtrl.btnOffsets[key].y = Math.round(Math.max(-280, Math.min(80, dragStart.oy + (e.clientY - dragStart.y) / sc)));
           applyMobileCtrlUI();
         });
-        el.addEventListener('pointerup', () => { dragStart = null; });
-        el.addEventListener('pointercancel', () => { dragStart = null; });
+        btn.addEventListener('pointerup', () => { dragStart = null; });
+        btn.addEventListener('pointercancel', () => { dragStart = null; });
       });
 
       document.getElementById('btn-save-touch-pos').addEventListener('click', () => {
@@ -5404,7 +5660,7 @@
         touchEditBar.classList.add('visible');
       });
       document.getElementById('mob-reset-btn').addEventListener('click', () => {
-        mobileCtrl = { ...DEFAULT_MOBILE_CTRL, leftOffset: { x: 0, y: 0 }, rightOffset: { x: 0, y: 0 } };
+        mobileCtrl = { ...DEFAULT_MOBILE_CTRL, leftOffset: { x: 0, y: 0 }, rightOffset: { x: 0, y: 0 }, btnOffsets: cloneBtnOffsets(null) };
         saveMobileCtrl();
         applyMobileCtrlUI();
         showToast(tr('toastMobReset'));
@@ -5739,6 +5995,8 @@
           if (lobbyStrokes.length > 85) lobbyStrokes.shift();
         } else if (data.type === 'draw_clear') {
           lobbyStrokes.length = 0;
+        } else if (data.type === 'draw_erase') {
+          eraseAtWorldPt(data.x, data.y);
         } else if (data.type === 'tag_sync') {
           if (data.itWho) tagState.itWho = (data.itWho === 'local' ? 'remote' : 'local');
           if (typeof data.timeLeft === 'number') tagState.timeLeft = data.timeLeft;
@@ -6572,10 +6830,12 @@
       document.getElementById('hp-len-range').addEventListener('input', (e) => {
         roomSettings.levelLength = Number(e.target.value);
         broadcastLobbySettings();
+        popValEl(document.getElementById('hp-len-val'));
       });
       document.getElementById('hp-height-range').addEventListener('input', (e) => {
         roomSettings.levelHeight = Number(e.target.value);
         broadcastLobbySettings();
+        popValEl(document.getElementById('hp-height-val'));
       });
       document.getElementById('hp-ring-btn').addEventListener('click', () => {
         roomSettings.spawnRingIdx = (roomSettings.spawnRingIdx + 1) % SPAWN_RING_MODES.length;
@@ -6618,6 +6878,8 @@
         launchTimer = 5.0;
         launchLastSec = 6;
         blackoutAlpha = 0;
+        localPlayer.suckedIn = false;
+        remotePlayer.suckedIn = false;
         vortexSuctionStarted = false;
         stopVortexSuctionSound();
         syncHostPanelUI();
@@ -6666,13 +6928,15 @@
         gamePhase = 'lobby';
         launchTimer = 0;
         blackoutAlpha = 0;
+        localPlayer.suckedIn = false;
+        remotePlayer.suckedIn = false;
         vortexSuctionStarted = false;
         stopVortexSuctionSound();
         screenShake = 5;
         // Snap players cleanly back upright onto lobby floor
         const restorePl = (pl, x) => {
           pl.x = x; pl.y = 420; pl.vx = 0; pl.vy = 0;
-          pl.rollTimer = 0; pl.rot = 0; pl.scaleX = 1; pl.scaleY = 1;
+          pl.rollTimer = 0; pl.rot = 0; pl.scaleX = 1; pl.scaleY = 1; pl.suckedIn = false; pl.facing = 1;
         };
         restorePl(localPlayer, netMode === 'host' ? 200 : 270);
         if (netConnected) restorePl(remotePlayer, netMode === 'host' ? 270 : 200);
@@ -6763,6 +7027,8 @@
         p.y = sp.y;
         p.vx = 0;
         p.vy = 0;
+        p.facing = 1;
+        p.suckedIn = false;
         p.wallCoyoteTimer = 0;
         p.wallCoyoteDir = 0;
         p.wallCoyoteSurface = 'solid';
@@ -8248,11 +8514,48 @@
           c.beginPath(); c.moveTo(-cx0 - 2, hatY + 3); c.lineTo(-cx0 - 1, hatY - 8.5); c.lineTo(-cx0 + 5.5, hatY + 1); c.closePath(); c.fill(); c.stroke();
           c.beginPath(); c.moveTo(cx0 + 2, hatY + 3); c.lineTo(cx0 + 1, hatY - 8.5); c.lineTo(cx0 - 5.5, hatY + 1); c.closePath(); c.fill(); c.stroke();
         } else if (acc === 'headband') {
+          // High-Detail Shinobi Ninja Headband: forehead wrap + brushed metal leaf plate + velocity-driven dual tails!
+          const fw = Math.min(foreheadW + 1, 14);
+          const by = foreheadY - 2;
+          const vx = (fm && fm.vx) || 0;
+          const vy = (fm && fm.vy) || 0;
+          const spd = Math.min(1, Math.hypot(vx, vy) / 420);
+          const trailDir = Math.abs(vx) > 25 ? -Math.sign(vx) : -facing;
+          const tailLen = 4.5 + spd * 11.5;
+          const droop = (1 - spd) * 7.5 + Math.max(-4, Math.min(5, -vy * 0.012));
+          const flut = spd > 0.06 ? Math.sin(worldTime * (12 + spd * 14)) * (2.6 * spd) : 0;
+          // Dual fluttering crimson tails behind head
           c.fillStyle = '#C83E31';
-          c.fillRect(-foreheadW, foreheadY - 2, foreheadW * 2, 4.2);
-          c.strokeRect(-foreheadW, foreheadY - 2, foreheadW * 2, 4.2);
-          c.beginPath(); c.moveTo(-facing * foreheadW, foreheadY); c.lineTo(-facing * (foreheadW + 8), foreheadY + 4.5);
-          c.strokeStyle = '#C83E31'; c.lineWidth = 2.8; c.stroke();
+          c.beginPath();
+          c.moveTo(trailDir * (fw - 1), by);
+          c.quadraticCurveTo(trailDir * (fw + tailLen * 0.5), by + droop * 0.4 + flut * 0.5, trailDir * (fw + tailLen), by + droop + flut);
+          c.lineTo(trailDir * (fw + tailLen * 0.85), by + droop + 3.2 + flut * 0.7);
+          c.lineTo(trailDir * (fw - 1), by + 2.8);
+          c.closePath(); c.fill(); c.stroke();
+          c.beginPath();
+          c.moveTo(trailDir * (fw - 1), by + 1.5);
+          c.quadraticCurveTo(trailDir * (fw + tailLen * 0.4), by + droop * 0.75 - flut * 0.4, trailDir * (fw + tailLen * 0.78), by + droop + 4.5 - flut * 0.8);
+          c.lineTo(trailDir * (fw + tailLen * 0.62), by + droop + 7.2 - flut * 0.5);
+          c.lineTo(trailDir * (fw - 1), by + 3.5);
+          c.closePath(); c.fill(); c.stroke();
+          // Main crimson cloth band
+          c.fillRect(-fw, by - 2.2, fw * 2, 5.0);
+          c.strokeRect(-fw, by - 2.2, fw * 2, 5.0);
+          // Brushed steel forehead plate with rivets & subtle sketch emblem
+          const pw = Math.min(7.5, fw * 0.62);
+          c.fillStyle = '#D8D4CA';
+          c.fillRect(-pw, by - 2.6, pw * 2, 5.8);
+          c.strokeRect(-pw, by - 2.6, pw * 2, 5.8);
+          c.fillStyle = '#FBF7EE';
+          c.fillRect(-pw + 1.5, by - 1.5, pw * 1.1, 1.4);
+          c.fillStyle = '#231F20';
+          c.beginPath();
+          c.arc(-pw + 2, by + 0.3, 0.85, 0, Math.PI * 2);
+          c.arc(pw - 2, by + 0.3, 0.85, 0, Math.PI * 2);
+          c.fill();
+          // Tiny engraved ink swirl on plate
+          c.strokeStyle = '#231F20'; c.lineWidth = 1.1;
+          c.beginPath(); c.arc(0, by + 0.3, 1.7, 0, Math.PI * 1.6); c.stroke();
         } else if (acc === 'wizard') {
           const ww = Math.min(13, hw + 2);
           c.fillStyle = '#6D68C4';
@@ -8281,17 +8584,23 @@
           c.beginPath(); c.moveTo(-vr, hatY); c.quadraticCurveTo(-vr - 7, hatY - 8, -vr - 1.5, hatY - 12); c.lineTo(-vr + 3, hatY - 2); c.closePath(); c.fill(); c.stroke();
           c.beginPath(); c.moveTo(vr, hatY); c.quadraticCurveTo(vr + 7, hatY - 8, vr + 1.5, hatY - 12); c.lineTo(vr - 3, hatY - 2); c.closePath(); c.fill(); c.stroke();
         } else if (acc === 'bandana') {
-          // Real Pirate/Biker Head Bandana wrapped cleanly across the top forehead with paisley dots & fluttering tails!
+          // Real Pirate/Biker Head Bandana with VELOCITY-DRIVEN ribbon tails (relaxed when still, streams with speed!)
           const bw = Math.min(foreheadW + 1, 14);
           const by = foreheadY - 2.5;
-          const flut = Math.sin(worldTime * 11) * 2.2;
+          const vx = (fm && fm.vx) || 0;
+          const vy = (fm && fm.vy) || 0;
+          const spd = Math.min(1, Math.hypot(vx, vy) / 420);
+          const trailDir = Math.abs(vx) > 25 ? -Math.sign(vx) : -facing;
+          const tailLen = 4.0 + spd * 11.0;
+          const droop = (1 - spd) * 7.5 + Math.max(-4, Math.min(5, -vy * 0.012));
+          const flut = spd > 0.06 ? Math.sin(worldTime * (12 + spd * 14)) * (2.6 * spd) : 0;
           // Trailing knotted tails behind head
           c.fillStyle = '#2952A3';
           c.beginPath();
-          c.moveTo(-facing * (bw - 1), by + 1);
-          c.quadraticCurveTo(-facing * (bw + 7), by + 1 + flut * 0.5, -facing * (bw + 11), by + 5.5 + flut);
-          c.lineTo(-facing * (bw + 7.5), by + 8.5 + flut * 0.7);
-          c.lineTo(-facing * (bw - 1), by + 3.5);
+          c.moveTo(trailDir * (bw - 1), by + 1);
+          c.quadraticCurveTo(trailDir * (bw + tailLen * 0.55), by + 1 + droop * 0.4 + flut * 0.5, trailDir * (bw + tailLen), by + 2 + droop + flut);
+          c.lineTo(trailDir * (bw + tailLen * 0.72), by + 5 + droop + flut * 0.7);
+          c.lineTo(trailDir * (bw - 1), by + 3.5);
           c.closePath(); c.fill(); c.stroke();
           // Snug skull-cap bandana wrap on forehead/crown
           c.beginPath();
@@ -8305,7 +8614,7 @@
           c.fillStyle = '#FBF7EE';
           c.beginPath(); c.arc(-bw * 0.38, by + 2.8, 1.2, 0, Math.PI * 2); c.arc(0, by + 2.1, 1.3, 0, Math.PI * 2); c.arc(bw * 0.38, by + 2.8, 1.2, 0, Math.PI * 2); c.fill();
           c.fillStyle = '#2952A3';
-          c.beginPath(); c.arc(-facing * bw, by + 2.6, 2.5, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.beginPath(); c.arc(trailDir * bw, by + 2.6, 2.5, 0, Math.PI * 2); c.fill(); c.stroke();
         } else if (acc === 'monocle') {
           c.save();
           c.translate(eyeX, eyeY);
@@ -8331,20 +8640,51 @@
           c.fillRect(-1.2, -1.1, 2.4, 2.2);
           c.restore();
         } else if (acc === 'scarf') {
-          // Warm fluttering red-gold sketchbook scarf around neck
-          const sw = Math.min(neckW + 1, 14);
-          const flut = Math.sin(worldTime * 10) * 2.5;
+          // High-Detail Knitted Scarf with ribbed collar, gold stripes & VELOCITY-DRIVEN flowing fringed tails!
+          const sw = Math.min(neckW + 1.5, 14.5);
+          const vx = (fm && fm.vx) || 0;
+          const vy = (fm && fm.vy) || 0;
+          const spd = Math.min(1, Math.hypot(vx, vy) / 420);
+          const trailDir = Math.abs(vx) > 25 ? -Math.sign(vx) : -facing;
+          const tailLen = 3.5 + spd * 13.0;
+          const droop = (1 - spd) * 9.5 + Math.max(-4, Math.min(5, -vy * 0.013));
+          const flut = spd > 0.06 ? Math.sin(worldTime * (11 + spd * 14)) * (2.8 * spd) : 0;
+          // Back tail
+          c.fillStyle = '#A83226';
+          c.beginPath();
+          c.moveTo(trailDir * (sw - 3), neckY + 1);
+          c.quadraticCurveTo(trailDir * (sw + tailLen * 0.45), neckY + droop * 0.65 - flut * 0.4, trailDir * (sw + tailLen * 0.8), neckY + 3 + droop - flut * 0.7);
+          c.lineTo(trailDir * (sw + tailLen * 0.62), neckY + 7 + droop - flut * 0.5);
+          c.lineTo(trailDir * (sw - 4), neckY + 4);
+          c.closePath(); c.fill(); c.stroke();
+          // Main streaming tail with gold stripe & fringe
           c.fillStyle = '#C83E31';
           c.beginPath();
-          c.moveTo(-facing * (sw - 2), neckY);
-          c.quadraticCurveTo(-facing * (sw + 7), neckY + 3 + flut * 0.5, -facing * (sw + 11), neckY + 9 + flut);
-          c.lineTo(-facing * (sw + 6), neckY + 12 + flut * 0.7);
-          c.lineTo(-facing * (sw - 4), neckY + 3.5);
+          c.moveTo(trailDir * (sw - 2), neckY - 0.5);
+          c.quadraticCurveTo(trailDir * (sw + tailLen * 0.55), neckY + droop * 0.45 + flut * 0.5, trailDir * (sw + tailLen), neckY + 1 + droop + flut);
+          c.lineTo(trailDir * (sw + tailLen * 0.82), neckY + 5.6 + droop + flut * 0.75);
+          c.lineTo(trailDir * (sw - 4), neckY + 3.5);
           c.closePath(); c.fill(); c.stroke();
-          c.fillRect(-sw, neckY - 2.6, sw * 2, 5.2);
-          c.strokeRect(-sw, neckY - 2.6, sw * 2, 5.2);
+          // Ribbed knitted collar wrap around neck
+          c.fillStyle = '#C83E31';
+          c.beginPath();
+          c.roundRect ? c.roundRect(-sw, neckY - 3, sw * 2, 6.2, 2.5) : c.rect(-sw, neckY - 3, sw * 2, 6.2);
+          c.fill(); c.stroke();
+          // Gold knitted stripe & stitch ribs
           c.fillStyle = '#E9C46A';
-          c.fillRect(-sw + 2, neckY - 0.8, sw * 2 - 4, 1.6);
+          c.fillRect(-sw + 2, neckY - 0.8, sw * 2 - 4, 1.9);
+          c.strokeStyle = 'rgba(35, 31, 32, 0.35)';
+          c.lineWidth = 1.1;
+          c.beginPath();
+          for (let rx = -sw + 4; rx <= sw - 4; rx += 4.5) {
+            c.moveTo(rx, neckY - 2.6); c.lineTo(rx, neckY + 2.8);
+          }
+          c.stroke();
+          // Knitted side knot
+          c.fillStyle = '#C83E31';
+          c.strokeStyle = '#231F20';
+          c.lineWidth = 1.7;
+          c.beginPath(); c.arc(trailDir * (sw - 1), neckY + 0.5, 2.8, 0, Math.PI * 2); c.fill(); c.stroke();
         } else if (acc === 'party') {
           const pw = Math.min(8.5, hw * 0.82);
           c.fillStyle = '#EA8EC2';
@@ -8484,6 +8824,7 @@
         const anchors = getShapeAnchors(shape, w, drawH);
         const faceCx = facing > 0 ? 2.5 : -2.5;
         const fm = computeFaceMotion(facing, faceState);
+        if (faceState) { fm.vx = faceState.vx || 0; fm.vy = faceState.vy || 0; }
         drawDynamicFace(c, faceId, faceCx, anchors.faceY, anchors.faceScale, facing, sprinting, faceState, fm);
 
         // 3. Cosmetic Slot 1 + Cosmetic Slot 2 (fitted to shape + synchronized with face motion!)
@@ -8495,7 +8836,7 @@
       }
 
       function drawGroundShadow(pl, solids) {
-        if (!pl || !solids) return;
+        if (!pl || !solids || pl.deadTimer > 0 || pl.suckedIn) return;
         const pBot = pl.y + pl.h;
         let floorY = Infinity;
         for (const s of solids) {
@@ -8519,7 +8860,7 @@
       }
 
       function drawSketchPlayer(p, color, label, isLocal) {
-        if (p.deadTimer > 0) return;
+        if (p.deadTimer > 0 || p.suckedIn) return;
         // Inked motion ghosts during roll
         const cos = isLocal ? localCosmetics : remoteCosmetics;
         const packAccent = getParticlePack(cos.particlePack).accent;
@@ -8651,6 +8992,8 @@
         const fState = {
           lookX: p.lookX || (p.facing * 1.3),
           lookY: p.lookY || 0,
+          vx: p.vx || 0,
+          vy: p.vy || 0,
           blinking: p.blinkDuration > 0,
           idleTimer: p.idleTimer || 0,
           tauntId: p.tauntTimer > 0 ? p.tauntId : ''
@@ -9101,70 +9444,98 @@
           }
 
           if (t === 'ice') {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#CFEBF7', false, true, s.seam);
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#C9EAF7', false, true, s.seam);
             ctx.save();
-            // Frosty white upper glaze
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
-            ctx.fillRect(s.x + 2, s.y + 2, Math.max(4, s.w - 4), 4);
-            // Crisp paired crystal sheen bands
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+            // Layered crystal glacier top glaze + inner cool turquoise bevel
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.84)';
+            ctx.fillRect(s.x + 2, s.y + 2, Math.max(4, s.w - 4), 4.5);
+            ctx.fillStyle = 'rgba(88, 179, 214, 0.28)';
+            ctx.fillRect(s.x + 2, s.y + s.h - 7, Math.max(4, s.w - 4), 5);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(s.x + 4, s.y + 4, Math.max(2, s.w - 8), Math.max(2, s.h - 8));
+            // Faceted crystal refraction bands + twinkling diamond frost glints
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
             ctx.lineCap = 'round';
-            for (let sx2 = s.x + 14; sx2 < s.x + s.w - 18; sx2 += 36) {
-              ctx.lineWidth = 2.4;
+            for (let sx2 = s.x + 14; sx2 < s.x + s.w - 18; sx2 += 34) {
+              ctx.lineWidth = 2.6;
               ctx.beginPath();
               ctx.moveTo(sx2, s.y + 6);
-              ctx.lineTo(sx2 + 12, s.y + Math.min(20, s.h - 6));
+              ctx.lineTo(sx2 + 12, s.y + Math.min(22, s.h - 5));
               ctx.stroke();
               ctx.lineWidth = 1.2;
               ctx.beginPath();
               ctx.moveTo(sx2 + 6, s.y + 6);
-              ctx.lineTo(sx2 + 15, s.y + Math.min(16, s.h - 6));
+              ctx.lineTo(sx2 + 15, s.y + Math.min(18, s.h - 5));
               ctx.stroke();
+              // Sparkling 4-point frost glint
+              const gl = 2.2 + Math.sin(worldTime * 4.5 + sx2 * 0.1) * 1.1;
+              ctx.fillStyle = '#FFFFFF';
+              ctx.beginPath();
+              ctx.moveTo(sx2 + 20, s.y + 10 - gl); ctx.lineTo(sx2 + 20 + gl * 0.4, s.y + 10);
+              ctx.lineTo(sx2 + 20, s.y + 10 + gl); ctx.lineTo(sx2 + 20 - gl * 0.4, s.y + 10);
+              ctx.closePath(); ctx.fill();
             }
-            // Hand-inked hanging icicles underneath horizontal ice ledges
+            // Shaded jagged hand-inked icicles underneath horizontal ice ledges
             if (s.w >= 48) {
-              ctx.fillStyle = '#E6F7FD';
-              ctx.strokeStyle = '#231F20';
-              ctx.lineWidth = 1.5;
               let icIdx = 0;
-              for (let ix = s.x + 14; ix < s.x + s.w - 16; ix += 30) {
-                const icH = 6 + ((i + icIdx) % 3) * 2.5;
+              for (let ix = s.x + 12; ix < s.x + s.w - 16; ix += 28) {
+                const icH = 7 + ((i + icIdx) % 3) * 3.5;
+                ctx.fillStyle = '#E6F7FD';
+                ctx.strokeStyle = '#231F20';
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.moveTo(ix, s.y + s.h);
-                ctx.lineTo(ix + 4.5, s.y + s.h + icH);
-                ctx.lineTo(ix + 9, s.y + s.h);
+                ctx.lineTo(ix + 5, s.y + s.h + icH);
+                ctx.lineTo(ix + 10, s.y + s.h);
                 ctx.closePath();
                 ctx.fill();
+                ctx.fillStyle = 'rgba(88, 179, 214, 0.35)';
+                ctx.beginPath();
+                ctx.moveTo(ix + 5, s.y + s.h);
+                ctx.lineTo(ix + 5, s.y + s.h + icH);
+                ctx.lineTo(ix + 10, s.y + s.h);
+                ctx.closePath(); ctx.fill();
                 ctx.stroke();
                 icIdx++;
               }
             }
             ctx.restore();
           } else if (t === 'slime') {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#84D97B', false, true, s.seam);
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#7CD873', false, true, s.seam);
             ctx.save();
-            // Glossy interior slime bubbles
-            ctx.fillStyle = 'rgba(235, 255, 232, 0.65)';
+            // Deeper emerald jelly core & glossy top meniscus
+            ctx.fillStyle = 'rgba(45, 138, 66, 0.25)';
+            ctx.fillRect(s.x + 4, s.y + 5, Math.max(2, s.w - 8), Math.max(2, s.h - 9));
+            ctx.fillStyle = 'rgba(235, 255, 232, 0.72)';
             const isTallWall = s.h > s.w * 1.5;
             if (isTallWall) {
-              for (let by = s.y + 16; by < s.y + s.h - 14; by += 28) {
-                ctx.beginPath(); ctx.ellipse(s.x + s.w * 0.5, by, 3.2, 5.5, 0, 0, Math.PI * 2); ctx.fill();
+              ctx.fillRect(s.x + 3, s.y + 4, 3.5, Math.max(4, s.h - 8));
+              for (let by = s.y + 16; by < s.y + s.h - 14; by += 26) {
+                const bBob = Math.sin(worldTime * 3 + by * 0.1) * 1.4;
+                ctx.strokeStyle = 'rgba(35, 100, 50, 0.45)';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.ellipse(s.x + s.w * 0.52 + bBob, by, 3.4, 5.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
               }
             } else {
-              for (let bx = s.x + 18; bx < s.x + s.w - 14; bx += 32) {
-                ctx.beginPath(); ctx.ellipse(bx, s.y + 9, 5, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+              ctx.fillRect(s.x + 4, s.y + 2.5, Math.max(4, s.w - 8), 3.5);
+              for (let bx = s.x + 18; bx < s.x + s.w - 14; bx += 30) {
+                const bPop = 2.6 + Math.sin(worldTime * 3.6 + bx) * 0.6;
+                ctx.strokeStyle = 'rgba(35, 100, 50, 0.45)';
+                ctx.lineWidth = 1.1;
+                ctx.beginPath(); ctx.ellipse(bx, s.y + 11, 5.2, bPop, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
               }
-              // Inked dripping tendrils along bottom edge
-              ctx.fillStyle = '#68C762';
+              // Glossy inked dripping tendrils along bottom edge
+              ctx.fillStyle = '#5EC258';
               ctx.strokeStyle = '#231F20';
               ctx.lineWidth = 1.6;
               let dIdx = 0;
-              for (let bx = s.x + 16; bx < s.x + s.w - 14; bx += 28) {
-                const dripLen = 5 + ((i + dIdx) % 3) * 3.5 + Math.sin(worldTime * 2.2 + bx) * 1.4;
+              for (let bx = s.x + 16; bx < s.x + s.w - 14; bx += 26) {
+                const dripLen = 6 + ((i + dIdx) % 3) * 3.8 + Math.sin(worldTime * 2.4 + bx) * 1.6;
                 ctx.beginPath();
-                ctx.moveTo(bx - 4, s.y + s.h);
+                ctx.moveTo(bx - 4.2, s.y + s.h);
                 ctx.quadraticCurveTo(bx - 3, s.y + s.h + dripLen, bx, s.y + s.h + dripLen);
-                ctx.quadraticCurveTo(bx + 3, s.y + s.h + dripLen, bx + 4, s.y + s.h);
+                ctx.quadraticCurveTo(bx + 3, s.y + s.h + dripLen, bx + 4.2, s.y + s.h);
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
@@ -9179,33 +9550,52 @@
             const th0 = Math.max(16, s.h - extraH);
             drawInkedRect(tx0, ty0, tw0, th0, i * 17 + 1, '#9B6BCE', false);
             ctx.save();
-            // Bottom stitched cushion band & top highlight
-            ctx.fillStyle = '#6D449E';
+            // Subtle diagonal sketchbook energy stripes inside trampoline cushion
+            ctx.save();
+            ctx.beginPath(); ctx.rect(tx0 + 2, ty0 + 2, tw0 - 4, th0 - 4); ctx.clip();
+            ctx.strokeStyle = 'rgba(54, 24, 92, 0.22)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let sx = tx0 - 10; sx < tx0 + tw0 + 10; sx += 16) {
+              ctx.moveTo(sx, ty0 + th0); ctx.lineTo(sx + 12, ty0);
+            }
+            ctx.stroke();
+            ctx.restore();
+            // Bolted steel base plate + stitched cushion top sheen
+            ctx.fillStyle = '#563480';
             ctx.fillRect(tx0 + 2, ty0 + th0 - 7, tw0 - 4, 5);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-            ctx.fillRect(tx0 + 4, ty0 + 3, tw0 - 8, 3);
-            // Left & right coiled spring zig-zags
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.fillRect(tx0 + 4, ty0 + 2.5, tw0 - 8, 3.5);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(tx0 + 6, ty0 + 7.5); ctx.lineTo(tx0 + tw0 - 6, ty0 + 7.5); ctx.stroke();
+            ctx.setLineDash([]);
+            // Left & right coiled steel springs + base rivets
             ctx.strokeStyle = '#231F20';
-            ctx.lineWidth = 1.7;
+            ctx.lineWidth = 1.8;
             ctx.lineJoin = 'round';
             const drawCoil = (cxCoil) => {
               ctx.beginPath();
-              ctx.moveTo(cxCoil - 4, ty0 + 5);
-              ctx.lineTo(cxCoil + 4, ty0 + th0 * 0.35);
-              ctx.lineTo(cxCoil - 4, ty0 + th0 * 0.65);
-              ctx.lineTo(cxCoil + 4, ty0 + th0 - 6);
+              ctx.moveTo(cxCoil - 4.5, ty0 + 5);
+              ctx.lineTo(cxCoil + 4.5, ty0 + th0 * 0.34);
+              ctx.lineTo(cxCoil - 4.5, ty0 + th0 * 0.66);
+              ctx.lineTo(cxCoil + 4.5, ty0 + th0 - 6);
               ctx.stroke();
+              ctx.fillStyle = '#E9C46A';
+              ctx.beginPath(); ctx.arc(cxCoil, ty0 + th0 - 4.5, 2.0, 0, Math.PI * 2); ctx.fill();
             };
             if (tw0 > 64) {
               drawCoil(tx0 + 16);
               drawCoil(tx0 + tw0 - 16);
             }
-            // Double upward bounce chevrons in center
+            // Animated pulsing double bounce chevrons in center
+            const chevPulse = Math.sin(worldTime * 7) * 1.6;
             ctx.strokeStyle = '#FBF7EE';
-            ctx.lineWidth = 2.3;
+            ctx.lineWidth = 2.4;
             ctx.lineCap = 'round';
             const mcx = s.x + s.w / 2;
-            const mcy = s.y + s.h / 2 + extraH * 0.25;
+            const mcy = s.y + s.h / 2 + extraH * 0.25 - chevPulse * 0.5;
             ctx.beginPath();
             ctx.moveTo(mcx - 9, mcy + 5); ctx.lineTo(mcx, mcy - 3); ctx.lineTo(mcx + 9, mcy + 5);
             ctx.moveTo(mcx - 7, mcy); ctx.lineTo(mcx, mcy - 7); ctx.lineTo(mcx + 7, mcy);
@@ -9456,31 +9846,41 @@
 
             ctx.fillStyle = '#231F20';
             ctx.fillRect(jp.x, jp.y + jp.h - 4, jp.w, 4);
+            // Upright non-tilted spring coils underneath pad
+            ctx.strokeStyle = '#6A635A';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(jp.x + 8, jp.y + jp.h - 4); ctx.lineTo(jp.x + 12, jp.y + 7 - lift);
+            ctx.moveTo(jp.x + jp.w - 8, jp.y + jp.h - 4); ctx.lineTo(jp.x + jp.w - 12, jp.y + 7 - lift);
+            ctx.stroke();
+            // Both orange vertical jump pads & red boost pads sit cleanly upright & flat (zero awkward tilt!)
+            ctx.fillStyle = jp.dirX ? '#E06354' : '#F08C4B';
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 2;
+            ctx.fillRect(jp.x + 2, jp.y - lift, jp.w - 4, 8);
+            ctx.strokeRect(jp.x + 2, jp.y - lift, jp.w - 4, 8);
+            ctx.fillStyle = 'rgba(255,255,255,0.42)';
+            ctx.fillRect(jp.x + 4, jp.y + 1.5 - lift, jp.w - 8, 2.2);
+            ctx.strokeStyle = '#C83E31';
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            const abob = Math.sin(worldTime * 7) * 1.5;
             if (jp.dirX) {
-              ctx.translate(jcx, jcy - lift);
-              ctx.rotate(jp.dirX * -0.34);
-              ctx.fillStyle = '#E06354';
-              ctx.strokeStyle = '#231F20';
-              ctx.lineWidth = 2;
-              ctx.fillRect(-jp.w * 0.5 + 2, -4, jp.w - 4, 8);
-              ctx.strokeRect(-jp.w * 0.5 + 2, -4, jp.w - 4, 8);
-              ctx.strokeStyle = '#C83E31';
-              ctx.lineCap = 'round';
+              // Crisp upright pad with diagonal ↗ arrow hint floating cleanly above
+              const d = Math.sign(jp.dirX);
               ctx.beginPath();
-              ctx.moveTo(-6, -9); ctx.lineTo(0, -16); ctx.lineTo(6, -9);
-              ctx.moveTo(-4, -14); ctx.lineTo(0, -19); ctx.lineTo(4, -14);
+              ctx.moveTo(jcx - 5 * d, jp.y - 4 - lift - abob);
+              ctx.lineTo(jcx + 6 * d, jp.y - 14 - lift - abob);
+              ctx.moveTo(jcx + 6 * d, jp.y - 14 - lift - abob);
+              ctx.lineTo(jcx - 1 * d, jp.y - 14 - lift - abob);
+              ctx.moveTo(jcx + 6 * d, jp.y - 14 - lift - abob);
+              ctx.lineTo(jcx + 6 * d, jp.y - 7 - lift - abob);
               ctx.stroke();
             } else {
-              ctx.fillStyle = '#F08C4B';
-              ctx.strokeStyle = '#231F20';
-              ctx.lineWidth = 2;
-              ctx.fillRect(jp.x + 2, jp.y - lift, jp.w - 4, 8);
-              ctx.strokeRect(jp.x + 2, jp.y - lift, jp.w - 4, 8);
-              ctx.strokeStyle = '#C83E31';
               ctx.beginPath();
-              ctx.moveTo(jcx - 7, jp.y - 4 - lift);
-              ctx.lineTo(jcx, jp.y - 11 - lift);
-              ctx.lineTo(jcx + 7, jp.y - 4 - lift);
+              ctx.moveTo(jcx - 7, jp.y - 4 - lift - abob);
+              ctx.lineTo(jcx, jp.y - 11 - lift - abob);
+              ctx.lineTo(jcx + 7, jp.y - 4 - lift - abob);
               ctx.stroke();
             }
             ctx.restore();
@@ -9520,21 +9920,26 @@
           });
         }
 
-        // 3b. Shared Lobby Wall Pencil Drawings
+        // 3b. Shared Lobby Wall Pencil Drawings (with live hand-drawn boil!)
         if (lvl.isLobby && lobbyStrokes.length > 0) {
           ctx.save();
           ctx.lineWidth = 3.2;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
-          for (const st of lobbyStrokes) {
+          for (let si = 0; si < lobbyStrokes.length; si++) {
+            const st = lobbyStrokes[si];
             if (!st.pts || st.pts.length === 0) continue;
             ctx.strokeStyle = st.color || '#231F20';
             ctx.beginPath();
-            ctx.moveTo(st.pts[0][0], st.pts[0][1]);
+            const bx0 = boilOffset(si * 71, boilFrame) * 0.65;
+            const by0 = boilOffset(si * 71 + 1, boilFrame) * 0.65;
+            ctx.moveTo(st.pts[0][0] + bx0, st.pts[0][1] + by0);
             for (let pi = 1; pi < st.pts.length; pi++) {
-              ctx.lineTo(st.pts[pi][0], st.pts[pi][1]);
+              const bx = boilOffset(si * 71 + pi * 3, boilFrame) * 0.55;
+              const by = boilOffset(si * 71 + pi * 3 + 1, boilFrame) * 0.55;
+              ctx.lineTo(st.pts[pi][0] + bx, st.pts[pi][1] + by);
             }
-            if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] + 0.5, st.pts[0][1] + 0.5);
+            if (st.pts.length === 1) ctx.lineTo(st.pts[0][0] + bx0 + 0.5, st.pts[0][1] + by0 + 0.5);
             ctx.stroke();
           }
           ctx.restore();
@@ -9573,24 +9978,35 @@
           });
         }
 
-        // 4. Inked Spikes / Hazards
+        // 4. High-Detail Hand-Inked Metallic-Crimson Spikes / Hazards
         lvl.hazards.forEach((hz, i) => {
           ctx.save();
-          ctx.fillStyle = '#C83E31';
-          ctx.strokeStyle = '#231F20';
-          ctx.lineWidth = 2;
           const teeth = Math.max(3, Math.floor(hz.w / 10));
           const tw = hz.w / teeth;
-          ctx.beginPath();
-          ctx.moveTo(hz.x, hz.y + hz.h);
+          // Dark riveted iron base bar
+          ctx.fillStyle = '#3B3637';
+          ctx.fillRect(hz.x, hz.y + hz.h - 3.5, hz.w, 3.5);
           for (let t = 0; t < teeth; t++) {
-            const j = boilOffset(i * 31 + t, boilFrame) * 1.1;
-            ctx.lineTo(hz.x + t * tw + tw * 0.5 + j, hz.y - 2 + j);
-            ctx.lineTo(hz.x + (t + 1) * tw, hz.y + hz.h);
+            const x0 = hz.x + t * tw;
+            const xm = x0 + tw * 0.5 + boilOffset(i * 31 + t, boilFrame) * 0.9;
+            const ym = hz.y - 3 + boilOffset(i * 31 + t + 7, boilFrame) * 0.8;
+            const x1 = x0 + tw;
+            const yb = hz.y + hz.h - 2;
+            // Left bright crimson/steel facet
+            ctx.fillStyle = '#E05244';
+            ctx.beginPath(); ctx.moveTo(x0, yb); ctx.lineTo(xm, ym); ctx.lineTo(x0 + tw * 0.52, yb); ctx.closePath(); ctx.fill();
+            // Right deeper shaded facet
+            ctx.fillStyle = '#A82E22';
+            ctx.beginPath(); ctx.moveTo(x0 + tw * 0.52, yb); ctx.lineTo(xm, ym); ctx.lineTo(x1, yb); ctx.closePath(); ctx.fill();
+            // Crisp specular edge glint & ink outline
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+            ctx.lineWidth = 1.1;
+            ctx.beginPath(); ctx.moveTo(x0 + 2, yb - 2); ctx.lineTo(xm - 0.5, ym + 2.5); ctx.stroke();
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 1.9;
+            ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(x0, yb); ctx.lineTo(xm, ym); ctx.lineTo(x1, yb); ctx.closePath(); ctx.stroke();
           }
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
           ctx.restore();
         });
 
@@ -9835,46 +10251,102 @@
           ctx.fillText(statusLine, bcx, 352);
           ctx.restore();
 
-          // Physical Glowing Portal Vortex (ONLY opens during launch; guests NEVER see a start button!)
+          // High-Detail Hand-Inked Dimensional Lobby Portal Vortex (paper-tear rim, swirling ink ribbons, orbiting runes!)
           ctx.save();
           const vx = VORTEX_POS.x;
           const vy = VORTEX_POS.y;
           if (gamePhase === 'launching') {
-            const openAmt = launchTimer <= 2.2 ? Math.min(1, (2.2 - launchTimer) / 1.2) : 0.1;
-            // Radiant golden/cobalt light beams
-            const rays = 12;
+            const openAmt = launchTimer <= 3.1 ? Math.min(1, (3.1 - launchTimer) / 1.45) : 0.12;
+            const rCore = 20 + openAmt * 44;
+
+            // Soft radial atmospheric aura
+            const aura = ctx.createRadialGradient(vx, vy, rCore * 0.4, vx, vy, rCore * 3.6);
+            aura.addColorStop(0, 'rgba(41, 82, 163, ' + (0.28 + openAmt * 0.34) + ')');
+            aura.addColorStop(0.5, 'rgba(212, 155, 39, ' + (0.14 + openAmt * 0.22) + ')');
+            aura.addColorStop(1, 'rgba(244, 237, 224, 0)');
+            ctx.fillStyle = aura;
+            ctx.beginPath(); ctx.arc(vx, vy, rCore * 3.6, 0, Math.PI * 2); ctx.fill();
+
+            // Radiant sketchbook speed-rays
+            const rays = 14;
             ctx.save();
             ctx.translate(vx, vy);
-            ctx.rotate(worldTime * (2.5 + openAmt * 6));
+            ctx.rotate(worldTime * (2.2 + openAmt * 5.2));
             for (let i = 0; i < rays; i++) {
               ctx.rotate((Math.PI * 2) / rays);
-              ctx.fillStyle = i % 2 === 0 ? 'rgba(212, 155, 39, ' + (0.18 + openAmt * 0.35) + ')' : 'rgba(41, 82, 163, ' + (0.12 + openAmt * 0.28) + ')';
+              ctx.fillStyle = i % 2 === 0 ? 'rgba(212, 155, 39, ' + (0.14 + openAmt * 0.28) + ')' : 'rgba(41, 82, 163, ' + (0.10 + openAmt * 0.24) + ')';
               ctx.beginPath();
-              ctx.moveTo(0, 0);
-              ctx.lineTo(18 + openAmt * 260, -14 - openAmt * 26);
-              ctx.lineTo(18 + openAmt * 260, 14 + openAmt * 26);
+              ctx.moveTo(rCore * 0.6, 0);
+              ctx.lineTo(rCore + 24 + openAmt * 240, -10 - openAmt * 22);
+              ctx.lineTo(rCore + 24 + openAmt * 240, 10 + openAmt * 22);
               ctx.closePath();
               ctx.fill();
             }
             ctx.restore();
 
-            // Swirling ink vortex rings
-            const rCore = 22 + openAmt * 38;
+            // Jagged torn-paper outer ring with live hand-drawn boil
+            ctx.save();
+            ctx.translate(vx, vy);
+            const tornPts = 24;
+            ctx.fillStyle = '#FBF7EE';
+            ctx.strokeStyle = '#231F20';
+            ctx.lineWidth = 2.6;
             ctx.beginPath();
-            ctx.arc(vx, vy, rCore, 0, Math.PI * 2);
-            ctx.fillStyle = '#161415';
-            ctx.fill();
-            ctx.strokeStyle = '#E9C46A';
-            ctx.lineWidth = 4;
-            ctx.stroke();
-
-            for (let k = 1; k <= 3; k++) {
-              ctx.beginPath();
-              ctx.arc(vx, vy, rCore + k * (14 + openAmt * 18), worldTime * (4 + k), worldTime * (4 + k) + Math.PI * 1.35);
-              ctx.strokeStyle = k === 2 ? '#2952A3' : '#D49B27';
-              ctx.lineWidth = 2.5;
-              ctx.stroke();
+            for (let ti = 0; ti < tornPts; ti++) {
+              const ang = (ti / tornPts) * Math.PI * 2 + worldTime * 0.7;
+              const jag = (ti % 2 === 0 ? 9 : 2) + boilOffset(ti * 13, boilFrame) * 1.6;
+              const rad = rCore + jag;
+              const px = Math.cos(ang) * rad, py = Math.sin(ang) * rad;
+              if (ti === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
             }
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+
+            // Deep midnight-indigo void core with counter-spinning spiral ink ribbons
+            const cg = ctx.createRadialGradient(0, 0, 2, 0, 0, rCore);
+            cg.addColorStop(0, '#0D0B10');
+            cg.addColorStop(0.62, '#1C2A4D');
+            cg.addColorStop(1, '#2952A3');
+            ctx.fillStyle = cg;
+            ctx.beginPath(); ctx.arc(0, 0, rCore, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#231F20'; ctx.lineWidth = 3; ctx.stroke();
+
+            // 3 nested counter-rotating spiral arcs inside core
+            for (let sp = 0; sp < 3; sp++) {
+              ctx.save();
+              ctx.rotate(worldTime * (sp % 2 === 0 ? 5.5 : -4.2) + sp * 2.1);
+              ctx.strokeStyle = sp === 0 ? '#E9C46A' : (sp === 1 ? '#73A6EE' : '#F29A8E');
+              ctx.lineWidth = 2.8 - sp * 0.4;
+              ctx.lineCap = 'round';
+              ctx.beginPath();
+              ctx.arc(0, 0, rCore * (0.78 - sp * 0.2), 0, Math.PI * 1.15);
+              ctx.stroke();
+              ctx.restore();
+            }
+
+            // Orbiting hand-drawn ink geometric debris & dashed compass rings
+            for (let k = 1; k <= 3; k++) {
+              ctx.save();
+              ctx.rotate(worldTime * (k % 2 === 0 ? -3.4 : 4.1) + k);
+              ctx.setLineDash([10, 8]);
+              ctx.strokeStyle = k === 2 ? '#2952A3' : (k === 3 ? '#C83E31' : '#D49B27');
+              ctx.lineWidth = 2.2;
+              ctx.beginPath();
+              ctx.arc(0, 0, rCore + 12 + k * (12 + openAmt * 14), 0, Math.PI * 1.45);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              // Orbiting sketched diamond shard
+              const dr = rCore + 12 + k * (12 + openAmt * 14);
+              ctx.fillStyle = k === 1 ? '#E9C46A' : '#FBF7EE';
+              ctx.strokeStyle = '#231F20';
+              ctx.lineWidth = 1.6;
+              ctx.translate(dr, 0);
+              ctx.rotate(worldTime * 6);
+              ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(4, 0); ctx.lineTo(0, 5); ctx.lineTo(-4, 0); ctx.closePath();
+              ctx.fill(); ctx.stroke();
+              ctx.restore();
+            }
+            ctx.restore();
           }
           ctx.restore();
         }
@@ -10102,15 +10574,24 @@
             const px = Math.max(pad, Math.min(w - pad, screenX));
             const py = Math.max(pad + 30, Math.min(h - pad - 40, screenY));
             ctx.save();
-            ctx.translate(px, py);
+            const bx = boilOffset(701, boilFrame) * 1.1;
+            const by = boilOffset(702, boilFrame) * 1.1;
+            const brot = boilOffset(703, boilFrame) * 0.05;
+            ctx.translate(px + bx, py + by);
+            ctx.rotate(brot);
             ctx.fillStyle = '#FBF7EE';
             ctx.strokeStyle = '#231F20';
-            ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.lineWidth = 2.2;
+            ctx.beginPath(); ctx.arc(0, 0, 18.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             ctx.save();
             ctx.rotate(ang);
             ctx.fillStyle = '#D49B27';
-            ctx.beginPath(); ctx.moveTo(11, 0); ctx.lineTo(-5, -7); ctx.lineTo(-2, 0); ctx.lineTo(-5, 7); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(11.5 + boilOffset(704, boilFrame) * 0.6, 0);
+            ctx.lineTo(-5, -7.2);
+            ctx.lineTo(-2, 0);
+            ctx.lineTo(-5, 7.2);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
             ctx.restore();
             ctx.restore();
           }
@@ -10291,35 +10772,50 @@
           if (launchTimer <= 0.65) {
             syncHostPanelUI();
           }
-          if (launchTimer > 2.2) {
-            // 5..3: Players can still walk around; gentle buildup shake at 3s
-            if (launchTimer <= 3.0) screenShake = Math.max(screenShake, 2.5);
+          if (launchTimer <= 3.1 && !vortexSuctionStarted) {
+            // Start vortex suction audio earlier so the buildup feels smooth and cinematic!
+            vortexSuctionStarted = true;
+            startVortexSuctionSound();
+          }
+          if (launchTimer > 2.35) {
+            // 5..2.35: Players can still walk around; gentle buildup shake at 3.1s
+            if (launchTimer <= 3.1) screenShake = Math.max(screenShake, 3.0);
             updatePhysics(dt);
           } else {
-            if (!vortexSuctionStarted) {
-              vortexSuctionStarted = true;
-              startVortexSuctionSound();
-            }
-            // 2..1..0: Strong screen shake & TORNADO sucks BOTH players into the glowing portal!
-            const pullProg = Math.min(1, (2.2 - launchTimer) / 1.85);
-            screenShake = 6 + pullProg * 18;
+            // 2.35..0.85: Strong pull sucks BOTH players (and ALL their trails/effects) 100% into the portal!
+            // 0.85..0.00: Dramatic lingering pause on the swirling vortex & fade to black with zero player visible!
+            const pullProg = Math.min(1, (2.35 - launchTimer) / 1.45);
+            screenShake = launchTimer > 0.75 ? (6 + pullProg * 16) : (screenShake * Math.pow(0.08, dt));
 
             const suckPlayer = (pl) => {
+              if (pl.suckedIn) return;
               const cx = pl.x + pl.w / 2;
               const cy = pl.y + pl.h / 2;
               const dx = VORTEX_POS.x - cx;
               const dy = VORTEX_POS.y - cy;
-              const dist = Math.max(4, Math.hypot(dx, dy));
-              const nx = dx / dist;
-              const ny = dy / dist;
-              // Tangential swirl + inward pull
-              const pullSpd = 170 + pullProg * 640;
-              const swirlSpd = (1 - pullProg * 0.5) * 260;
+              const dist = Math.hypot(dx, dy);
+              pl.ghosts.length = 0;
+              pl.highSpeedTimer = 0;
+              if (dist < 14 || pullProg >= 0.96) {
+                pl.suckedIn = true;
+                pl.scaleX = 0;
+                pl.scaleY = 0;
+                pl.vx = 0;
+                pl.vy = 0;
+                pl.facing = 1;
+                spawnShockwave(VORTEX_POS.x, VORTEX_POS.y, '#E9C46A', 64);
+                return;
+              }
+              const nx = dx / Math.max(4, dist);
+              const ny = dy / Math.max(4, dist);
+              // Tangential swirl + strong inward pull directly into core
+              const pullSpd = 240 + pullProg * 860;
+              const swirlSpd = (1 - pullProg * 0.75) * 260;
               pl.x += (nx * pullSpd - ny * swirlSpd) * dt;
               pl.y += (ny * pullSpd + nx * swirlSpd) * dt;
-              pl.rot += (10 + pullProg * 18) * dt;
-              pl.rollTimer = 0.05; // triggers spin rotation in renderer
-              const shrink = Math.max(0.15, 1 - pullProg * 0.85);
+              pl.rot += (12 + pullProg * 20) * dt;
+              pl.rollTimer = 0.05;
+              const shrink = Math.max(0, 1 - pullProg * 1.04);
               pl.scaleX = shrink;
               pl.scaleY = shrink;
             };
@@ -10327,7 +10823,7 @@
             suckPlayer(localPlayer);
             if (netConnected) suckPlayer(remotePlayer);
 
-            if (Math.random() < 0.75) {
+            if (launchTimer > 0.55 && Math.random() < 0.75) {
               const ang = Math.random() * Math.PI * 2;
               const r = 45 + Math.random() * 140;
               particles.push({
@@ -10343,11 +10839,14 @@
               });
             }
 
-            // Rapid fade to black in the last 0.65s
-            if (launchTimer < 0.65) {
-              blackoutAlpha = Math.min(1, (0.65 - launchTimer) / 0.55);
+            // Smooth fade to black with a lingering cinematic hold after player vanishes inside portal!
+            if (launchTimer < 0.78) {
+              blackoutAlpha = Math.min(1, (0.78 - launchTimer) / 0.48);
             }
             if (launchTimer <= 0) {
+              localPlayer.suckedIn = false;
+              localPlayer.facing = 1;
+              if (netConnected) { remotePlayer.suckedIn = false; remotePlayer.facing = 1; }
               finishLaunchIntoRound1(netMode === 'host');
             }
           }
