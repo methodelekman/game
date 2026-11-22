@@ -1742,6 +1742,13 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.17.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Адаптивна музика по контексту й швидкості:</b> окремі саундтреки для Гонки, Тікай від гумки (напружений ритм, що прискорюється), Салочок (фанковий грув) та Лобі; коли швидко біжиш, дешиш чи летиш у повітрі — плавно додаються нові інструменти (ударні, дзвіночки-арпеджіо й мелодійний лід).</li>
+                <li><b>Новий режим «Дуель (Відлік)»:</b> щоразу, коли хтось першим заходить у двері, усе завмирає, камера переводиться й наближається на переможця біля дверей (+1 очко), після чого всіх телепортує на спавн із новим відліком 3·2·1·ПОЇХАЛИ!</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.16.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Виправлено крок ніжок:</b> прибрано ефект «мунволку» при русі вправо — тепер ноги природно відштовхуються назад на землі й виносяться вперед у повітрі в обидва боки.</li>
@@ -1793,6 +1800,13 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.17.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Dynamic Context &amp; Speed-Adaptive Music:</b> distinct soundtracks for Race, Eraser Chase (urgent accelerating rhythm), Tag Arena (funky groove), and Lobby; flying fast, dashing, or launching smoothly layers in percussion, shimmering bells, and a soaring lead.</li>
+                <li><b>New Mode — Door Duel (Countdown):</b> every time someone reaches the door first, the action freezes and the camera zooms onto the winner at the door (+1 pt), then teleports everyone back to spawn for a fresh 3·2·1·GO! countdown.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.16.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Natural Run Stride:</b> fixed the moonwalk leg direction when running right — feet now properly swing forward in the air and push backward on the ground in both directions.</li>
@@ -1825,7 +1839,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.16.1 · Changelog</button>
+      <button id="version-tag">v0.17.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -1988,6 +2002,8 @@
           ringNoteSub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути',
           raceNoteMain: 'Хто перший у двері — +1 очко!',
           raceNoteSub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути',
+          duelNoteMain: 'Дуель! Перший у двері — стоп-кадр і новий відлік!',
+          duelBanner: 'ПЕРШИЙ У ДВЕРЯХ: {name} +1',
           toastStopTaunt: 'Зупинись на місці для таунту!',
           toastAutoSprintOn: 'Авто-біг увімкнено',
           toastAutoSprintOff: 'Авто-біг вимкнено',
@@ -2156,6 +2172,8 @@
           ringNoteSub: 'Switches ink in dashed bridges · Jump pads · Trampolines',
           raceNoteMain: 'First through the door gets +1 pt!',
           raceNoteSub: 'Switches ink in dashed bridges · Dash, Slide, Trampolines',
+          duelNoteMain: 'Door Duel! First in triggers freeze-cam & fresh countdown!',
+          duelBanner: 'FIRST AT THE DOOR: {name} +1',
           toastStopTaunt: 'Stand still to taunt!',
           toastAutoSprintOn: 'Auto-sprint enabled',
           toastAutoSprintOff: 'Auto-sprint disabled',
@@ -2598,9 +2616,71 @@
         }
       }
 
-      // Cozy Procedural Sketchbook Music Sequencer (Multi-Variation Lobby + Gameplay)
+      // Dynamic Context-Aware & Speed-Adaptive Sketchbook Music Sequencer
       let musicStep = 0;
       let musicAccum = 0;
+      let musicIntensity = 0;
+
+      function playBell(ctx, freq, time, dur, vol) {
+        const sc = musicVolume;
+        if (sc <= 0.005) return;
+        const osc = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc2.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, time);
+        osc2.frequency.setValueAtTime(freq * 2, time);
+        gain.gain.setValueAtTime(0.0001, time);
+        gain.gain.linearRampToValueAtTime(vol * sc, time + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+        const g2 = ctx.createGain();
+        g2.gain.value = 0.25;
+        osc.connect(gain);
+        osc2.connect(g2); g2.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(time); osc2.start(time);
+        osc.stop(time + dur + 0.02); osc2.stop(time + dur + 0.02);
+      }
+
+      function playLead(ctx, freq, time, dur, vol) {
+        const sc = musicVolume;
+        if (sc <= 0.005) return;
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, time);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(Math.min(2800, freq * 3.2), time);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(450, freq * 1.4), time + dur);
+        gain.gain.setValueAtTime(0.0001, time);
+        gain.gain.linearRampToValueAtTime(vol * sc, time + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+        osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        osc.start(time); osc.stop(time + dur + 0.03);
+      }
+
+      function playDrum(ctx, kind, time, vol) {
+        const sc = musicVolume;
+        if (sc <= 0.005) return;
+        if (kind === 'kick') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(118, time);
+          osc.frequency.exponentialRampToValueAtTime(44, time + 0.09);
+          gain.gain.setValueAtTime(vol * sc, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.11);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(time); osc.stop(time + 0.12);
+        } else if (kind === 'snare') {
+          playNoiseBurst(0.065, 1950, vol * 0.85, true);
+          playPluck(ctx, 185, time, 0.045, vol * 0.55, true);
+        } else {
+          playNoiseBurst(0.02, 4200, vol * 0.65, true);
+        }
+      }
 
       const LOBBY_VARIATIONS = [
         // 0: Warm lo-fi acoustic sketchbook arpeggio
@@ -2638,13 +2718,66 @@
         }
       ];
 
+      // Context Theme: Eraser Chase (urgent minor-key pulse!)
+      const ERASER_VARIATIONS = [
+        {
+          mel:  [440.0, 0, 466.16, 440.0, 392.0, 0, 440.0, 523.25, 440.0, 0, 349.23, 392.0, 440.0, 392.0, 329.63, 0],
+          bass: [110.0, 110.0, 0, 110.0, 98.0, 98.0, 0, 98.0, 87.31, 87.31, 0, 87.31, 82.41, 0, 98.0, 103.83],
+          harm: [0, 0, 659.25, 0, 0, 0, 587.33, 0, 0, 0, 523.25, 0, 659.25, 0, 0, 0]
+        },
+        {
+          mel:  [523.25, 493.88, 440.0, 0, 587.33, 523.25, 440.0, 0, 466.16, 440.0, 392.0, 349.23, 392.0, 440.0, 493.88, 0],
+          bass: [110.0, 0, 110.0, 130.81, 110.0, 0, 98.0, 0, 87.31, 0, 87.31, 98.0, 82.41, 98.0, 110.0, 0],
+          harm: [659.25, 0, 0, 0, 698.46, 0, 0, 0, 587.33, 0, 0, 0, 659.25, 0, 0, 0]
+        }
+      ];
+
+      // Context Theme: Tag Arena (playful syncopated funk-chase!)
+      const TAG_VARIATIONS = [
+        {
+          mel:  [392.0, 0, 493.88, 587.33, 0, 523.25, 493.88, 440.0, 392.0, 440.0, 0, 587.33, 659.25, 0, 587.33, 493.88],
+          bass: [98.0, 0, 196.0, 0, 110.0, 0, 146.83, 0, 98.0, 0, 196.0, 146.83, 130.81, 0, 146.83, 0],
+          harm: [0, 0, 0, 783.99, 0, 0, 0, 659.25, 0, 0, 0, 783.99, 0, 0, 698.46, 0]
+        },
+        {
+          mel:  [587.33, 0, 523.25, 493.88, 440.0, 0, 493.88, 587.33, 659.25, 0, 587.33, 523.25, 493.88, 440.0, 392.0, 0],
+          bass: [130.81, 0, 130.81, 164.81, 146.83, 0, 146.83, 196.0, 110.0, 0, 164.81, 0, 98.0, 123.47, 146.83, 0],
+          harm: [0, 0, 659.25, 0, 0, 0, 783.99, 0, 0, 0, 783.99, 0, 0, 0, 587.33, 0]
+        }
+      ];
+
       function updateMusic(dt) {
         if (muted || !musicEnabled || musicVolume <= 0.005 || !audioCtx || audioCtx.state !== 'running') return;
-        if (gamePhase === 'launching') return; // let countdown & vortex breathe
+        if (gamePhase === 'launching' || gamePhase === 'door_spotlight') return; // let spotlight & vortex breathe
 
         const inMenuOrLobby = !lobbyModal.classList.contains('hidden') || gamePhase === 'lobby';
+        const isEraser = !inMenuOrLobby && typeof eraserState !== 'undefined' && eraserState.active;
+        const isTag = !inMenuOrLobby && typeof tagState !== 'undefined' && tagState.active;
+
+        // Smooth speed/flight/tension intensity (0..1) that dynamically layers in extra instruments!
+        let targetInt = 0.08;
+        if (!inMenuOrLobby && typeof localPlayer !== 'undefined') {
+          const spd = Math.hypot(localPlayer.vx || 0, localPlayer.vy || 0);
+          if (spd > 520 || (!localPlayer.grounded && spd > 410) || localPlayer.highSpeedTimer > 0) targetInt = 1.0;
+          else if (spd > 350 || localPlayer.sprinting) targetInt = 0.68;
+          else if (spd > 150) targetInt = 0.36;
+          else targetInt = 0.14;
+          if (isEraser) targetInt = Math.min(1.0, targetInt + 0.25);
+          if (isTag && tagState.timeLeft < 12) targetInt = Math.min(1.0, targetInt + 0.3);
+        }
+        const rate = targetInt > musicIntensity ? 3.8 : 1.3;
+        musicIntensity += (targetInt - musicIntensity) * Math.min(1, rate * dt);
+
         const barNum = Math.floor(musicStep / 16);
-        const stepDur = inMenuOrLobby ? 0.34 : 0.205;
+        let stepDur = inMenuOrLobby ? 0.34 : 0.202;
+        if (isEraser) {
+          stepDur = 0.184 - musicIntensity * 0.022;
+        } else if (isTag) {
+          stepDur = (tagState.timeLeft < 12 ? 0.165 : 0.188);
+        } else if (!inMenuOrLobby) {
+          stepDur = 0.205 - musicIntensity * 0.016;
+        }
+
         musicAccum += dt;
         if (musicAccum < stepDur) return;
         musicAccum -= stepDur;
@@ -2660,17 +2793,52 @@
           if (idx % 4 === 0 && note) playPluck(audioCtx, note * 0.5, now, 0.62, 0.026, true);
           if (idx === 12 && note) playPluck(audioCtx, note * 1.5, now, 0.35, 0.014, true);
         } else {
-          // Rotate variations smoothly every 2 bars + offset by roundNumber
-          const vIdx = (Math.floor(barNum / 2) + (roundNumber - 1)) % GAME_VARIATIONS.length;
-          const pat = GAME_VARIATIONS[vIdx];
+          const bank = isEraser ? ERASER_VARIATIONS : (isTag ? TAG_VARIATIONS : GAME_VARIATIONS);
+          const vIdx = (Math.floor(barNum / 2) + (roundNumber - 1)) % bank.length;
+          const pat = bank[vIdx];
           const mel = pat.mel[idx];
           const bass = pat.bass[idx];
           const harm = pat.harm[idx];
-          if (mel) playPluck(audioCtx, mel, now, 0.22, 0.035, true);
+
+          // Base layer: melody pluck, bass, light brush hi-hat
+          if (mel) playPluck(audioCtx, mel, now, 0.22, 0.034, true);
           if (bass) playPluck(audioCtx, bass, now, 0.24, 0.042, true);
           if (harm) playPluck(audioCtx, harm, now, 0.26, 0.018, true);
-          if (idx % 4 === 2) playNoiseBurst(0.028, 2200, 0.017, true); // soft brush hi-hat
-          if (idx === 0 || idx === 8) playPluck(audioCtx, 74, now, 0.09, 0.035, true); // soft paper-desk kick
+          if (idx % 4 === 2) playNoiseBurst(0.026, 2200, 0.016, true);
+
+          // Layer 1 (moving): driving kick + crisp paper-brush snare groove
+          if (musicIntensity > 0.26 || isEraser || isTag) {
+            if (idx === 0 || idx === 8 || (musicIntensity > 0.55 && idx === 10)) {
+              playDrum(audioCtx, 'kick', now, 0.052);
+            }
+            if (idx === 4 || idx === 12) {
+              playDrum(audioCtx, 'snare', now, 0.034);
+            }
+          }
+
+          // Layer 2 (sprinting / fast): shimmering high octave bell-arp + 16th shaker hat
+          if (musicIntensity > 0.52) {
+            const bellScale = Math.min(1, (musicIntensity - 0.52) / 0.35);
+            if (mel && idx % 2 === 0) {
+              playBell(audioCtx, mel * 2, now, 0.16, 0.022 * bellScale);
+            }
+            if (idx % 2 === 1) {
+              playDrum(audioCtx, 'hat', now, 0.02 * bellScale);
+            }
+          }
+
+          // Layer 3 (flying fast / dash-jump / trampoline launch): soaring warm lead + sub-bass punch
+          if (musicIntensity > 0.76) {
+            const leadScale = Math.min(1, (musicIntensity - 0.76) / 0.24);
+            if (harm) {
+              playLead(audioCtx, harm, now, 0.34, 0.026 * leadScale);
+            } else if (mel && (idx === 0 || idx === 6 || idx === 12)) {
+              playLead(audioCtx, mel * 1.5, now, 0.26, 0.02 * leadScale);
+            }
+            if (idx === 0 && bass) {
+              playPluck(audioCtx, bass * 0.5, now, 0.28, 0.03 * leadScale, true);
+            }
+          }
         }
       }
 
@@ -2742,8 +2910,9 @@
       }
 
       const GAME_MODES = [
-        { id: 'race',   label: 'Гонка до дверей', labelEn: 'Door Race' },
-        { id: 'eraser', label: 'Тікай від гумки', labelEn: 'Eraser Chase' },
+        { id: 'race',   label: 'Гонка до дверей',  labelEn: 'Door Race' },
+        { id: 'duel',   label: 'Дуель (Відлік)',   labelEn: 'Door Duel (Countdown)' },
+        { id: 'eraser', label: 'Тікай від гумки',  labelEn: 'Eraser Chase' },
         { id: 'tag',    label: 'Салочки (Квачик)', labelEn: 'Tag Arena' }
       ];
 
@@ -3027,7 +3196,7 @@
           platforms.push(makePlatform(sx - 95, sy, 220, 44, 'solid'));
 
           if (roundNum === 1) {
-            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : tr('ringNoteMain'), sub: tr('ringNoteSub') });
+            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : tr('ringNoteMain')), sub: tr('ringNoteSub') });
           }
 
           const overlapsPlats = (rx, ry, rw, rh, padX = 12, padY = 16) => {
@@ -3136,7 +3305,7 @@
           const maxY = Math.round(480 + vertSpan * 0.28);
           platforms.push(makePlatform(0, 480, 280, 140, 'solid'));
           if (roundNum === 1) {
-            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : tr('raceNoteMain'), sub: tr('raceNoteSub') });
+            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : tr('raceNoteMain')), sub: tr('raceNoteSub') });
           }
 
           let curX = 280;
@@ -4674,6 +4843,16 @@
           if (typeof data.seed === 'number' && data.seed !== currentSeed) {
             loadRound(data.seed, data.round || 1, false);
           }
+        } else if (data.type === 'door_spotlight') {
+          if (netMode === 'host') {
+            if (typeof data.hostScore === 'number') localScore = data.hostScore;
+            if (typeof data.clientScore === 'number') remoteScore = data.clientScore;
+          } else {
+            if (typeof data.hostScore === 'number') remoteScore = data.hostScore;
+            if (typeof data.clientScore === 'number') localScore = data.clientScore;
+          }
+          updateLeaderboardUI('remote');
+          triggerDoorSpotlight('remote', data.x, data.y, data.nextSeed, data.nextRound || (roundNumber + 1), !!data.isMatchEnd, false);
         } else if (data.type === 'next_round') {
           if (netMode === 'host') {
             if (typeof data.hostScore === 'number') localScore = data.hostScore;
@@ -5064,6 +5243,50 @@
 
       const eraserState = { active: false, x: -240, y: 0, w: 96, h: 420, dir: 'right', rubTimer: 0 };
       const tagState = { active: false, timeLeft: 50, itWho: 'local', cooldown: 0, bot: null, botJumpCd: 0, botDashCd: 0 };
+      const doorSpotlight = {
+        active: false,
+        timer: 0,
+        who: 'local',
+        nick: '',
+        x: 0,
+        y: 0,
+        nextSeed: 0,
+        nextRound: 1,
+        isMatchEnd: false
+      };
+
+      function triggerDoorSpotlight(who, x, y, nextSeed, nextRound, isMatchEnd, broadcast = false) {
+        doorLock = true;
+        gamePhase = 'door_spotlight';
+        doorSpotlight.active = true;
+        doorSpotlight.timer = 1.8;
+        doorSpotlight.who = who;
+        doorSpotlight.nick = who === 'local'
+          ? ((localNick === 'Гравець' && currentLang === 'en') ? tr('defaultNick') : localNick)
+          : ((remoteNick === 'Друг' && currentLang === 'en') ? tr('defaultFriend') : remoteNick);
+        doorSpotlight.x = x;
+        doorSpotlight.y = y;
+        doorSpotlight.nextSeed = nextSeed;
+        doorSpotlight.nextRound = nextRound;
+        doorSpotlight.isMatchEnd = isMatchEnd;
+        screenShake = 7;
+        playSound('fanfare');
+        spawnShockwave(x, y, '#E9C46A', 72);
+        spawnPackParticles(who === 'local' ? localCosmetics.particlePack : remoteCosmetics.particlePack, x, y, 28, 260);
+        if (broadcast && netConnected) {
+          sendGameMsg({
+            type: 'door_spotlight',
+            winner: netMode === 'host' ? 'host' : 'client',
+            x: Math.round(x),
+            y: Math.round(y),
+            hostScore: netMode === 'host' ? localScore : remoteScore,
+            clientScore: netMode === 'host' ? remoteScore : localScore,
+            nextSeed,
+            nextRound,
+            isMatchEnd
+          });
+        }
+      }
 
       function triggerPageFlip() {
         pageFlipTimer = PAGE_FLIP_DUR;
@@ -5168,10 +5391,18 @@
       function loadRound(seed, rNum, broadcast = false) {
         if (worldTime > 0.4) triggerPageFlip();
         scuffs.length = 0;
+        doorSpotlight.active = false;
         if (soloLobbyActive || (netMode === 'solo' && gamePhase === 'lobby')) {
           gamePhase = 'playing';
           soloLobbyActive = false;
           updateNetUI(tr('soloWord'), '');
+        }
+        const curMode = GAME_MODES[roomSettings.gameModeIdx || 0] || GAME_MODES[0];
+        if (curMode.id === 'duel' && gamePhase !== 'launching') {
+          gamePhase = 'round_intro';
+          roundIntroTimer = 3.0;
+          roundIntroLastSec = 4;
+          goBannerTimer = 0;
         }
         lobbyDrawMode = false;
         if (drawToggleLabel) drawToggleLabel.textContent = tr('drawOff');
@@ -6295,21 +6526,28 @@
         if (!doorLock && lvl.goal && rectsOverlap(p, lvl.goal)) {
           doorLock = true;
           localScore++;
-          playSound('win');
-          spawnPackParticles(localCosmetics.particlePack, lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, 24, 260);
           if (!activeGhostData || roundElapsed < activeGhostData.bestTime) {
             saveBestGhostForLevel(roundElapsed, ghostRecording);
             showToast(tr('toastNewRecord', { time: formatTimer(roundElapsed) }));
           }
           updateLeaderboardUI('local');
 
-          if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
-            lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : tr('drawWord'));
-            showToast(tr('toastMatchEnd', { name: lastMatchWinner }));
-            enterLobbyRoom(true, true);
+          const curMode = GAME_MODES[roomSettings.gameModeIdx || 0] || GAME_MODES[0];
+          const isMatchEnd = !roomSettings.infinite && roundNumber >= roomSettings.rounds;
+          const nextSeed = resolveNextSeed();
+
+          if (curMode.id === 'duel') {
+            triggerDoorSpotlight('local', p.x + p.w / 2, p.y + p.h / 2, nextSeed, roundNumber + 1, isMatchEnd, true);
           } else {
-            const nextSeed = resolveNextSeed();
-            loadRound(nextSeed, roundNumber + 1, true);
+            playSound('win');
+            spawnPackParticles(localCosmetics.particlePack, lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, 24, 260);
+            if (isMatchEnd) {
+              lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : tr('drawWord'));
+              showToast(tr('toastMatchEnd', { name: lastMatchWinner }));
+              enterLobbyRoom(true, true);
+            } else {
+              loadRound(nextSeed, roundNumber + 1, true);
+            }
           }
         }
       }
@@ -7080,11 +7318,16 @@
           const targetCamY = 285 - h * 0.5;
           cam.x += (targetCamX - cam.x) * 0.1;
           cam.y += (targetCamY - cam.y) * 0.1;
+        } else if (gamePhase === 'door_spotlight' && doorSpotlight.active) {
+          const targetCamX = doorSpotlight.x - w * 0.5;
+          const targetCamY = doorSpotlight.y - h * 0.52;
+          cam.x += (targetCamX - cam.x) * 0.15;
+          cam.y += (targetCamY - cam.y) * 0.15;
         } else if (gamePhase === 'round_intro') {
           const targetCamX = localPlayer.x + localPlayer.w / 2 - w * 0.5;
           const targetCamY = localPlayer.y + localPlayer.h / 2 - h * 0.55;
-          cam.x += (targetCamX - cam.x) * 0.05;
-          cam.y += (targetCamY - cam.y) * 0.05;
+          cam.x += (targetCamX - cam.x) * 0.08;
+          cam.y += (targetCamY - cam.y) * 0.08;
         } else {
           // Smoothly locked on player center (works identically on desktop & phone, zero A/D jerk!)
           const velLeadX = Math.max(-65, Math.min(65, localPlayer.vx * 0.13));
@@ -7177,6 +7420,8 @@
         if (gamePhase === 'launching') {
           const zProg = Math.min(1, (5.0 - launchTimer) / 4.2);
           targetZoom = 1.08 + zProg * 0.44;
+        } else if (gamePhase === 'door_spotlight' && doorSpotlight.active) {
+          targetZoom = 1.46;
         } else if (gamePhase === 'lobby' && netMode === 'host' && startBtnHover) {
           targetZoom = 1.07;
           screenShake = Math.max(screenShake, 1.4);
@@ -7772,6 +8017,20 @@
           ctx.restore();
         }
 
+        // Door Duel Winner Spotlight Ring in World Space
+        if (gamePhase === 'door_spotlight' && doorSpotlight.active) {
+          ctx.save();
+          const pulse = 36 + Math.sin(worldTime * 11) * 5;
+          ctx.strokeStyle = '#D49B27';
+          ctx.lineWidth = 3.2;
+          ctx.setLineDash([7, 5]);
+          ctx.beginPath();
+          ctx.arc(doorSpotlight.x, doorSpotlight.y, pulse, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.restore();
+        }
+
         // 7a. Ink Shockwave Rings (Dash, Dash-Jump, Wall-Kick)
         for (const sw of shockwaves) {
           const prog = 1 - sw.life / sw.maxLife;
@@ -7969,7 +8228,21 @@
           ctx.restore();
         }
 
-        // 10c. Torn Paper Win Stamp
+        // 10c. Door Duel Spotlight Banner & Torn Paper Win Stamp
+        if (gamePhase === 'door_spotlight' && doorSpotlight.active) {
+          ctx.save();
+          ctx.translate(w / 2, Math.max(96, h * 0.2));
+          ctx.rotate(-0.02);
+          const msg = tr('duelBanner', { name: doorSpotlight.nick });
+          ctx.font = '700 30px "Caveat", cursive';
+          const bw = Math.max(270, ctx.measureText(msg).width + 44);
+          drawInkedRect(-bw / 2, -28, bw, 56, 779, '#FBF7EE', false);
+          ctx.fillStyle = '#C83E31';
+          ctx.textAlign = 'center';
+          ctx.fillText(msg, 0, 9);
+          ctx.restore();
+        }
+
         if (winBannerTimer > 0) {
           ctx.save();
           ctx.translate(w / 2, h / 2);
@@ -8081,6 +8354,23 @@
             }
             if (launchTimer <= 0) {
               finishLaunchIntoRound1(netMode === 'host');
+            }
+          }
+        } else if (gamePhase === 'door_spotlight') {
+          // Everything freezes while camera spotlights the first player at the door!
+          doorSpotlight.timer -= dt;
+          if (Math.random() < 0.35) {
+            spawnParticles(doorSpotlight.x + (Math.random() - 0.5) * 44, doorSpotlight.y - 16, Math.random() < 0.5 ? '#E9C46A' : '#2952A3', 1, 110);
+          }
+          if (doorSpotlight.timer <= 0) {
+            doorSpotlight.active = false;
+            if (doorSpotlight.isMatchEnd) {
+              lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : tr('drawWord'));
+              showToast(tr('toastMatchEnd', { name: lastMatchWinner }));
+              enterLobbyRoom(netConnected && netMode === 'host', true);
+            } else {
+              loadRound(doorSpotlight.nextSeed, doorSpotlight.nextRound, false);
+              playSound('tick');
             }
           }
         } else if (gamePhase === 'round_intro') {
@@ -8550,7 +8840,7 @@
             if (currentLevel.notes && currentLevel.notes[0]) {
               const modeObj = GAME_MODES[roomSettings.gameModeIdx || 0] || GAME_MODES[0];
               const isRing = !!currentLevel.ringMeta;
-              currentLevel.notes[0].text = modeObj.id === 'eraser' ? tr('eraserNoteMain') : (isRing ? tr('ringNoteMain') : tr('raceNoteMain'));
+              currentLevel.notes[0].text = modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : (isRing ? tr('ringNoteMain') : tr('raceNoteMain')));
               currentLevel.notes[0].sub = isRing ? tr('ringNoteSub') : tr('raceNoteSub');
             }
           }
