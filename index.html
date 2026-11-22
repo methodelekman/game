@@ -37,6 +37,10 @@
       font-family: "Caveat", "Comic Sans MS", cursive, sans-serif;
     }
 
+    button, input {
+      font-family: inherit;
+    }
+
     #app {
       position: relative;
       width: 100%;
@@ -1021,7 +1025,8 @@
       position: fixed;
       bottom: 10px;
       right: 12px;
-      font-size: 15px;
+      font-family: inherit;
+      font-size: 16px;
       font-weight: 700;
       color: var(--ink);
       background: rgba(251, 247, 238, 0.92);
@@ -1357,7 +1362,7 @@
       <div id="level-scrap">Раунд #1 · ✕0</div>
 
       <div id="leaderboard">
-        <div class="lb-head"><span>Лідерборд</span><span>Очки</span></div>
+        <div class="lb-head"><span data-i18n="lbTitle">Лідерборд</span><span data-i18n="lbPts">Очки</span></div>
         <div class="lb-rows" id="lb-rows">
           <div class="lb-row" id="lb-row-local" style="transform: translateY(0px);">
             <div class="lb-left">
@@ -1379,9 +1384,9 @@
       </div>
 
       <div id="corner-tabs">
-        <button class="sketch-btn" id="btn-wardrobe" title="Косметика та образ"><svg class="ico" viewBox="0 0 24 24"><path d="M18.3 2.7a2.1 2.1 0 0 1 3 3L11.5 15.5l-4 1 1-4L18.3 2.7z"/><path d="M7.5 16.5c-1.8 0-3 1.2-3 2.7 0 1.1-.8 1.8-1.5 2.1 1.7.7 4.2.5 5.4-.8.9-.9.8-2.4-.9-4z"/></svg><span>Образ</span></button>
-        <button class="sketch-btn mobile-only-btn" id="btn-taunt" title="Таунти"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.4 5.2L20 9l-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6L4 9l5.6-.8L12 3z"/></svg></button>
-        <button class="sketch-btn" id="btn-game-settings" title="Налаштування гри"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+        <button class="sketch-btn" id="btn-wardrobe" data-i18n-title="wardrobeTip" title="Косметика та образ"><svg class="ico" viewBox="0 0 24 24"><path d="M18.3 2.7a2.1 2.1 0 0 1 3 3L11.5 15.5l-4 1 1-4L18.3 2.7z"/><path d="M7.5 16.5c-1.8 0-3 1.2-3 2.7 0 1.1-.8 1.8-1.5 2.1 1.7.7 4.2.5 5.4-.8.9-.9.8-2.4-.9-4z"/></svg><span data-i18n="wardrobeBtn">Образ</span></button>
+        <button class="sketch-btn mobile-only-btn" id="btn-taunt" data-i18n-title="taunts" title="Таунти"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.4 5.2L20 9l-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6L4 9l5.6-.8L12 3z"/></svg></button>
+        <button class="sketch-btn" id="btn-game-settings" data-i18n-title="gameSettings" title="Налаштування гри"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
         <button class="sketch-btn net-pill" id="btn-lobby">
           <span class="status-dot" id="net-dot"></span>
           <span id="net-label">Соло</span>
@@ -1390,17 +1395,17 @@
 
       <div id="lobby-draw-bar">
         <button class="sketch-btn" id="btn-draw-toggle" style="font-size:15px; padding:2px 9px;"><svg class="ico" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span id="draw-toggle-label">Малювати: Вимк</span></button>
-        <button class="draw-swatch active" data-dcol="#231F20" style="background:#231F20;" title="Чорний"></button>
-        <button class="draw-swatch" data-dcol="#C83E31" style="background:#C83E31;" title="Червоний"></button>
-        <button class="draw-swatch" data-dcol="#2952A3" style="background:#2952A3;" title="Синій"></button>
-        <button class="draw-swatch" data-dcol="#D49B27" style="background:#D49B27;" title="Золотий"></button>
-        <button class="draw-swatch" data-dcol="#2D7A46" style="background:#2D7A46;" title="Зелений"></button>
-        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" title="Очистити малюнки"><svg class="ico" viewBox="0 0 24 24"><path d="M7 21h13M16.2 3.8a2.2 2.2 0 0 1 3.1 3.1L9.5 16.7a2.2 2.2 0 0 1-3.1 0L3.3 13.6a2.2 2.2 0 0 1 0-3.1l10.2-6.7z"/><path d="M6.5 10.5l7 7"/></svg></button>
+        <button class="draw-swatch active" data-dcol="#231F20" style="background:#231F20;" title="Black / Чорний"></button>
+        <button class="draw-swatch" data-dcol="#C83E31" style="background:#C83E31;" title="Red / Червоний"></button>
+        <button class="draw-swatch" data-dcol="#2952A3" style="background:#2952A3;" title="Blue / Синій"></button>
+        <button class="draw-swatch" data-dcol="#D49B27" style="background:#D49B27;" title="Gold / Золотий"></button>
+        <button class="draw-swatch" data-dcol="#2D7A46" style="background:#2D7A46;" title="Green / Зелений"></button>
+        <button class="sketch-btn" id="btn-draw-clear" style="font-size:15px; padding:2px 8px;" data-i18n-title="clearDrawTip" title="Очистити малюнки"><svg class="ico" viewBox="0 0 24 24"><path d="M7 21h13M16.2 3.8a2.2 2.2 0 0 1 3.1 3.1L9.5 16.7a2.2 2.2 0 0 1-3.1 0L3.3 13.6a2.2 2.2 0 0 1 0-3.1l10.2-6.7z"/><path d="M6.5 10.5l7 7"/></svg></button>
       </div>
 
       <div id="touch-edit-bar">
-        <span style="font-size:16px; font-weight:700;">Перетягни панелі кнопок</span>
-        <button class="sketch-btn ink-blue" id="btn-save-touch-pos" style="font-size:15px; padding:2px 10px;">✓ Зберегти</button>
+        <span style="font-size:16px; font-weight:700;" data-i18n="dragTouchHint">Перетягни панелі кнопок</span>
+        <button class="sketch-btn ink-blue" id="btn-save-touch-pos" style="font-size:15px; padding:2px 10px;" data-i18n="saveBtn">✓ Зберегти</button>
       </div>
 
       <div id="touch-controls">
@@ -1443,40 +1448,43 @@
 
           <div class="nb-header">
             <div>
-              <div class="nb-title">На полях</div>
-              <div class="nb-sub">паркур олівцем — соло або з другом</div>
+              <div class="nb-title" data-i18n="gameTitle">На полях</div>
+              <div class="nb-sub" data-i18n="gameSub">паркур олівцем — соло або з другом</div>
             </div>
-            <button class="sketch-btn" id="btn-close-lobby">✕</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="sketch-btn" id="btn-lang-lobby" style="font-size:16px; padding:3px 9px;" title="Switch Language / Змінити мову">UA / EN</button>
+              <button class="sketch-btn" id="btn-close-lobby">✕</button>
+            </div>
           </div>
 
           <div class="sketch-notes" id="lobby-key-notes">
-            <div class="note-row"><span>Вліво / Вправо</span><span class="key-doodle" id="ln-lr">A / D</span></div>
-            <div class="note-row"><span>Стрибок (подвійний)</span><span class="key-doodle" id="ln-jump">SPACE</span></div>
-            <div class="note-row"><span>Деш / Перекат</span><span class="key-doodle" id="ln-roll">CTRL</span></div>
-            <div class="note-row"><span>Біг / Присідання</span><span class="key-doodle" id="ln-sp">SHIFT / S</span></div>
+            <div class="note-row"><span data-i18n="noteLR">Вліво / Вправо</span><span class="key-doodle" id="ln-lr">A / D</span></div>
+            <div class="note-row"><span data-i18n="noteJump">Стрибок (подвійний)</span><span class="key-doodle" id="ln-jump">SPACE</span></div>
+            <div class="note-row"><span data-i18n="noteRoll">Деш / Перекат</span><span class="key-doodle" id="ln-roll">CTRL</span></div>
+            <div class="note-row"><span data-i18n="noteSp">Біг / Присідання</span><span class="key-doodle" id="ln-sp">SHIFT / S</span></div>
           </div>
 
           <div>
-            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;">Твій нік у лідерборді:</div>
+            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;" data-i18n="nickLabel">Твій нік у лідерборді:</div>
             <div class="room-row" style="margin-bottom:8px;">
               <input class="room-input" id="nick-input" value="Гравець" maxlength="12" style="text-transform:none; font-size:20px;" aria-label="Твій нік" />
             </div>
-            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;">Код сторінки для друга:</div>
+            <div style="font-size:17px; color:var(--pencil); margin-bottom:2px;" data-i18n="roomLabel">Код сторінки для друга:</div>
             <div class="room-row">
               <input class="room-input" id="room-code" value="SKETCH1" maxlength="14" aria-label="Код кімнати" />
-              <button class="sketch-btn" id="btn-copy-link">Скопіювати лінк</button>
+              <button class="sketch-btn" id="btn-copy-link" data-i18n="copyLink">Скопіювати лінк</button>
             </div>
           </div>
 
           <div class="actions-row">
-            <button class="sketch-btn ink-red" id="btn-host">Створити (P1)</button>
-            <button class="sketch-btn ink-blue" id="btn-join">Приєднатися (P2)</button>
-            <button class="sketch-btn" id="btn-solo">Грати соло</button>
-            <button class="sketch-btn" id="btn-solo-lobby" style="flex:1 1 100%; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Кімната лобі (малювати й налаштувати)</span></button>
+            <button class="sketch-btn ink-red" id="btn-host" data-i18n="hostBtn">Створити (P1)</button>
+            <button class="sketch-btn ink-blue" id="btn-join" data-i18n="joinBtn">Приєднатися (P2)</button>
+            <button class="sketch-btn" id="btn-solo" data-i18n="soloBtn">Грати соло</button>
+            <button class="sketch-btn" id="btn-solo-lobby" style="flex:1 1 100%; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span data-i18n="soloLobbyBtn">Кімната лобі (малювати й налаштувати)</span></button>
           </div>
 
           <div class="lobby-status">
-            <span id="lobby-msg">Обери режим або скинь лінк другу.</span>
+            <span id="lobby-msg" data-i18n="lobbyDefaultMsg">Обери режим або скинь лінк другу.</span>
             <span id="ping-readout"></span>
           </div>
         </div>
@@ -1484,8 +1492,8 @@
 
       <div id="host-panel">
         <div class="host-top-row" id="hp-top-row">
-          <button class="sketch-btn" id="hp-open-settings" style="font-size:20px; padding:4px 14px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Налаштування</span></button>
-          <button class="host-code-pill" id="hp-code-copy" title="Натисни, щоб скопіювати лінк">Код: ------</button>
+          <button class="sketch-btn" id="hp-open-settings" style="font-size:20px; padding:4px 14px;"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="settingsShort">Налаштування</span></button>
+          <button class="host-code-pill" id="hp-code-copy" data-i18n-title="copyCodeTip" title="Натисни, щоб скопіювати лінк">Код: ------</button>
         </div>
         <button class="sketch-btn ink-red big-host-btn" id="hp-start-btn">▶ СТАРТ</button>
       </div>
@@ -1496,18 +1504,18 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Налаштування карти й кімнати</div>
-              <div class="nb-sub">сід, розмір, кільцевий спавн і фізика</div>
+              <div class="nb-title" data-i18n="mapSetTitle">Налаштування карти й кімнати</div>
+              <div class="nb-sub" data-i18n="mapSetSub">сід, розмір, кільцевий спавн і фізика</div>
             </div>
             <button class="sketch-btn" id="hp-close-settings">✕</button>
           </div>
           <div class="settings-grid" style="gap:9px; font-size:19px;">
             <div class="set-row">
-              <span>Режим гри:</span>
+              <span data-i18n="setMode">Режим гри:</span>
               <button class="sketch-btn ink-red" id="hp-mode-btn" style="padding:2px 12px;">Гонка до дверей</button>
             </div>
             <div class="set-row">
-              <span>Раунди:</span>
+              <span data-i18n="setRounds">Раунди:</span>
               <div class="set-controls">
                 <button class="sketch-btn" id="hp-rounds-minus" style="padding:1px 9px;">−</button>
                 <span id="hp-rounds-val" style="min-width:28px; text-align:center;">∞</span>
@@ -1516,47 +1524,47 @@
               </div>
             </div>
             <div class="set-row">
-              <span>Швидкість:</span>
+              <span data-i18n="setSpeed">Швидкість:</span>
               <button class="sketch-btn" id="hp-speed-btn" style="padding:2px 12px;">Норма</button>
             </div>
             <div class="set-row">
-              <span>Гравітація:</span>
+              <span data-i18n="setGrav">Гравітація:</span>
               <button class="sketch-btn" id="hp-grav-btn" style="padding:2px 12px;">Норма</button>
             </div>
             <div class="set-row">
-              <span>Колізія гравців:</span>
+              <span data-i18n="setColl">Колізія гравців:</span>
               <button class="sketch-btn" id="hp-coll-btn" style="padding:2px 12px;">Увімк</button>
             </div>
             <div class="set-row" style="flex-wrap:wrap;">
-              <span>Сід рівня:</span>
+              <span data-i18n="setSeed">Сід рівня:</span>
               <div class="set-controls">
-                <input class="room-input" id="hp-seed-input" placeholder="Випадковий" maxlength="16" style="width:128px; font-size:17px; padding:1px 4px;" />
-                <button class="sketch-btn" id="hp-seed-rand" style="padding:3px 8px; font-size:16px;" title="Згенерувати випадковий сід"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg></button>
-                <label class="hp-check" style="font-size:15px;"><input type="checkbox" id="hp-seed-lock" /> Фікс</label>
+                <input class="room-input" id="hp-seed-input" data-i18n-placeholder="seedRandom" placeholder="Випадковий" maxlength="16" style="width:128px; font-size:17px; padding:1px 4px;" />
+                <button class="sketch-btn" id="hp-seed-rand" style="padding:3px 8px; font-size:16px;" data-i18n-title="seedRandTip" title="Згенерувати випадковий сід"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/></svg></button>
+                <label class="hp-check" style="font-size:15px;"><input type="checkbox" id="hp-seed-lock" /> <span data-i18n="seedLock">Фікс</span></label>
               </div>
             </div>
             <div class="set-row">
-              <span>Довжина (ширина):</span>
+              <span data-i18n="setLen">Довжина (ширина):</span>
               <div class="range-wrap">
                 <input type="range" id="hp-len-range" min="4" max="16" step="1" value="8" />
                 <span id="hp-len-val" style="min-width:52px; text-align:right;">8 сегм.</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Висота раунда:</span>
+              <span data-i18n="setHeight">Висота раунда:</span>
               <div class="range-wrap">
                 <input type="range" id="hp-height-range" min="180" max="880" step="40" value="380" />
                 <span id="hp-height-val" style="min-width:56px; text-align:right;">380 px</span>
               </div>
             </div>
             <div class="set-row" style="border-bottom:none;">
-              <span>Радіус спавну (кільце):</span>
+              <span data-i18n="setRing">Радіус спавну (кільце):</span>
               <button class="sketch-btn" id="hp-ring-btn" style="padding:2px 12px;">Вимк (прямий)</button>
             </div>
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="sketch-btn" id="hp-regen-btn" style="flex:1; font-size:18px;"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Новий рівень</span></button>
-            <button class="sketch-btn ink-blue" id="hp-done-settings" style="flex:1; font-size:20px;">Готово</button>
+            <button class="sketch-btn" id="hp-regen-btn" style="flex:1; font-size:18px;"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span data-i18n="newLevelBtn">Новий рівень</span></button>
+            <button class="sketch-btn ink-blue" id="hp-done-settings" style="flex:1; font-size:20px;" data-i18n="doneBtn">Готово</button>
           </div>
         </div>
       </div>
@@ -1567,109 +1575,113 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Налаштування гри</div>
-              <div class="nb-sub">звук, перепризначення клавіш і сенсорне керування</div>
+              <div class="nb-title" data-i18n="gameSettings">Налаштування гри</div>
+              <div class="nb-sub" data-i18n="gameSettingsSub">мова, звук, клавіші й сенсорне керування</div>
             </div>
             <button class="sketch-btn" id="btn-close-game-settings">✕</button>
           </div>
           <div class="gs-tabs">
-            <button class="sketch-btn gs-tab active" data-gstab="audio"><svg class="ico" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>Звук / Гра</span></button>
-            <button class="sketch-btn gs-tab" data-gstab="keys"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg><span>Клавіші ПК</span></button>
-            <button class="sketch-btn gs-tab" data-gstab="mobile"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg><span>Мобільне</span></button>
+            <button class="sketch-btn gs-tab active" data-gstab="audio"><svg class="ico" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span data-i18n="tabAudio">Звук / Гра</span></button>
+            <button class="sketch-btn gs-tab" data-gstab="keys"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg><span data-i18n="tabKeys">Клавіші ПК</span></button>
+            <button class="sketch-btn gs-tab" data-gstab="mobile"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg><span data-i18n="tabMobile">Мобільне</span></button>
           </div>
 
           <div class="gs-panel active" id="gs-panel-audio">
             <div class="set-row">
-              <span>Загальний звук:</span>
+              <span data-i18n="langLabel">Мова / Language:</span>
+              <button class="sketch-btn ink-blue" id="btn-lang-toggle" style="padding:3px 14px;">Українська</button>
+            </div>
+            <div class="set-row">
+              <span data-i18n="masterAudio">Загальний звук:</span>
               <button class="sketch-btn" id="btn-mute" style="padding:3px 14px;">Увімкнено</button>
             </div>
             <div class="set-row">
-              <span>Фонова музика:</span>
+              <span data-i18n="bgMusic">Фонова музика:</span>
               <button class="sketch-btn" id="btn-music-toggle" style="padding:3px 14px;">Увімкнено</button>
             </div>
             <div class="set-row">
-              <span>Гучність ефектів:</span>
+              <span data-i18n="sfxVol">Гучність ефектів:</span>
               <div class="range-wrap">
                 <input type="range" id="rng-sfx-vol" min="0" max="100" value="100" />
                 <span id="val-sfx-vol" style="min-width:38px;">100%</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Гучність музики:</span>
+              <span data-i18n="musicVol">Гучність музики:</span>
               <div class="range-wrap">
                 <input type="range" id="rng-music-vol" min="0" max="100" value="100" />
                 <span id="val-music-vol" style="min-width:38px;">100%</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Привид спідрану (рекорди):</span>
+              <span data-i18n="ghostLabel">Привид спідрану (рекорди):</span>
               <button class="sketch-btn" id="btn-ghost-toggle" style="padding:3px 14px;">Увімкнено</button>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-              <button class="sketch-btn" id="gs-open-map-settings" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg><span>Генератор карти / Сід</span></button>
-              <button class="sketch-btn" id="gs-open-changelog" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg><span>Щоденник змін</span></button>
-              <button class="sketch-btn ink-red" id="btn-restart" style="flex:1; font-size:17px;">↺ Респавн</button>
+              <button class="sketch-btn" id="gs-open-map-settings" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg><span data-i18n="mapGenBtn">Генератор карти / Сід</span></button>
+              <button class="sketch-btn" id="gs-open-changelog" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg><span data-i18n="changelogTitle">Щоденник змін</span></button>
+              <button class="sketch-btn ink-red" id="btn-restart" style="flex:1; font-size:17px;" data-i18n="respawnBtn">↺ Респавн</button>
             </div>
           </div>
 
           <div class="gs-panel" id="gs-panel-keys">
-            <div style="font-size:15px; color:var(--pencil);">Натисни на клавішу, щоб перепризначити (Esc — скасувати).</div>
+            <div style="font-size:15px; color:var(--pencil);" data-i18n="rebindHint">Натисни на клавішу, щоб перепризначити (Esc — скасувати).</div>
             <div id="keybinds-list"></div>
-            <button class="sketch-btn" id="btn-reset-keybinds" style="font-size:17px; margin-top:4px;">↺ Скинути клавіші за замовчуванням</button>
+            <button class="sketch-btn" id="btn-reset-keybinds" style="font-size:17px; margin-top:4px;" data-i18n="resetKeysBtn">↺ Скинути клавіші за замовчуванням</button>
           </div>
 
           <div class="gs-panel" id="gs-panel-mobile">
             <div class="set-row">
-              <span>Авто-біг (за замовч.):</span>
+              <span data-i18n="mobAutoSprint">Авто-біг (за замовч.):</span>
               <button class="sketch-btn" id="mob-autosprint-btn" style="padding:2px 12px;">Увімк</button>
             </div>
             <div class="set-row">
-              <span>Авто-присідання біля пройомів:</span>
+              <span data-i18n="mobAutoCrouch">Авто-присідання біля пройомів:</span>
               <button class="sketch-btn" id="mob-autocrouch-btn" style="padding:2px 12px;">Увімк</button>
             </div>
             <div class="set-row">
-              <span>Розмір кнопок:</span>
+              <span data-i18n="mobScale">Розмір кнопок:</span>
               <div class="range-wrap">
                 <input type="range" id="mob-scale-rng" min="75" max="135" value="100" />
                 <span id="mob-scale-val" style="min-width:40px;">100%</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Прозорість кнопок:</span>
+              <span data-i18n="mobOpac">Прозорість кнопок:</span>
               <div class="range-wrap">
                 <input type="range" id="mob-opac-rng" min="35" max="100" value="90" />
                 <span id="mob-opac-val" style="min-width:40px;">90%</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Висота від низу:</span>
+              <span data-i18n="mobBottom">Висота від низу:</span>
               <div class="range-wrap">
                 <input type="range" id="mob-bottom-rng" min="8" max="90" value="14" />
                 <span id="mob-bottom-val" style="min-width:40px;">14px</span>
               </div>
             </div>
             <div class="set-row">
-              <span>Віддзеркалити (для лівші):</span>
+              <span data-i18n="mobMirror">Віддзеркалити (для лівші):</span>
               <button class="sketch-btn" id="mob-mirror-btn" style="padding:2px 12px;">Ні</button>
             </div>
             <div class="set-row" style="border-bottom:none;">
-              <span>Завжди показувати сенсорні кнопки:</span>
+              <span data-i18n="mobForce">Завжди показувати сенсорні кнопки:</span>
               <button class="sketch-btn" id="mob-force-btn" style="padding:2px 12px;">Ні</button>
             </div>
             <div style="display:flex; gap:8px; margin-top:4px;">
-              <button class="sketch-btn ink-blue" id="mob-reposition-btn" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg><span>Пересунути кнопки</span></button>
-              <button class="sketch-btn" id="mob-reset-btn" style="font-size:17px;">↺ Скинути</button>
+              <button class="sketch-btn ink-blue" id="mob-reposition-btn" style="flex:1; font-size:17px;"><svg class="ico" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg><span data-i18n="mobMoveBtn">Пересунути кнопки</span></button>
+              <button class="sketch-btn" id="mob-reset-btn" style="font-size:17px;" data-i18n="resetBtn">↺ Скинути</button>
             </div>
           </div>
 
-          <button class="sketch-btn ink-blue" id="btn-done-game-settings" style="width:100%; font-size:20px;">Готово</button>
+          <button class="sketch-btn ink-blue" id="btn-done-game-settings" style="width:100%; font-size:20px;" data-i18n="doneBtn">Готово</button>
         </div>
       </div>
 
       <div id="chat-box">
         <div id="chat-messages"></div>
         <div id="chat-input-row">
-          <input id="chat-input" type="text" maxlength="90" placeholder="Написати в чат..." autocomplete="off" />
+          <input id="chat-input" type="text" maxlength="90" data-i18n-placeholder="chatPlaceholder" placeholder="Написати в чат..." autocomplete="off" />
           <button class="sketch-btn" id="chat-send-btn" style="padding:3px 10px;">↵</button>
         </div>
         <div id="chat-hint">[Enter] Чат · [B] Таунти</div>
@@ -1679,8 +1691,8 @@
         <div class="wheel-wrap" id="wheel-wrap">
           <svg id="wheel-svg" viewBox="-160 -160 320 320" width="310" height="310"></svg>
           <div class="wheel-center">
-            <div class="wheel-center-name" id="wheel-label">Таунти</div>
-            <div class="wheel-center-hint">Наведи мишку</div>
+            <div class="wheel-center-name" id="wheel-label" data-i18n="taunts">Таунти</div>
+            <div class="wheel-center-hint" data-i18n="tauntHover">Наведи мишку</div>
           </div>
         </div>
       </div>
@@ -1691,8 +1703,8 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Гардероб</div>
-              <div class="nb-sub">колір, форма, обличчя, аксесуари й ефекти</div>
+              <div class="nb-title" data-i18n="wardrobeTitle">Гардероб</div>
+              <div class="nb-sub" data-i18n="wardrobeSub">колір, форма, обличчя, аксесуари й ефекти</div>
             </div>
             <button class="sketch-btn" id="btn-close-wardrobe">✕</button>
           </div>
@@ -1703,17 +1715,17 @@
             </div>
             <div>
               <div class="w-tabs">
-                <button class="sketch-btn w-tab active" data-wtab="colors">Колір (16)</button>
-                <button class="sketch-btn w-tab" data-wtab="shapes">Форма (6)</button>
-                <button class="sketch-btn w-tab" data-wtab="faces">Лице (15)</button>
-                <button class="sketch-btn w-tab" data-wtab="accs">Косм. 1</button>
-                <button class="sketch-btn w-tab" data-wtab="accs2">Косм. 2</button>
-                <button class="sketch-btn w-tab" data-wtab="particles">Партікли (8)</button>
+                <button class="sketch-btn w-tab active" data-wtab="colors" data-i18n="wColors">Колір (16)</button>
+                <button class="sketch-btn w-tab" data-wtab="shapes" data-i18n="wShapes">Форма (6)</button>
+                <button class="sketch-btn w-tab" data-wtab="faces" data-i18n="wFaces">Лице (15)</button>
+                <button class="sketch-btn w-tab" data-wtab="accs" data-i18n="wAccs1">Косм. 1</button>
+                <button class="sketch-btn w-tab" data-wtab="accs2" data-i18n="wAccs2">Косм. 2</button>
+                <button class="sketch-btn w-tab" data-wtab="particles" data-i18n="wParticles">Партікли (8)</button>
               </div>
               <div class="w-grid colors" id="wardrobe-grid"></div>
             </div>
           </div>
-          <button class="sketch-btn ink-blue" id="btn-done-wardrobe" style="width:100%; font-size:21px;">Зберегти образ</button>
+          <button class="sketch-btn ink-blue" id="btn-done-wardrobe" style="width:100%; font-size:21px;" data-i18n="saveLookBtn">Зберегти образ</button>
         </div>
       </div>
 
@@ -1723,12 +1735,20 @@
           <div class="tape tr"></div>
           <div class="nb-header">
             <div>
-              <div class="nb-title">Щоденник змін</div>
-              <div class="nb-sub">історія оновлень по версіях</div>
+              <div class="nb-title" data-i18n="changelogTitle">Щоденник змін</div>
+              <div class="nb-sub" data-i18n="changelogSub">історія оновлень по версіях</div>
             </div>
             <button class="sketch-btn" id="btn-close-changelog">✕</button>
           </div>
-          <div style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
+          <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
+            <div>
+              <b>v0.16.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Виправлено крок ніжок:</b> прибрано ефект «мунволку» при русі вправо — тепер ноги природно відштовхуються назад на землі й виносяться вперед у повітрі в обидва боки.</li>
+                <li><b>Англійська локалізація (UA / EN):</b> додано повний переклад інтерфейсу, режимів, косметики, підказок і полотна — перемикач доступний у лобі та в налаштуваннях гри.</li>
+                <li><b>Шрифт Changelog:</b> кнопка версії внизу праворуч тепер використовує основний шрифт гри (<code>Caveat</code>), як і весь інтерфейс.</li>
+              </ul>
+            </div>
             <div>
               <b>v0.16.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
@@ -1764,45 +1784,417 @@
             <div>
               <b>v0.14.0</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
-                <li><b>Changelog &amp; HUD:</b> виправлено кнопку Changelog (тепер працює й не перекриває кнопки на телефоні); прибрано «Заново» й десктоп-«Таунти», додано шестерню <b>⚙ Налаштування</b>.</li>
-                <li><b>Керування ПК і мобіл:</b> повний ребіндінг клавіш на ПК; нові SVG-кнопки на телефоні, налаштування розміру/позиції, авто-біг за замовчуванням та авто-присідання біля низьких пройомів.</li>
-                <li><b>Звук:</b> додано ефект засмоктування в портал при старті гри та повзунки гучності.</li>
-                <li><b>Карти й блоки:</b> кастомний сід (+🎲), вибір ширини й висоти раунда, кільцевий радіус спавну (двері можуть бути згори/знизу), 5 нових блоків (джамп-пади, ламкі платформи, лід, слайм, фіолетові батути).</li>
-                <li><b>Баланс мувменту:</b> перероблено стаміну та арку деш-джампу, щоб кожен прийом був ситуативним; лінії швидкості ближче до фігури.</li>
-                <li><b>Косметика 2.0:</b> 15 живих лиць (слідують за курсором на ПК і реагують на таунти), 2 слоти косметики, точна підгонка під кожну форму, живі прев'ю замість емоджі та 8 паків партіклів.</li>
+                <li><b>Changelog &amp; HUD:</b> виправлено кнопку Changelog; прибрано «Заново» й десктоп-«Таунти», додано шестерню налаштувань.</li>
+                <li><b>Керування ПК і мобіл:</b> повний ребіндінг клавіш на ПК; нові SVG-кнопки на телефоні, налаштування розміру/позиції, авто-біг та авто-присідання.</li>
+                <li><b>Карти й блоки:</b> кастомний сід, вибір ширини й висоти раунда, кільцевий радіус спавну, 5 нових блоків (джамп-пади, ламкі платформи, лід, слайм, батути).</li>
+                <li><b>Косметика 2.0:</b> 15 живих лиць, 2 слоти косметики, точна підгонка під кожну форму та 8 паків партіклів.</li>
+              </ul>
+            </div>
+          </div>
+          <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
+            <div>
+              <b>v0.16.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Natural Run Stride:</b> fixed the moonwalk leg direction when running right — feet now properly swing forward in the air and push backward on the ground in both directions.</li>
+                <li><b>English Localization (UA / EN):</b> full English translation across menus, settings, wardrobe, level notes, and HUD — switch anytime in the Lobby or Game Settings.</li>
+                <li><b>Unified Font:</b> the bottom-right Changelog pill now inherits the game's handwritten <code>Caveat</code> font.</li>
               </ul>
             </div>
             <div>
-              <b>v0.13.0</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
+              <b>v0.16.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
-                <li><b>Музика:</b> 3 варіації мелодій для лобі та 4 варіації для гри.</li>
-                <li><b>Дизайн зошита:</b> червона лінія полів, кавове кільце на аркуші, олівцеві дудли.</li>
-                <li><b>Анімації:</b> дихання, біг, нахил у стрибку, іскри фінішних дверей.</li>
+                <li><b>Cohesive Ink Style:</b> replaced glossy OS emojis with monochrome hand-inked SVG icons, comic taunt callouts, and painted badges.</li>
+                <li><b>Paper Grain &amp; Detailed Blocks:</b> added cotton paper texture, platform shadows, hanging icicles on ice, bubbling drips on slime, spring coils on trampolines, and branching cracks on breakables.</li>
+                <li><b>Grounded Feel:</b> added animated doodle legs, dynamic contact shadows, landing/skid scuff marks, impact hit-stop, and pitch-varied footsteps.</li>
+                <li><b>Map &amp; HUD Polish:</b> fixed Ring Spawn platform overlaps, anchored page headers near spawn, and compacted the Solo leaderboard.</li>
               </ul>
             </div>
             <div>
-              <b>v0.12.1</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
+              <b>v0.15.0</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
-                <li>Додано кнопку Changelog, смужки паперового скотчу, непрозорий лідерборд.</li>
+                <li><b>Page-Flip Transitions</b>, <b>Speedrun Pencil Ghost + Records</b>, <b>Eraser Chase</b> mode, <b>Tag Arena</b> (+ Solo Ink Bot), <b>Ink Switches &amp; Dashed Bridges</b>, and <b>Shared Lobby Wall Drawing</b>.</li>
               </ul>
             </div>
             <div>
-              <b>v0.12.0</b>
+              <b>v0.14.0 – v0.14.2</b> <span style="color:var(--pencil); font-size:15px;">— 21.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
-                <li>Реліз скетчбук-платформера на двох (MQTT), гардероб, таунти, чат і лідерборд.</li>
+                <li>Pure-flow movement without stamina limits, smooth camera zoom, full PC key rebinding, customizable touch controls, custom seeds, Ring Spawn, 5 special block types, and Cosmetics 2.0.</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
 
-      <button id="version-tag">v0.16.0 · Changelog</button>
+      <button id="version-tag">v0.16.1 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
 
   <script>
     (() => {
+      // =========================================================
+      // 0. LOCALIZATION (Ukrainian / English)
+      // =========================================================
+      let currentLang = 'uk';
+      try {
+        const savedLang = localStorage.getItem('sketch_lang');
+        if (savedLang === 'en' || savedLang === 'uk') currentLang = savedLang;
+      } catch (_) {}
+
+      const I18N = {
+        uk: {
+          docTitle: 'На полях — скетчбук-платформер',
+          lbTitle: 'Лідерборд',
+          lbPts: 'Очки',
+          wardrobeTip: 'Косметика та образ',
+          wardrobeBtn: 'Образ',
+          taunts: 'Таунти',
+          gameSettings: 'Налаштування гри',
+          gameSettingsSub: 'мова, звук, клавіші й сенсорне керування',
+          clearDrawTip: 'Очистити малюнки',
+          dragTouchHint: 'Перетягни панелі кнопок',
+          saveBtn: '✓ Зберегти',
+          gameTitle: 'На полях',
+          gameSub: 'паркур олівцем — соло або з другом',
+          noteLR: 'Вліво / Вправо',
+          noteJump: 'Стрибок (подвійний)',
+          noteRoll: 'Деш / Перекат',
+          noteSp: 'Біг / Присідання',
+          nickLabel: 'Твій нік у лідерборді:',
+          roomLabel: 'Код сторінки для друга:',
+          copyLink: 'Скопіювати лінк',
+          hostBtn: 'Створити (P1)',
+          joinBtn: 'Приєднатися (P2)',
+          soloBtn: 'Грати соло',
+          soloLobbyBtn: 'Кімната лобі (малювати й налаштувати)',
+          lobbyDefaultMsg: 'Обери режим або скинь лінк другу.',
+          lobbyLinkLoaded: 'Код кімнати підставлено! Натисни «Приєднатися (P2)», коли будеш готовий.',
+          settingsShort: 'Налаштування',
+          copyCodeTip: 'Натисни, щоб скопіювати лінк',
+          mapSetTitle: 'Налаштування карти й кімнати',
+          mapSetSub: 'сід, розмір, кільцевий спавн і фізика',
+          setMode: 'Режим гри:',
+          setRounds: 'Раунди:',
+          setSpeed: 'Швидкість:',
+          setGrav: 'Гравітація:',
+          setColl: 'Колізія гравців:',
+          setSeed: 'Сід рівня:',
+          seedRandom: 'Випадковий',
+          seedRandTip: 'Згенерувати випадковий сід',
+          seedLock: 'Фікс',
+          setLen: 'Довжина (ширина):',
+          setHeight: 'Висота раунда:',
+          setRing: 'Радіус спавну (кільце):',
+          newLevelBtn: 'Новий рівень',
+          doneBtn: 'Готово',
+          tabAudio: 'Звук / Гра',
+          tabKeys: 'Клавіші ПК',
+          tabMobile: 'Мобільне',
+          langLabel: 'Мова / Language:',
+          langName: 'Українська',
+          masterAudio: 'Загальний звук:',
+          bgMusic: 'Фонова музика:',
+          sfxVol: 'Гучність ефектів:',
+          musicVol: 'Гучність музики:',
+          ghostLabel: 'Привид спідрану (рекорди):',
+          mapGenBtn: 'Генератор карти / Сід',
+          changelogTitle: 'Щоденник змін',
+          changelogSub: 'історія оновлень по версіях',
+          respawnBtn: '↺ Респавн',
+          rebindHint: 'Натисни на клавішу, щоб перепризначити (Esc — скасувати).',
+          resetKeysBtn: '↺ Скинути клавіші за замовчуванням',
+          mobAutoSprint: 'Авто-біг (за замовч.):',
+          mobAutoCrouch: 'Авто-присідання біля пройомів:',
+          mobScale: 'Розмір кнопок:',
+          mobOpac: 'Прозорість кнопок:',
+          mobBottom: 'Висота від низу:',
+          mobMirror: 'Віддзеркалити (для лівші):',
+          mobForce: 'Завжди показувати сенсорні кнопки:',
+          mobMoveBtn: 'Пересунути кнопки',
+          resetBtn: '↺ Скинути',
+          chatPlaceholder: 'Написати в чат...',
+          chatWord: 'Чат',
+          tauntHover: 'Наведи мишку',
+          wardrobeTitle: 'Гардероб',
+          wardrobeSub: 'колір, форма, обличчя, аксесуари й ефекти',
+          wColors: 'Колір (16)',
+          wShapes: 'Форма (6)',
+          wFaces: 'Лице (15)',
+          wAccs1: 'Косм. 1',
+          wAccs2: 'Косм. 2',
+          wParticles: 'Партікли (8)',
+          saveLookBtn: 'Зберегти образ',
+          onFull: 'Увімкнено',
+          offFull: 'Вимкнено',
+          onShort: 'Увімк',
+          offShort: 'Вимк',
+          yesWord: 'Так',
+          noWord: 'Ні',
+          pressKey: 'Натисни...',
+          drawOn: 'Малювати: Увімк',
+          drawOff: 'Малювати: Вимк',
+          soloWord: 'Соло',
+          soloLobbyWord: 'Лобі (Соло)',
+          onlineWord: 'Онлайн',
+          searchingWord: 'Пошук...',
+          errorWord: 'Помилка',
+          waitP2: 'Чекаю P2...',
+          findP1: 'Пошук P1...',
+          codePrefix: 'Код: ',
+          startBtn: '▶ СТАРТ',
+          cancelBtn: '✕ ВІДМІНИТИ',
+          segShort: ' сегм.',
+          roundWord: 'Раунд #',
+          recordWord: 'Рекорд: ',
+          secSuffix: 'с',
+          podiumScrap: 'Пʼєдестал переможців!',
+          lobbyScrap: 'Лобі кімнати',
+          tagScrap: 'Салочки',
+          youAreIt: 'ТИ ВОДА!',
+          runAway: 'ТІКАЙ!',
+          itBadge: 'ВОДА!',
+          finishLabel: 'Фініш',
+          ghostLabelCanvas: 'Привид',
+          eraserLabel: 'ГУМКА!',
+          botName: 'Бот',
+          inkBotName: 'Чорнильний Бот',
+          youLabel: 'Ти',
+          defaultNick: 'Гравець',
+          defaultFriend: 'Друг',
+          drawWord: 'Нічия',
+          portalPull: 'ЗАТЯГУЄ В ПОРТАЛ!',
+          getReady: 'ПРИГОТУЙТЕСЬ...',
+          goBanner: 'ПОЇХАЛИ!',
+          pageCleared: 'Сторінку пройдено!',
+          wallSettings: 'НАЛАШТУВАННЯ',
+          wallMode: 'Режим:',
+          wallRounds: 'Раунди:',
+          wallSpeed: 'Швидкість:',
+          wallGrav: 'Гравітація:',
+          wallSeed: 'Сід / Розмір:',
+          wallRing: 'Спавн-кільце:',
+          wallColl: 'Колізія:',
+          wallInf: '∞ Нескінченно',
+          wallRndUnit: ' р.',
+          wallRand: 'Рандом',
+          wallWinner: 'Переміг: ',
+          wallHostHint: 'Ти хост — обирай і тисни СТАРТ',
+          wallGuestHint: 'Чекаємо, поки хост запустить гру...',
+          tagArenaTitle: 'Салочки (Арена)',
+          tagNoteMain: 'Салочки! Тікай або лови!',
+          tagNoteSub: 'Хто не «ВОДА» по таймеру — отримує +1 очко',
+          eraserNoteMain: 'Тікай від гумки до дверей!',
+          ringNoteMain: 'Кільцевий спавн — шукай двері',
+          ringNoteSub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути',
+          raceNoteMain: 'Хто перший у двері — +1 очко!',
+          raceNoteSub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути',
+          toastStopTaunt: 'Зупинись на місці для таунту!',
+          toastAutoSprintOn: 'Авто-біг увімкнено',
+          toastAutoSprintOff: 'Авто-біг вимкнено',
+          toastTouchSaved: 'Позиції кнопок збережено!',
+          toastKeysReset: 'Клавіші скинуто!',
+          toastMobReset: 'Мобільні налаштування скинуто!',
+          toastFriendJoined: 'Друг підключився!',
+          toastP2P: 'Прямий P2P активний!',
+          toastRoomCreated: 'Кімната {code} створена! Клікни по коду щоб скопіювати лінк.',
+          toastCopied: 'Лінк скопійовано!',
+          toastOvertake: '{name} виривається вперед!',
+          toastSettingsSaved: 'Налаштування збережено — тисни СТАРТ!',
+          toastRegen: 'Рівень перегенеровано (сід: {seed})',
+          toastLaunchCancel: 'Запуск скасовано!',
+          toastErased: 'Гумка стерла тебе!',
+          toastNowIt: 'Ти тепер ВОДА!',
+          toastTaggedOut: 'Ти передав квача!',
+          toastTagWin: 'Ти переміг у Салочках!',
+          toastTagLose: 'Переміг {name}!',
+          toastNewRecord: 'Новий рекорд: {time}!',
+          toastMatchEnd: 'Матч завершено! Переміг: {name}'
+        },
+        en: {
+          docTitle: 'In the Margins — Sketchbook Platformer',
+          lbTitle: 'Leaderboard',
+          lbPts: 'Pts',
+          wardrobeTip: 'Cosmetics & style',
+          wardrobeBtn: 'Style',
+          taunts: 'Taunts',
+          gameSettings: 'Game Settings',
+          gameSettingsSub: 'language, audio, keybinds & touch controls',
+          clearDrawTip: 'Clear drawings',
+          dragTouchHint: 'Drag touch button pads',
+          saveBtn: '✓ Save',
+          gameTitle: 'In the Margins',
+          gameSub: 'pencil parkour — solo or with a friend',
+          noteLR: 'Left / Right',
+          noteJump: 'Jump (double)',
+          noteRoll: 'Dash / Roll',
+          noteSp: 'Sprint / Crouch',
+          nickLabel: 'Your leaderboard nickname:',
+          roomLabel: 'Page code for a friend:',
+          copyLink: 'Copy link',
+          hostBtn: 'Host (P1)',
+          joinBtn: 'Join (P2)',
+          soloBtn: 'Play Solo',
+          soloLobbyBtn: 'Lobby Room (draw & configure)',
+          lobbyDefaultMsg: 'Pick a mode or share the link with a friend.',
+          lobbyLinkLoaded: 'Room code filled in! Click "Join (P2)" when ready.',
+          settingsShort: 'Settings',
+          copyCodeTip: 'Click to copy invite link',
+          mapSetTitle: 'Map & Room Settings',
+          mapSetSub: 'seed, size, ring spawn & physics',
+          setMode: 'Game mode:',
+          setRounds: 'Rounds:',
+          setSpeed: 'Speed:',
+          setGrav: 'Gravity:',
+          setColl: 'Player collision:',
+          setSeed: 'Level seed:',
+          seedRandom: 'Random',
+          seedRandTip: 'Generate random seed',
+          seedLock: 'Lock',
+          setLen: 'Length (width):',
+          setHeight: 'Round height:',
+          setRing: 'Spawn radius (ring):',
+          newLevelBtn: 'New Level',
+          doneBtn: 'Done',
+          tabAudio: 'Audio / Game',
+          tabKeys: 'PC Keys',
+          tabMobile: 'Mobile',
+          langLabel: 'Language / Мова:',
+          langName: 'English',
+          masterAudio: 'Master audio:',
+          bgMusic: 'Background music:',
+          sfxVol: 'SFX volume:',
+          musicVol: 'Music volume:',
+          ghostLabel: 'Speedrun ghost (best runs):',
+          mapGenBtn: 'Map Generator / Seed',
+          changelogTitle: 'Changelog',
+          changelogSub: 'version history',
+          respawnBtn: '↺ Respawn',
+          rebindHint: 'Click a key to rebind (Esc to cancel).',
+          resetKeysBtn: '↺ Reset default keys',
+          mobAutoSprint: 'Auto-sprint (default):',
+          mobAutoCrouch: 'Auto-crouch near low gaps:',
+          mobScale: 'Button size:',
+          mobOpac: 'Button opacity:',
+          mobBottom: 'Bottom offset:',
+          mobMirror: 'Mirror layout (left-handed):',
+          mobForce: 'Always show touch controls:',
+          mobMoveBtn: 'Reposition pads',
+          resetBtn: '↺ Reset',
+          chatPlaceholder: 'Type in chat...',
+          chatWord: 'Chat',
+          tauntHover: 'Hover to pick',
+          wardrobeTitle: 'Wardrobe',
+          wardrobeSub: 'color, shape, face, accessories & effects',
+          wColors: 'Color (16)',
+          wShapes: 'Shape (6)',
+          wFaces: 'Face (15)',
+          wAccs1: 'Acc. 1',
+          wAccs2: 'Acc. 2',
+          wParticles: 'Particles (8)',
+          saveLookBtn: 'Save Look',
+          onFull: 'On',
+          offFull: 'Off',
+          onShort: 'On',
+          offShort: 'Off',
+          yesWord: 'Yes',
+          noWord: 'No',
+          pressKey: 'Press key...',
+          drawOn: 'Draw: On',
+          drawOff: 'Draw: Off',
+          soloWord: 'Solo',
+          soloLobbyWord: 'Lobby (Solo)',
+          onlineWord: 'Online',
+          searchingWord: 'Searching...',
+          errorWord: 'Error',
+          waitP2: 'Waiting P2...',
+          findP1: 'Finding P1...',
+          codePrefix: 'Code: ',
+          startBtn: '▶ START',
+          cancelBtn: '✕ CANCEL',
+          segShort: ' seg.',
+          roundWord: 'Round #',
+          recordWord: 'Best: ',
+          secSuffix: 's',
+          podiumScrap: 'Winners Podium!',
+          lobbyScrap: 'Lobby Room',
+          tagScrap: 'Tag',
+          youAreIt: "YOU'RE IT!",
+          runAway: 'RUN!',
+          itBadge: 'IT!',
+          finishLabel: 'Finish',
+          ghostLabelCanvas: 'Ghost',
+          eraserLabel: 'ERASER!',
+          botName: 'Bot',
+          inkBotName: 'Ink Bot',
+          youLabel: 'You',
+          defaultNick: 'Player',
+          defaultFriend: 'Friend',
+          drawWord: 'Draw',
+          portalPull: 'PORTAL PULL!',
+          getReady: 'GET READY...',
+          goBanner: 'GO!',
+          pageCleared: 'Page Cleared!',
+          wallSettings: 'SETTINGS',
+          wallMode: 'Mode:',
+          wallRounds: 'Rounds:',
+          wallSpeed: 'Speed:',
+          wallGrav: 'Gravity:',
+          wallSeed: 'Seed / Size:',
+          wallRing: 'Spawn Ring:',
+          wallColl: 'Collision:',
+          wallInf: '∞ Infinite',
+          wallRndUnit: ' r.',
+          wallRand: 'Random',
+          wallWinner: 'Winner: ',
+          wallHostHint: 'You are host — configure & press START',
+          wallGuestHint: 'Waiting for host to start the match...',
+          tagArenaTitle: 'Tag (Arena)',
+          tagNoteMain: 'Tag! Chase or escape!',
+          tagNoteSub: 'Whoever is NOT "IT" when time runs out gets +1 pt',
+          eraserNoteMain: 'Outrun the eraser to the door!',
+          ringNoteMain: 'Ring Spawn — find the exit door',
+          ringNoteSub: 'Switches ink in dashed bridges · Jump pads · Trampolines',
+          raceNoteMain: 'First through the door gets +1 pt!',
+          raceNoteSub: 'Switches ink in dashed bridges · Dash, Slide, Trampolines',
+          toastStopTaunt: 'Stand still to taunt!',
+          toastAutoSprintOn: 'Auto-sprint enabled',
+          toastAutoSprintOff: 'Auto-sprint disabled',
+          toastTouchSaved: 'Touch pad positions saved!',
+          toastKeysReset: 'Keybinds reset!',
+          toastMobReset: 'Mobile controls reset!',
+          toastFriendJoined: 'Friend connected!',
+          toastP2P: 'Direct P2P active!',
+          toastRoomCreated: 'Room {code} created! Click the code to copy link.',
+          toastCopied: 'Link copied!',
+          toastOvertake: '{name} takes the lead!',
+          toastSettingsSaved: 'Settings saved — press START!',
+          toastRegen: 'Level regenerated (seed: {seed})',
+          toastLaunchCancel: 'Launch cancelled!',
+          toastErased: 'The eraser got you!',
+          toastNowIt: "You're IT now!",
+          toastTaggedOut: 'Tagged! Run away!',
+          toastTagWin: 'You won Tag!',
+          toastTagLose: '{name} won!',
+          toastNewRecord: 'New record: {time}!',
+          toastMatchEnd: 'Match over! Winner: {name}'
+        }
+      };
+
+      function tr(key, vars = null) {
+        let s = (I18N[currentLang] && I18N[currentLang][key]) || I18N.uk[key] || key;
+        if (vars) {
+          for (const k of Object.keys(vars)) {
+            s = s.replace('{' + k + '}', vars[k]);
+          }
+        }
+        return s;
+      }
+      function pickLang(obj, key = 'label') {
+        if (!obj) return '';
+        if (currentLang === 'en' && obj[key + 'En']) return obj[key + 'En'];
+        return obj[key] || '';
+      }
+
       const changelogModal = document.getElementById('changelog-modal');
       document.getElementById('version-tag').addEventListener('click', (e) => {
         e.currentTarget.blur();
@@ -2309,21 +2701,25 @@
         };
       }
 
-      const SKETCH_TITLES = [
+      const SKETCH_TITLES_UK = [
         'Чистий аркуш', 'На полях', 'Чорнильна пляма',
         'Остання парта', 'Швидкий ескіз', 'Через клітинку'
       ];
+      const SKETCH_TITLES_EN = [
+        'Fresh Sheet', 'In the Margins', 'Ink Blot',
+        'Back Desk', 'Quick Sketch', 'Across the Grid'
+      ];
 
       const SPEED_MODES = [
-        { id: 'slow', label: 'Повільно', mult: 0.75 },
-        { id: 'normal', label: 'Норма', mult: 1.0 },
-        { id: 'fast', label: 'Швидко', mult: 1.3 },
-        { id: 'hyper', label: 'Гіпер', mult: 1.65 }
+        { id: 'slow', label: 'Повільно', labelEn: 'Slow', mult: 0.75 },
+        { id: 'normal', label: 'Норма', labelEn: 'Normal', mult: 1.0 },
+        { id: 'fast', label: 'Швидко', labelEn: 'Fast', mult: 1.3 },
+        { id: 'hyper', label: 'Гіпер', labelEn: 'Hyper', mult: 1.65 }
       ];
       const GRAV_MODES = [
-        { id: 'moon', label: 'Місяць', mult: 0.68 },
-        { id: 'normal', label: 'Норма', mult: 1.0 },
-        { id: 'heavy', label: 'Важка', mult: 1.35 }
+        { id: 'moon', label: 'Місяць', labelEn: 'Moon', mult: 0.68 },
+        { id: 'normal', label: 'Норма', labelEn: 'Normal', mult: 1.0 },
+        { id: 'heavy', label: 'Важка', labelEn: 'Heavy', mult: 1.35 }
       ];
 
       function hashSeedString(str) {
@@ -2346,16 +2742,16 @@
       }
 
       const GAME_MODES = [
-        { id: 'race',   label: 'Гонка до дверей' },
-        { id: 'eraser', label: 'Тікай від гумки' },
-        { id: 'tag',    label: 'Салочки (Квачик)' }
+        { id: 'race',   label: 'Гонка до дверей', labelEn: 'Door Race' },
+        { id: 'eraser', label: 'Тікай від гумки', labelEn: 'Eraser Chase' },
+        { id: 'tag',    label: 'Салочки (Квачик)', labelEn: 'Tag Arena' }
       ];
 
       const SPAWN_RING_MODES = [
-        { radius: 0,    label: 'Вимк (прямий)' },
-        { radius: 460,  label: 'Малий (460)' },
-        { radius: 740,  label: 'Середній (740)' },
-        { radius: 1050, label: 'Великий (1050)' }
+        { radius: 0,    label: 'Вимк (прямий)', labelEn: 'Off (linear)' },
+        { radius: 460,  label: 'Малий (460)', labelEn: 'Small (460)' },
+        { radius: 740,  label: 'Середній (740)', labelEn: 'Medium (740)' },
+        { radius: 1050, label: 'Великий (1050)', labelEn: 'Large (1050)' }
       ];
 
       const roomSettings = {
@@ -2376,83 +2772,83 @@
       let lastMatchWinner = '';
 
       const COSMETIC_COLORS = [
-        { name: 'Корал',    hex: '#F29A8E' },
-        { name: 'Червоний', hex: '#D94B43' },
-        { name: 'Апельсин', hex: '#F08C4B' },
-        { name: 'Золото',   hex: '#E9C46A' },
-        { name: 'Лимон',    hex: '#F3E37C' },
-        { name: 'Лайм',     hex: '#A7D46F' },
-        { name: 'Смарагд',  hex: '#57B889' },
-        { name: 'Мʼята',    hex: '#72CFC9' },
-        { name: 'Блакить',  hex: '#8FB3E8' },
-        { name: 'Кобальт',  hex: '#4A77D4' },
-        { name: 'Індиго',   hex: '#6D68C4' },
-        { name: 'Фіолет',   hex: '#A879D9' },
-        { name: 'Рожевий',  hex: '#EA8EC2' },
-        { name: 'Какао',    hex: '#B07D5B' },
-        { name: 'Графіт',   hex: '#7A7D85' },
-        { name: 'Кремовий', hex: '#FBF7EE' }
+        { name: 'Корал',    nameEn: 'Coral',    hex: '#F29A8E' },
+        { name: 'Червоний', nameEn: 'Red',      hex: '#D94B43' },
+        { name: 'Апельсин', nameEn: 'Orange',   hex: '#F08C4B' },
+        { name: 'Золото',   nameEn: 'Gold',     hex: '#E9C46A' },
+        { name: 'Лимон',    nameEn: 'Lemon',    hex: '#F3E37C' },
+        { name: 'Лайм',     nameEn: 'Lime',     hex: '#A7D46F' },
+        { name: 'Смарагд',  nameEn: 'Emerald',  hex: '#57B889' },
+        { name: 'Мʼята',    nameEn: 'Mint',     hex: '#72CFC9' },
+        { name: 'Блакить',  nameEn: 'Sky',      hex: '#8FB3E8' },
+        { name: 'Кобальт',  nameEn: 'Cobalt',   hex: '#4A77D4' },
+        { name: 'Індиго',   nameEn: 'Indigo',   hex: '#6D68C4' },
+        { name: 'Фіолет',   nameEn: 'Violet',   hex: '#A879D9' },
+        { name: 'Рожевий',  nameEn: 'Pink',     hex: '#EA8EC2' },
+        { name: 'Какао',    nameEn: 'Cocoa',    hex: '#B07D5B' },
+        { name: 'Графіт',   nameEn: 'Graphite', hex: '#7A7D85' },
+        { name: 'Кремовий', nameEn: 'Cream',    hex: '#FBF7EE' }
       ];
 
       const COSMETIC_SHAPES = [
-        { id: 'rect',    name: 'Прямокутник' },
-        { id: 'cube',    name: 'Куб' },
-        { id: 'circle',  name: 'Круг' },
-        { id: 'tri',     name: 'Трикутник' },
-        { id: 'diamond', name: 'Ромб' },
-        { id: 'pill',    name: 'Капсула' }
+        { id: 'rect',    name: 'Прямокутник', nameEn: 'Rect' },
+        { id: 'cube',    name: 'Куб',         nameEn: 'Cube' },
+        { id: 'circle',  name: 'Круг',        nameEn: 'Circle' },
+        { id: 'tri',     name: 'Трикутник',   nameEn: 'Triangle' },
+        { id: 'diamond', name: 'Ромб',        nameEn: 'Diamond' },
+        { id: 'pill',    name: 'Капсула',     nameEn: 'Capsule' }
       ];
 
       const COSMETIC_FACES = [
-        { id: 'classic', name: 'Класик' },
-        { id: 'happy',   name: 'Радість' },
-        { id: 'cool',    name: 'Крутий' },
-        { id: 'angry',   name: 'Злюка' },
-        { id: 'cat',     name: 'Кіт :3' },
-        { id: 'uwu',     name: 'UwU' },
-        { id: 'derp',    name: 'Дерп' },
-        { id: 'shock',   name: 'Шок' },
-        { id: 'sleepy',  name: 'Сонний' },
-        { id: 'wink',    name: 'Підморг' },
-        { id: 'robot',   name: 'Робот' },
-        { id: 'sus',     name: 'Підозра' },
-        { id: 'starry',  name: 'Зірки' },
-        { id: 'cry',     name: 'Сльози' },
-        { id: 'dizzy',   name: 'Спіраль' }
+        { id: 'classic', name: 'Класик',  nameEn: 'Classic' },
+        { id: 'happy',   name: 'Радість', nameEn: 'Happy' },
+        { id: 'cool',    name: 'Крутий',  nameEn: 'Cool' },
+        { id: 'angry',   name: 'Злюка',   nameEn: 'Angry' },
+        { id: 'cat',     name: 'Кіт :3',  nameEn: 'Cat :3' },
+        { id: 'uwu',     name: 'UwU',     nameEn: 'UwU' },
+        { id: 'derp',    name: 'Дерп',    nameEn: 'Derp' },
+        { id: 'shock',   name: 'Шок',     nameEn: 'Shock' },
+        { id: 'sleepy',  name: 'Сонний',  nameEn: 'Sleepy' },
+        { id: 'wink',    name: 'Підморг', nameEn: 'Wink' },
+        { id: 'robot',   name: 'Робот',   nameEn: 'Robot' },
+        { id: 'sus',     name: 'Підозра', nameEn: 'Sus' },
+        { id: 'starry',  name: 'Зірки',   nameEn: 'Starry' },
+        { id: 'cry',     name: 'Сльози',  nameEn: 'Tears' },
+        { id: 'dizzy',   name: 'Спіраль', nameEn: 'Dizzy' }
       ];
 
       const COSMETIC_ACCS = [
-        { id: 'none',       name: 'Немає' },
-        { id: 'shades',     name: 'Сонячні' },
-        { id: 'glasses',    name: 'Окуляри' },
-        { id: 'cap',        name: 'Кепка' },
-        { id: 'crown',      name: 'Корона' },
-        { id: 'eyepatch',   name: 'Пірат' },
-        { id: 'tophat',     name: 'Циліндр' },
-        { id: 'beanie',     name: 'Біні' },
-        { id: 'halo',       name: 'Німб' },
-        { id: 'horns',      name: 'Ріжки' },
-        { id: 'cat',        name: 'Вушка' },
-        { id: 'headband',   name: 'Ніндзя' },
-        { id: 'wizard',     name: 'Маг' },
-        { id: 'headphones', name: 'Навушники' },
-        { id: 'mustache',   name: 'Вуса' },
-        { id: 'bowtie',     name: 'Метелик' },
-        { id: 'sprout',     name: 'Паросток' },
-        { id: 'viking',     name: 'Вікінг' },
-        { id: 'bandana',    name: 'Бандана' },
-        { id: 'party',      name: 'Ковпак' }
+        { id: 'none',       name: 'Немає',     nameEn: 'None' },
+        { id: 'shades',     name: 'Сонячні',   nameEn: 'Shades' },
+        { id: 'glasses',    name: 'Окуляри',   nameEn: 'Glasses' },
+        { id: 'cap',        name: 'Кепка',     nameEn: 'Cap' },
+        { id: 'crown',      name: 'Корона',    nameEn: 'Crown' },
+        { id: 'eyepatch',   name: 'Пірат',     nameEn: 'Pirate' },
+        { id: 'tophat',     name: 'Циліндр',   nameEn: 'Top Hat' },
+        { id: 'beanie',     name: 'Біні',      nameEn: 'Beanie' },
+        { id: 'halo',       name: 'Німб',      nameEn: 'Halo' },
+        { id: 'horns',      name: 'Ріжки',     nameEn: 'Horns' },
+        { id: 'cat',        name: 'Вушка',     nameEn: 'Cat Ears' },
+        { id: 'headband',   name: 'Ніндзя',    nameEn: 'Ninja' },
+        { id: 'wizard',     name: 'Маг',       nameEn: 'Wizard' },
+        { id: 'headphones', name: 'Навушники', nameEn: 'Headset' },
+        { id: 'mustache',   name: 'Вуса',      nameEn: 'Stache' },
+        { id: 'bowtie',     name: 'Метелик',   nameEn: 'Bowtie' },
+        { id: 'sprout',     name: 'Паросток',  nameEn: 'Sprout' },
+        { id: 'viking',     name: 'Вікінг',    nameEn: 'Viking' },
+        { id: 'bandana',    name: 'Бандана',   nameEn: 'Bandana' },
+        { id: 'party',      name: 'Ковпак',    nameEn: 'Party' }
       ];
 
       const PARTICLE_PACKS = [
-        { id: 'ink',      name: 'Туш (База)',       colors: ['#231F20', '#2952A3', '#D49B27'], shapes: ['rect', 'circle'], gravMult: 1.0,  sway: 0,  accent: '#2952A3' },
-        { id: 'acid',     name: 'Кислотний вибух',  colors: ['#84CC16', '#BEF264', '#22C55E', '#14532D'], shapes: ['circle', 'ring'], gravMult: -0.35, sway: 22, accent: '#65A30D' },
-        { id: 'plasma',   name: 'Неон-Іскри',       colors: ['#06B6D4', '#EC4899', '#A855F7', '#FDE047'], shapes: ['spark', 'tri'], gravMult: 0.25, sway: 0, accent: '#06B6D4' },
-        { id: 'sakura',   name: 'Пелюстки сакури',  colors: ['#F9A8D4', '#F472B6', '#FBCFE8', '#FDF2F8'], shapes: ['petal'], gravMult: 0.16, sway: 65, accent: '#EC4899' },
-        { id: 'fire',     name: 'Вогняний слід',    colors: ['#EF4444', '#F97316', '#FACC15', '#7F1D1D'], shapes: ['circle', 'tri'], gravMult: -0.75, sway: 28, accent: '#EA580C' },
-        { id: 'void',     name: 'Безодня',          colors: ['#581C87', '#7E22CE', '#312E81', '#C084FC'], shapes: ['ring', 'circle'], gravMult: -0.1, sway: 40, accent: '#7E22CE' },
-        { id: 'confetti', name: 'Конфеті-паті',     colors: ['#EF4444', '#3B82F6', '#EAB308', '#10B981', '#EC4899'], shapes: ['rect', 'tri'], gravMult: 0.45, sway: 55, accent: '#EAB308' },
-        { id: 'pixel',    name: '8-Біт Глітч',      colors: ['#18181B', '#22D3EE', '#F43F5E', '#FACC15'], shapes: ['glitch', 'rect'], gravMult: 0.2, sway: 0, accent: '#F43F5E' }
+        { id: 'ink',      name: 'Туш (База)',       nameEn: 'Ink (Base)',   colors: ['#231F20', '#2952A3', '#D49B27'], shapes: ['rect', 'circle'], gravMult: 1.0,  sway: 0,  accent: '#2952A3' },
+        { id: 'acid',     name: 'Кислотний вибух',  nameEn: 'Acid Burst',   colors: ['#84CC16', '#BEF264', '#22C55E', '#14532D'], shapes: ['circle', 'ring'], gravMult: -0.35, sway: 22, accent: '#65A30D' },
+        { id: 'plasma',   name: 'Неон-Іскри',       nameEn: 'Neon Sparks',  colors: ['#06B6D4', '#EC4899', '#A855F7', '#FDE047'], shapes: ['spark', 'tri'], gravMult: 0.25, sway: 0, accent: '#06B6D4' },
+        { id: 'sakura',   name: 'Пелюстки сакури',  nameEn: 'Sakura',       colors: ['#F9A8D4', '#F472B6', '#FBCFE8', '#FDF2F8'], shapes: ['petal'], gravMult: 0.16, sway: 65, accent: '#EC4899' },
+        { id: 'fire',     name: 'Вогняний слід',    nameEn: 'Fire Trail',   colors: ['#EF4444', '#F97316', '#FACC15', '#7F1D1D'], shapes: ['circle', 'tri'], gravMult: -0.75, sway: 28, accent: '#EA580C' },
+        { id: 'void',     name: 'Безодня',          nameEn: 'Void Rings',   colors: ['#581C87', '#7E22CE', '#312E81', '#C084FC'], shapes: ['ring', 'circle'], gravMult: -0.1, sway: 40, accent: '#7E22CE' },
+        { id: 'confetti', name: 'Конфеті-паті',     nameEn: 'Confetti',     colors: ['#EF4444', '#3B82F6', '#EAB308', '#10B981', '#EC4899'], shapes: ['rect', 'tri'], gravMult: 0.45, sway: 55, accent: '#EAB308' },
+        { id: 'pixel',    name: '8-Біт Глітч',      nameEn: '8-Bit Glitch', colors: ['#18181B', '#22D3EE', '#F43F5E', '#FACC15'], shapes: ['glitch', 'rect'], gravMult: 0.2, sway: 0, accent: '#F43F5E' }
       ];
 
       let localCosmetics = { colorIdx: 0, shape: 'rect', face: 'classic', acc: 'none', acc2: 'none', particlePack: 'ink' };
@@ -2473,14 +2869,14 @@
       } catch (_) {}
 
       const TAUNTS = [
-        { id: 'wave', name: 'Махає', callout: 'Хей!', dur: 2.0, svgPath: 'M8 14V7a1.5 1.5 0 0 1 3 0v4M11 11V5a1.5 1.5 0 0 1 3 0v6M14 11V6.5a1.5 1.5 0 0 1 3 0V14c0 3.5-2.5 6-6 6s-5-2-6-5l-1-3a1.5 1.5 0 0 1 2.7-1.2L8 14z' },
-        { id: 'flip', name: 'Сальто', callout: 'Фліп!', dur: 1.1, svgPath: 'M12 4a8 8 0 1 0 7.4 5M19 4v5h-5' },
-        { id: 'dance', name: 'Танець', callout: 'Йоу ♪', dur: 2.6, svgPath: 'M9 18V5l10-2v11M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm10-4a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z' },
-        { id: 'laugh', name: 'Сміх', callout: 'Ха-ха!', dur: 2.0, svgPath: 'M6 9l3 2-3 2M18 9l-3 2 3 2M7 16c2 2.5 8 2.5 10 0' },
-        { id: 'hype', name: 'Хайп', callout: 'Воу!', dur: 2.0, svgPath: 'M13 2L4 14h7l-1 8 10-12h-7z' },
-        { id: 'chill', name: 'Чіл', callout: 'Чіл~', dur: 2.8, svgPath: 'M5 10h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-6zM16 11h2a2 2 0 0 1 0 4h-2M8 6c0-1.5 2-1.5 2-3M12 6c0-1.5 2-1.5 2-3' },
-        { id: 'salute', name: 'Респект', callout: 'Респект!', dur: 1.8, svgPath: 'M12 3l2.2 5.4L20 9l-4.2 3.8 1.2 5.7-5-3-5 3 1.2-5.7L4 9l5.8-.6z' },
-        { id: 'facepalm', name: 'Фейспалм', callout: 'Ой...', dur: 2.0, svgPath: 'M5 5l14 14M19 5L5 19' }
+        { id: 'wave', name: 'Махає', nameEn: 'Wave', callout: 'Хей!', calloutEn: 'Hey!', dur: 2.0, svgPath: 'M8 14V7a1.5 1.5 0 0 1 3 0v4M11 11V5a1.5 1.5 0 0 1 3 0v6M14 11V6.5a1.5 1.5 0 0 1 3 0V14c0 3.5-2.5 6-6 6s-5-2-6-5l-1-3a1.5 1.5 0 0 1 2.7-1.2L8 14z' },
+        { id: 'flip', name: 'Сальто', nameEn: 'Flip', callout: 'Фліп!', calloutEn: 'Flip!', dur: 1.1, svgPath: 'M12 4a8 8 0 1 0 7.4 5M19 4v5h-5' },
+        { id: 'dance', name: 'Танець', nameEn: 'Dance', callout: 'Йоу ♪', calloutEn: 'Groove ♪', dur: 2.6, svgPath: 'M9 18V5l10-2v11M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm10-4a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z' },
+        { id: 'laugh', name: 'Сміх', nameEn: 'Laugh', callout: 'Ха-ха!', calloutEn: 'Ha-ha!', dur: 2.0, svgPath: 'M6 9l3 2-3 2M18 9l-3 2 3 2M7 16c2 2.5 8 2.5 10 0' },
+        { id: 'hype', name: 'Хайп', nameEn: 'Hype', callout: 'Воу!', calloutEn: 'Whoa!', dur: 2.0, svgPath: 'M13 2L4 14h7l-1 8 10-12h-7z' },
+        { id: 'chill', name: 'Чіл', nameEn: 'Chill', callout: 'Чіл~', calloutEn: 'Chill~', dur: 2.8, svgPath: 'M5 10h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-6zM16 11h2a2 2 0 0 1 0 4h-2M8 6c0-1.5 2-1.5 2-3M12 6c0-1.5 2-1.5 2-3' },
+        { id: 'salute', name: 'Респект', nameEn: 'Respect', callout: 'Респект!', calloutEn: 'Respect!', dur: 1.8, svgPath: 'M12 3l2.2 5.4L20 9l-4.2 3.8 1.2 5.7-5-3-5 3 1.2-5.7L4 9l5.8-.6z' },
+        { id: 'facepalm', name: 'Фейспалм', nameEn: 'Facepalm', callout: 'Ой...', calloutEn: 'Oops...', dur: 2.0, svgPath: 'M5 5l14 14M19 5L5 19' }
       ];
 
       // Cinematic Launch & Round-Start Intro State
@@ -2499,7 +2895,7 @@
 
       function generateLobbyLevel() {
         return {
-          id: 'ЛОБІ',
+          id: currentLang === 'en' ? 'LOBBY' : 'ЛОБІ',
           isLobby: true,
           isTagArena: false,
           title: '',
@@ -2571,11 +2967,11 @@
           id: String(roundNum).padStart(2, '0'),
           isLobby: false,
           isTagArena: true,
-          title: 'Раунд #' + roundNum + ' · Салочки (Арена)',
+          title: tr('roundWord') + roundNum + ' · ' + tr('tagArenaTitle'),
           spawn: { x: 180, y: 500 },
           spawn2: { x: 900, y: 500 },
           goal: null,
-          notes: [{ x: 560, y: 148, align: 'center', text: 'Салочки! Тікай або лови!', sub: 'Хто не «ВОДА» по таймеру — отримує +1 очко' }],
+          notes: [{ x: 560, y: 148, align: 'center', text: tr('tagNoteMain'), sub: tr('tagNoteSub') }],
           platforms,
           movers: [],
           hazards: [],
@@ -2631,7 +3027,7 @@
           platforms.push(makePlatform(sx - 95, sy, 220, 44, 'solid'));
 
           if (roundNum === 1) {
-            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? 'Тікай від гумки до дверей!' : 'Кільцевий спавн — шукай двері', sub: 'Кнопки вмикають пунктирні мости · Джамп-пади · Батути' });
+            notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : tr('ringNoteMain'), sub: tr('ringNoteSub') });
           }
 
           const overlapsPlats = (rx, ry, rw, rh, padX = 12, padY = 16) => {
@@ -2740,7 +3136,7 @@
           const maxY = Math.round(480 + vertSpan * 0.28);
           platforms.push(makePlatform(0, 480, 280, 140, 'solid'));
           if (roundNum === 1) {
-            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? 'Тікай від гумки до дверей!' : 'Хто перший у двері — +1 очко!', sub: 'Кнопки вмикають пунктирні мости · Деш, Підкат, Батути' });
+            notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : tr('raceNoteMain'), sub: tr('raceNoteSub') });
           }
 
           let curX = 280;
@@ -2881,11 +3277,12 @@
         for (const p of platforms) maxBot = Math.max(maxBot, p.y + p.h);
         for (const m of movers) maxBot = Math.max(maxBot, m.ay + m.h, m.by + m.h);
 
+        const titleArr = currentLang === 'en' ? SKETCH_TITLES_EN : SKETCH_TITLES_UK;
         return {
           id: String(roundNum).padStart(2, '0'),
           isLobby: false,
           isTagArena: false,
-          title: 'Раунд #' + roundNum + ' · ' + SKETCH_TITLES[seed % SKETCH_TITLES.length],
+          title: tr('roundWord') + roundNum + ' · ' + titleArr[seed % titleArr.length],
           spawn: spawnPos,
           goal: goalRect,
           notes,
@@ -3129,16 +3526,16 @@
         restart: 'KeyR'
       };
       const KEYBIND_LABELS = {
-        left: 'Вліво',
-        right: 'Вправо',
-        up: 'Вгору',
-        down: 'Присісти / Підкат',
-        jump: 'Стрибок',
-        roll: 'Деш / Перекат',
-        sprint: 'Біг (утримання)',
-        taunt: 'Таунти',
-        chat: 'Чат',
-        restart: 'Респавн'
+        left: { uk: 'Вліво', en: 'Move Left' },
+        right: { uk: 'Вправо', en: 'Move Right' },
+        up: { uk: 'Вгору', en: 'Up' },
+        down: { uk: 'Присісти / Підкат', en: 'Crouch / Slide' },
+        jump: { uk: 'Стрибок', en: 'Jump' },
+        roll: { uk: 'Деш / Перекат', en: 'Dash / Roll' },
+        sprint: { uk: 'Біг (утримання)', en: 'Sprint (hold)' },
+        taunt: { uk: 'Таунти', en: 'Taunts' },
+        chat: { uk: 'Чат', en: 'Chat' },
+        restart: { uk: 'Респавн', en: 'Respawn' }
       };
       let keybinds = { ...DEFAULT_KEYBINDS };
       try {
@@ -3188,7 +3585,7 @@
         if (jp) jp.textContent = formatKeyCode(keybinds.jump);
         if (rl) rl.textContent = formatKeyCode(keybinds.roll);
         if (sp) sp.textContent = formatKeyCode(keybinds.sprint) + ' / ' + formatKeyCode(keybinds.down);
-        if (ch) ch.textContent = '[' + formatKeyCode(keybinds.chat) + '] Чат · [' + formatKeyCode(keybinds.taunt) + '] Таунти';
+        if (ch) ch.textContent = '[' + formatKeyCode(keybinds.chat) + '] ' + tr('chatWord') + ' · [' + formatKeyCode(keybinds.taunt) + '] ' + tr('taunts');
       }
 
       function triggerJump() {
@@ -3349,7 +3746,7 @@
           tx.setAttribute('font-weight', '700');
           tx.setAttribute('fill', '#231F20');
           tx.style.pointerEvents = 'none';
-          tx.textContent = TAUNTS[i].name;
+          tx.textContent = pickLang(TAUNTS[i], 'name');
           wheelSvg.appendChild(tx);
         }
       }
@@ -3361,7 +3758,7 @@
           const i = Number(p.getAttribute('data-idx'));
           p.setAttribute('fill', i === idx ? '#F2D388' : '#FBF7EE');
         });
-        wheelLabel.textContent = idx >= 0 ? TAUNTS[idx].name : 'Таунти';
+        wheelLabel.textContent = idx >= 0 ? pickLang(TAUNTS[idx], 'name') : tr('taunts');
       }
 
       function openTauntWheel() {
@@ -3390,7 +3787,7 @@
         if (triggerSelected && wheelHoveredIdx >= 0) {
           const p = localPlayer;
           if (!p.grounded || Math.abs(p.vx) > 35 || p.rollTimer > 0) {
-            showToast('Зупинись на місці для таунту!');
+            showToast(tr('toastStopTaunt'));
             return;
           }
           const t = TAUNTS[wheelHoveredIdx];
@@ -3567,10 +3964,10 @@
         const acb = document.getElementById('mob-autocrouch-btn');
         const mrb = document.getElementById('mob-mirror-btn');
         const frb = document.getElementById('mob-force-btn');
-        if (asb) asb.textContent = mobileCtrl.autoSprint ? 'Увімк' : 'Вимк';
-        if (acb) acb.textContent = mobileCtrl.autoCrouch ? 'Увімк' : 'Вимк';
-        if (mrb) mrb.textContent = mobileCtrl.mirror ? 'Так' : 'Ні';
-        if (frb) frb.textContent = mobileCtrl.forceShow ? 'Так' : 'Ні';
+        if (asb) asb.textContent = mobileCtrl.autoSprint ? tr('onShort') : tr('offShort');
+        if (acb) acb.textContent = mobileCtrl.autoCrouch ? tr('onShort') : tr('offShort');
+        if (mrb) mrb.textContent = mobileCtrl.mirror ? tr('yesWord') : tr('noWord');
+        if (frb) frb.textContent = mobileCtrl.forceShow ? tr('yesWord') : tr('noWord');
         document.getElementById('mob-scale-rng').value = String(Math.round(mobileCtrl.scale * 100));
         document.getElementById('mob-scale-val').textContent = Math.round(mobileCtrl.scale * 100) + '%';
         document.getElementById('mob-opac-rng').value = String(Math.round(mobileCtrl.opacity * 100));
@@ -3592,7 +3989,7 @@
           mobileCtrl.autoSprint = !mobileCtrl.autoSprint;
           saveMobileCtrl();
           applyMobileCtrlUI();
-          showToast(mobileCtrl.autoSprint ? 'Авто-біг увімкнено' : 'Авто-біг вимкнено');
+          showToast(mobileCtrl.autoSprint ? tr('toastAutoSprintOn') : tr('toastAutoSprintOff'));
         }
       }
 
@@ -3761,7 +4158,7 @@
       const drawToggleLabel = document.getElementById('draw-toggle-label');
       btnDrawToggle.addEventListener('click', () => {
         lobbyDrawMode = !lobbyDrawMode;
-        if (drawToggleLabel) drawToggleLabel.textContent = lobbyDrawMode ? 'Малювати: Увімк' : 'Малювати: Вимк';
+        if (drawToggleLabel) drawToggleLabel.textContent = lobbyDrawMode ? tr('drawOn') : tr('drawOff');
         btnDrawToggle.classList.toggle('ink-blue', lobbyDrawMode);
         canvas.style.cursor = lobbyDrawMode ? 'crosshair' : '';
       });
@@ -3817,7 +4214,7 @@
         touchWrap.classList.remove('repositioning');
         touchEditBar.classList.remove('visible');
         saveMobileCtrl();
-        showToast('Позиції кнопок збережено!');
+        showToast(tr('toastTouchSaved'));
       });
 
       // Game Settings Modal (Gear icon)
@@ -3830,10 +4227,11 @@
           const row = document.createElement('div');
           row.className = 'keybind-row';
           const lbl = document.createElement('span');
-          lbl.textContent = KEYBIND_LABELS[action];
+          const kbObj = KEYBIND_LABELS[action];
+          lbl.textContent = kbObj ? (kbObj[currentLang] || kbObj.uk) : action;
           const btn = document.createElement('button');
           btn.className = 'sketch-btn keybind-btn' + (rebindingAction === action ? ' listening' : '');
-          btn.textContent = rebindingAction === action ? 'Натисни...' : formatKeyCode(keybinds[action]);
+          btn.textContent = rebindingAction === action ? tr('pressKey') : formatKeyCode(keybinds[action]);
           btn.addEventListener('click', () => {
             rebindingAction = (rebindingAction === action) ? null : action;
             renderKeybindsList();
@@ -3854,9 +4252,9 @@
         const btnMute = document.getElementById('btn-mute');
         const btnMus = document.getElementById('btn-music-toggle');
         const btnGh = document.getElementById('btn-ghost-toggle');
-        if (btnMute) btnMute.textContent = muted ? 'Вимкнено' : 'Увімкнено';
-        if (btnMus) btnMus.textContent = musicEnabled ? 'Увімкнено' : 'Вимкнено';
-        if (btnGh) btnGh.textContent = ghostEnabled ? 'Увімкнено' : 'Вимкнено';
+        if (btnMute) btnMute.textContent = muted ? tr('offFull') : tr('onFull');
+        if (btnMus) btnMus.textContent = musicEnabled ? tr('onFull') : tr('offFull');
+        if (btnGh) btnGh.textContent = ghostEnabled ? tr('onFull') : tr('offFull');
         document.getElementById('rng-sfx-vol').value = String(Math.round(sfxVolume * 100));
         document.getElementById('val-sfx-vol').textContent = Math.round(sfxVolume * 100) + '%';
         document.getElementById('rng-music-vol').value = String(Math.round(musicVolume * 100));
@@ -3933,7 +4331,7 @@
         try { localStorage.setItem('sketch_keybinds', JSON.stringify(keybinds)); } catch (_) {}
         syncKeybindLabelsUI();
         renderKeybindsList();
-        showToast('Клавіші скинуто!');
+        showToast(tr('toastKeysReset'));
       });
 
       document.getElementById('mob-autosprint-btn').addEventListener('click', () => {
@@ -3984,7 +4382,7 @@
         mobileCtrl = { ...DEFAULT_MOBILE_CTRL, leftOffset: { x: 0, y: 0 }, rightOffset: { x: 0, y: 0 } };
         saveMobileCtrl();
         applyMobileCtrlUI();
-        showToast('Мобільні налаштування скинуто!');
+        showToast(tr('toastMobReset'));
       });
 
       syncKeybindLabelsUI();
@@ -4490,7 +4888,7 @@
         soloLobbyActive = false;
         gamePhase = 'playing';
         syncHostPanelUI();
-        updateNetUI('Соло', '');
+        updateNetUI(tr('soloWord'), '');
         if (currentLevel && currentLevel.isLobby) loadRound(resolveNextSeed(), 1, false);
         lobbyModal.classList.add('hidden');
       });
@@ -4499,7 +4897,7 @@
         cleanupNet();
         netMode = 'solo';
         soloLobbyActive = true;
-        updateNetUI('Лобі (Соло)', '');
+        updateNetUI(tr('soloLobbyWord'), '');
         enterLobbyRoom(false);
         lobbyModal.classList.add('hidden');
       });
@@ -4515,7 +4913,7 @@
         const code = sanitizeCode(roomInput.value);
         const url = window.location.href.split('?')[0] + '?room=' + encodeURIComponent(code);
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(() => showToast('Лінк скопійовано!')).catch(() => fallbackCopy(url));
+          navigator.clipboard.writeText(url).then(() => showToast(tr('toastCopied'))).catch(() => fallbackCopy(url));
         } else {
           fallbackCopy(url);
         }
@@ -4526,7 +4924,7 @@
         ta.value = text;
         document.body.appendChild(ta);
         ta.select();
-        try { document.execCommand('copy'); showToast('Лінк скопійовано!'); } catch (_) {}
+        try { document.execCommand('copy'); showToast(tr('toastCopied')); } catch (_) {}
         document.body.removeChild(ta);
       }
 
@@ -4591,9 +4989,13 @@
         const localRow = document.getElementById('lb-row-local');
         const remoteRow = document.getElementById('lb-row-remote');
         const showRemote = netConnected || (typeof tagState !== 'undefined' && tagState.active);
+        const dispLocalNick = (localNick === 'Гравець' && currentLang === 'en') ? tr('defaultNick') : localNick;
+        const dispRemoteNick = netConnected
+          ? ((remoteNick === 'Друг' && currentLang === 'en') ? tr('defaultFriend') : remoteNick)
+          : tr('botName');
 
-        document.getElementById('lb-name-local').textContent = localNick;
-        document.getElementById('lb-name-remote').textContent = netConnected ? remoteNick : 'Бот';
+        document.getElementById('lb-name-local').textContent = dispLocalNick;
+        document.getElementById('lb-name-remote').textContent = dispRemoteNick;
         document.getElementById('lb-score-local').textContent = localScore;
         document.getElementById('lb-score-remote').textContent = remoteScore;
 
@@ -4627,7 +5029,7 @@
           overtaker.classList.remove('overtake');
           void overtaker.offsetWidth;
           overtaker.classList.add('overtake');
-          showToast((newLeader === 'local' ? localNick : (netConnected ? remoteNick : 'Бот')) + ' виривається вперед!');
+          showToast(tr('toastOvertake', { name: newLeader === 'local' ? dispLocalNick : dispRemoteNick }));
         }
         if (newLeader !== 'tie') prevLeader = newLeader;
 
@@ -4672,7 +5074,7 @@
         const s = Math.max(0, sec);
         const mins = Math.floor(s / 60);
         const rem = (s % 60).toFixed(1).padStart(4, '0');
-        return (mins > 0 ? String(mins).padStart(2, '0') + ':' : '') + rem + 'с';
+        return (mins > 0 ? String(mins).padStart(2, '0') + ':' : '') + rem + tr('secSuffix');
       }
 
       function getLevelGhostKey() {
@@ -4751,16 +5153,16 @@
 
       function updateLevelScrap() {
         if (currentLevel && currentLevel.isLobby) {
-          document.getElementById('level-scrap').textContent = podiumActive ? 'Пʼєдестал переможців!' : 'Лобі кімнати';
+          document.getElementById('level-scrap').textContent = podiumActive ? tr('podiumScrap') : tr('lobbyScrap');
           return;
         }
         if (tagState.active) {
-          const whoTxt = tagState.itWho === 'local' ? 'ТИ ВОДА!' : 'ТІКАЙ!';
-          document.getElementById('level-scrap').textContent = 'Салочки · ' + Math.ceil(Math.max(0, tagState.timeLeft)) + 'с · ' + whoTxt;
+          const whoTxt = tagState.itWho === 'local' ? tr('youAreIt') : tr('runAway');
+          document.getElementById('level-scrap').textContent = tr('tagScrap') + ' · ' + Math.ceil(Math.max(0, tagState.timeLeft)) + tr('secSuffix') + ' · ' + whoTxt;
           return;
         }
-        const bestStr = (activeGhostData && activeGhostData.bestTime) ? (' · Рекорд: ' + formatTimer(activeGhostData.bestTime)) : '';
-        document.getElementById('level-scrap').textContent = 'Раунд #' + roundNumber + ' · ' + formatTimer(roundElapsed) + bestStr;
+        const bestStr = (activeGhostData && activeGhostData.bestTime) ? (' · ' + tr('recordWord') + formatTimer(activeGhostData.bestTime)) : '';
+        document.getElementById('level-scrap').textContent = tr('roundWord') + roundNumber + ' · ' + formatTimer(roundElapsed) + bestStr;
       }
 
       function loadRound(seed, rNum, broadcast = false) {
@@ -4769,10 +5171,10 @@
         if (soloLobbyActive || (netMode === 'solo' && gamePhase === 'lobby')) {
           gamePhase = 'playing';
           soloLobbyActive = false;
-          updateNetUI('Соло', '');
+          updateNetUI(tr('soloWord'), '');
         }
         lobbyDrawMode = false;
-        if (drawToggleLabel) drawToggleLabel.textContent = 'Малювати: Вимк';
+        if (drawToggleLabel) drawToggleLabel.textContent = tr('drawOff');
         btnDrawToggle.classList.remove('ink-blue');
         canvas.style.cursor = '';
         currentSeed = seed;
@@ -4842,31 +5244,36 @@
         const startBtn = document.getElementById('hp-start-btn');
         const topRow = document.getElementById('hp-top-row');
         if (gamePhase === 'launching') {
-          startBtn.textContent = '✕ ВІДМІНИТИ';
+          startBtn.textContent = tr('cancelBtn');
           startBtn.classList.add('cancelling');
           topRow.style.display = 'none';
         } else {
-          startBtn.textContent = '▶ СТАРТ';
+          startBtn.textContent = tr('startBtn');
           startBtn.classList.remove('cancelling');
           topRow.style.display = '';
         }
         const modeObj = GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0];
         const modeBtn = document.getElementById('hp-mode-btn');
-        if (modeBtn) modeBtn.textContent = modeObj.label;
+        if (modeBtn) modeBtn.textContent = pickLang(modeObj, 'label');
         document.getElementById('hp-rounds-val').textContent = roomSettings.infinite ? '∞' : String(roomSettings.rounds);
         document.getElementById('hp-rounds-inf').checked = !!roomSettings.infinite;
-        document.getElementById('hp-speed-btn').textContent = SPEED_MODES[roomSettings.speedIdx].label;
-        document.getElementById('hp-grav-btn').textContent = GRAV_MODES[roomSettings.gravIdx].label;
-        document.getElementById('hp-coll-btn').textContent = roomSettings.playerCollision ? 'Увімк' : 'Вимк';
+        document.getElementById('hp-speed-btn').textContent = pickLang(SPEED_MODES[roomSettings.speedIdx], 'label');
+        document.getElementById('hp-grav-btn').textContent = pickLang(GRAV_MODES[roomSettings.gravIdx], 'label');
+        document.getElementById('hp-coll-btn').textContent = roomSettings.playerCollision ? tr('onShort') : tr('offShort');
         const seedIn = document.getElementById('hp-seed-input');
         if (seedIn && document.activeElement !== seedIn) seedIn.value = roomSettings.seedInput || '';
         document.getElementById('hp-seed-lock').checked = !!roomSettings.lockSeed;
         document.getElementById('hp-len-range').value = String(roomSettings.levelLength);
-        document.getElementById('hp-len-val').textContent = roomSettings.levelLength + ' сегм.';
+        document.getElementById('hp-len-val').textContent = roomSettings.levelLength + tr('segShort');
         document.getElementById('hp-height-range').value = String(roomSettings.levelHeight);
         document.getElementById('hp-height-val').textContent = roomSettings.levelHeight + ' px';
         const ringMode = SPAWN_RING_MODES[roomSettings.spawnRingIdx] || SPAWN_RING_MODES[0];
-        document.getElementById('hp-ring-btn').textContent = ringMode.label;
+        document.getElementById('hp-ring-btn').textContent = pickLang(ringMode, 'label');
+        const codePill = document.getElementById('hp-code-copy');
+        if (codePill) {
+          const curCode = (roomInput && roomInput.value) ? roomInput.value : '------';
+          codePill.textContent = tr('codePrefix') + (netMode === 'host' ? curCode : 'SOLO');
+        }
       }
 
       function broadcastLobbySettings() {
@@ -5019,13 +5426,13 @@
       });
       document.getElementById('hp-regen-btn').addEventListener('click', () => {
         if (netMode !== 'solo' && gamePhase === 'lobby') {
-          showToast('Налаштування збережено — тисни СТАРТ!');
+          showToast(tr('toastSettingsSaved'));
           return;
         }
         settingsModal.classList.remove('open');
         const s = resolveNextSeed();
         loadRound(s, roundNumber, netConnected && netMode === 'host');
-        showToast('Рівень перегенеровано (сід: ' + s + ')');
+        showToast(tr('toastRegen', { seed: s }));
       });
       const settingsModal = document.getElementById('settings-modal');
       document.getElementById('hp-open-settings').addEventListener('click', () => {
@@ -5840,7 +6247,7 @@
             }
           }
           if (rectsOverlap(p, eraserState)) {
-            showToast('Гумка стерла тебе!');
+            showToast(tr('toastErased'));
             resetPlayerToSpawn(true);
             return;
           }
@@ -5863,7 +6270,7 @@
               screenShake = 8;
               spawnShockwave(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 54);
               spawnPackParticles('ink', p.x + p.w / 2, p.y + p.h / 2, 16, 220, '#C83E31');
-              showToast(tagState.itWho === 'local' ? 'Ти тепер ВОДА!' : 'Ти передав квача!');
+              showToast(tagState.itWho === 'local' ? tr('toastNowIt') : tr('toastTaggedOut'));
               if (netConnected) sendGameMsg({ type: 'tag_sync', itWho: tagState.itWho, timeLeft: tagState.timeLeft });
             }
           }
@@ -5874,9 +6281,9 @@
             if (localWon) localScore++; else remoteScore++;
             playSound('win');
             updateLeaderboardUI(localWon ? 'local' : 'remote');
-            showToast(localWon ? 'Ти переміг у Салочках!' : ('Переміг ' + (netConnected ? remoteNick : 'Чорнильний Бот') + '!'));
+            showToast(localWon ? tr('toastTagWin') : tr('toastTagLose', { name: netConnected ? remoteNick : tr('inkBotName') }));
             if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
-              lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
+              lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : tr('drawWord'));
               enterLobbyRoom(true, true);
             } else {
               loadRound(resolveNextSeed(), roundNumber + 1, netConnected && netMode === 'host');
@@ -5892,13 +6299,13 @@
           spawnPackParticles(localCosmetics.particlePack, lvl.goal.x + lvl.goal.w / 2, lvl.goal.y + 20, 24, 260);
           if (!activeGhostData || roundElapsed < activeGhostData.bestTime) {
             saveBestGhostForLevel(roundElapsed, ghostRecording);
-            showToast('Новий рекорд: ' + formatTimer(roundElapsed) + '!');
+            showToast(tr('toastNewRecord', { time: formatTimer(roundElapsed) }));
           }
           updateLeaderboardUI('local');
 
           if (!roomSettings.infinite && roundNumber >= roomSettings.rounds) {
-            lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : 'Нічия');
-            showToast('Матч завершено! Переміг: ' + lastMatchWinner);
+            lastMatchWinner = localScore > remoteScore ? localNick : (remoteScore > localScore ? remoteNick : tr('drawWord'));
+            showToast(tr('toastMatchEnd', { name: lastMatchWinner }));
             enterLobbyRoom(true, true);
           } else {
             const nextSeed = resolveNextSeed();
@@ -6395,13 +6802,19 @@
         let lFoot = facing * 3.5, rFoot = facing * 3.5;
 
         if (ls.running) {
+          const dir = ls.moveDir || facing || 1;
           const ph = ls.phase || 0;
           const s1 = Math.sin(ph);
+          const c1 = Math.cos(ph);
           const s2 = Math.sin(ph + Math.PI);
-          lx = -2 + s1 * 6.5;
-          rx = 2 + s2 * 6.5;
-          ly = -Math.max(0, -Math.cos(ph)) * 4.5;
-          ry = -Math.max(0, -Math.cos(ph + Math.PI)) * 4.5;
+          const c2 = Math.cos(ph + Math.PI);
+          // Swing forward while lifted (cos > 0), push backward while planted (cos <= 0)
+          lx = -1.5 + dir * s1 * 6.5;
+          rx = 1.5 + dir * s2 * 6.5;
+          ly = -Math.max(0, c1) * 4.8;
+          ry = -Math.max(0, c2) * 4.8;
+          lFoot = dir * 3.5;
+          rFoot = dir * 3.5;
         } else if (ls.grounded === false) {
           if (ls.wallDir) {
             lx = ls.wallDir * 5; rx = ls.wallDir * 5;
@@ -6593,6 +7006,7 @@
           show: p.rollTimer <= 0 && !p.sliding && p.h > 25,
           running: isMovingOnGround,
           grounded: p.grounded,
+          moveDir: Math.sign(p.vx || 0) || p.facing,
           phase: worldTime * (p.sprinting ? 18 : 13.5),
           vy: p.vy || 0,
           wallDir: p.wallDir || 0
@@ -6622,7 +7036,7 @@
           const tObj = TAUNTS.find((x) => x.id === p.tauntId);
           if (tObj) {
             const bob = Math.sin(worldTime * 8) * 3.5;
-            const txt = tObj.callout || tObj.name;
+            const txt = pickLang(tObj, 'callout') || pickLang(tObj, 'name');
             ctx.save();
             ctx.font = '700 19px "Caveat", cursive';
             const tw = Math.max(42, ctx.measureText(txt).width + 16);
@@ -6779,7 +7193,7 @@
 
         // 2. Handwritten Page Number & Margin Sketch Notes (anchored near start so Ring Spawn keeps them visible)
         const hx = (lvl.isLobby || lvl.isTagArena) ? 44 : Math.round((lvl.spawn ? lvl.spawn.x : 80) - 52);
-        const hy = (lvl.isLobby || lvl.isTagArena) ? 215 : Math.round((lvl.spawn ? lvl.spawn.y : 420) - 110);
+        const hy = (lvl.isLobby || lvl.isTagArena) ? 215 : Math.round((lvl.spawn ? lvl.spawn.y : 420) - 160);
         ctx.save();
         ctx.textAlign = 'left';
         ctx.fillStyle = 'rgba(35, 31, 32, 0.09)';
@@ -7154,7 +7568,7 @@
           ctx.fillStyle = '#231F20';
           ctx.textAlign = 'center';
           ctx.font = '700 25px "Caveat", cursive';
-          ctx.fillText('НАЛАШТУВАННЯ', bcx, 126);
+          ctx.fillText(tr('wallSettings'), bcx, 126);
           ctx.strokeStyle = 'rgba(35,31,32,0.35)';
           ctx.lineWidth = 1.5;
           ctx.beginPath(); ctx.moveTo(bx + 20, 136); ctx.lineTo(bx + bw - 20, 136); ctx.stroke();
@@ -7162,33 +7576,33 @@
           ctx.textAlign = 'left';
           ctx.font = '700 18px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
-          ctx.fillText('Режим:', bx + 20, 160);
-          ctx.fillText('Раунди:', bx + 20, 186);
-          ctx.fillText('Швидкість:', bx + 20, 212);
-          ctx.fillText('Гравітація:', bx + 20, 238);
-          ctx.fillText('Сід / Розмір:', bx + 20, 264);
-          ctx.fillText('Спавн-кільце:', bx + 20, 290);
-          ctx.fillText('Колізія:', bx + 20, 316);
+          ctx.fillText(tr('wallMode'), bx + 20, 160);
+          ctx.fillText(tr('wallRounds'), bx + 20, 186);
+          ctx.fillText(tr('wallSpeed'), bx + 20, 212);
+          ctx.fillText(tr('wallGrav'), bx + 20, 238);
+          ctx.fillText(tr('wallSeed'), bx + 20, 264);
+          ctx.fillText(tr('wallRing'), bx + 20, 290);
+          ctx.fillText(tr('wallColl'), bx + 20, 316);
 
           ctx.textAlign = 'right';
           ctx.fillStyle = '#C83E31';
-          ctx.fillText((GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0]).label, bx + bw - 20, 160);
-          ctx.fillText(roomSettings.infinite ? '∞ Нескінченно' : (roomSettings.rounds + ' р.'), bx + bw - 20, 186);
+          ctx.fillText(pickLang(GAME_MODES[roomSettings.gameModeIdx] || GAME_MODES[0], 'label'), bx + bw - 20, 160);
+          ctx.fillText(roomSettings.infinite ? tr('wallInf') : (roomSettings.rounds + tr('wallRndUnit')), bx + bw - 20, 186);
           ctx.fillStyle = '#2952A3';
-          ctx.fillText(SPEED_MODES[roomSettings.speedIdx].label + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', bx + bw - 20, 212);
-          ctx.fillText(GRAV_MODES[roomSettings.gravIdx].label + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', bx + bw - 20, 238);
-          const seedTxt = roomSettings.lockSeed && roomSettings.seedInput ? roomSettings.seedInput : 'Рандом';
+          ctx.fillText(pickLang(SPEED_MODES[roomSettings.speedIdx], 'label') + ' (' + SPEED_MODES[roomSettings.speedIdx].mult + 'x)', bx + bw - 20, 212);
+          ctx.fillText(pickLang(GRAV_MODES[roomSettings.gravIdx], 'label') + ' (' + GRAV_MODES[roomSettings.gravIdx].mult + 'x)', bx + bw - 20, 238);
+          const seedTxt = roomSettings.lockSeed && roomSettings.seedInput ? roomSettings.seedInput : tr('wallRand');
           ctx.fillText(seedTxt + ' · ' + roomSettings.levelLength + '×' + roomSettings.levelHeight, bx + bw - 20, 264);
-          ctx.fillText((SPAWN_RING_MODES[roomSettings.spawnRingIdx] || SPAWN_RING_MODES[0]).label, bx + bw - 20, 290);
+          ctx.fillText(pickLang(SPAWN_RING_MODES[roomSettings.spawnRingIdx] || SPAWN_RING_MODES[0], 'label'), bx + bw - 20, 290);
           ctx.fillStyle = roomSettings.playerCollision ? '#2D7A46' : '#6A635A';
-          ctx.fillText(roomSettings.playerCollision ? 'Увімкнено' : 'Вимкнено', bx + bw - 20, 316);
+          ctx.fillText(roomSettings.playerCollision ? tr('onFull') : tr('offFull'), bx + bw - 20, 316);
 
           ctx.textAlign = 'center';
           ctx.font = '700 17px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
           const statusLine = lastMatchWinner
-            ? ('Переміг: ' + lastMatchWinner)
-            : (netMode === 'host' ? 'Ти хост — обирай і тисни СТАРТ' : 'Чекаємо, поки хост запустить гру...');
+            ? (tr('wallWinner') + lastMatchWinner)
+            : ((netMode === 'host' || soloLobbyActive) ? tr('wallHostHint') : tr('wallGuestHint'));
           ctx.fillText(statusLine, bcx, 352);
           ctx.restore();
 
@@ -7249,7 +7663,7 @@
           ctx.fillStyle = '#231F20';
           ctx.font = '700 20px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('Фініш', g.x + g.w / 2, g.y - 8 + labelBob);
+          ctx.fillText(tr('finishLabel'), g.x + g.w / 2, g.y - 8 + labelBob);
           for (let si = 0; si < 3; si++) {
             const ang = worldTime * 2.1 + si * 2.1;
             const sx2 = g.x + g.w / 2 + Math.cos(ang) * (g.w * 0.65);
@@ -7283,7 +7697,7 @@
           ctx.fillStyle = '#6A635A';
           ctx.font = '700 14px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('Привид', 0, -gh - 6);
+          ctx.fillText(tr('ghostLabelCanvas'), 0, -gh - 6);
           ctx.restore();
         }
 
@@ -7293,10 +7707,10 @@
           drawSketchPlayer(remotePlayer, '#8FB3E8', remoteNick, false);
         } else if (tagState.active && tagState.bot) {
           drawGroundShadow(tagState.bot, solids);
-          drawSketchPlayer(tagState.bot, '#8FB3E8', 'Бот', false);
+          drawSketchPlayer(tagState.bot, '#8FB3E8', tr('botName'), false);
         }
         drawGroundShadow(localPlayer, solids);
-        drawSketchPlayer(localPlayer, '#F29A8E', 'Ти', true);
+        drawSketchPlayer(localPlayer, '#F29A8E', tr('youLabel'), true);
 
         // Tag "ВОДА!" Red Ink Aura & Hand-Inked Badge
         if (tagState.active) {
@@ -7325,7 +7739,7 @@
             ctx.fillStyle = '#FBF7EE';
             ctx.font = '700 16px "Caveat", cursive';
             ctx.textAlign = 'center';
-            ctx.fillText('ВОДА!', 0, 4);
+            ctx.fillText(tr('itBadge'), 0, 4);
             ctx.restore();
           }
         }
@@ -7354,7 +7768,7 @@
           ctx.fillStyle = '#231F20';
           ctx.font = '700 22px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('ГУМКА!', blockX + blockW / 2, blockY + blockH / 2);
+          ctx.fillText(tr('eraserLabel'), blockX + blockW / 2, blockY + blockH / 2);
           ctx.restore();
         }
 
@@ -7474,7 +7888,7 @@
           ctx.fillText(String(sec), 0, 0);
           ctx.font = '700 24px "Caveat", cursive';
           ctx.fillStyle = '#6A635A';
-          ctx.fillText(sec <= 2 ? 'ЗАТЯГУЄ В ПОРТАЛ!' : 'ПРИГОТУЙТЕСЬ...', 0, 32);
+          ctx.fillText(sec <= 2 ? tr('portalPull') : tr('getReady'), 0, 32);
           ctx.restore();
         }
 
@@ -7515,7 +7929,7 @@
           ctx.fillStyle = '#C83E31';
           ctx.font = '700 88px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('ПОЇХАЛИ!', 0, 10);
+          ctx.fillText(tr('goBanner'), 0, 10);
           ctx.restore();
         }
 
@@ -7564,7 +7978,7 @@
           ctx.fillStyle = '#231F20';
           ctx.font = '700 30px "Caveat", cursive';
           ctx.textAlign = 'center';
-          ctx.fillText('Сторінку пройдено!', 0, 9);
+          ctx.fillText(tr('pageCleared'), 0, 9);
           ctx.restore();
         }
       }
@@ -7862,7 +8276,7 @@
         const cObj = COSMETIC_COLORS[localCosmetics.colorIdx];
         const sObj = COSMETIC_SHAPES.find((x) => x.id === localCosmetics.shape) || COSMETIC_SHAPES[0];
         const fObj = COSMETIC_FACES.find((x) => x.id === localCosmetics.face) || COSMETIC_FACES[0];
-        wardrobeSummary.textContent = cObj.name + ' · ' + sObj.name + ' · ' + fObj.name;
+        wardrobeSummary.textContent = pickLang(cObj, 'name') + ' · ' + pickLang(sObj, 'name') + ' · ' + pickLang(fObj, 'name');
         if (netConnected) sendGameMsg({ type: 'cosmetics', c: localCosmetics });
         renderWardrobePreview();
       }
@@ -7929,7 +8343,7 @@
             const btn = document.createElement('button');
             btn.className = 'swatch-btn' + (localCosmetics.colorIdx === idx ? ' selected' : '');
             btn.style.background = col.hex;
-            btn.title = col.name;
+            btn.title = pickLang(col, 'name');
             btn.addEventListener('click', () => {
               localCosmetics.colorIdx = idx;
               playSound('click');
@@ -7950,7 +8364,7 @@
               c.restore();
             });
             const lbl = document.createElement('span');
-            lbl.textContent = sh.name;
+            lbl.textContent = pickLang(sh, 'name');
             btn.appendChild(cv);
             btn.appendChild(lbl);
             btn.addEventListener('click', () => {
@@ -7973,7 +8387,7 @@
               c.restore();
             });
             const lbl = document.createElement('span');
-            lbl.textContent = fc.name;
+            lbl.textContent = pickLang(fc, 'name');
             btn.appendChild(cv);
             btn.appendChild(lbl);
             btn.addEventListener('click', () => {
@@ -8015,7 +8429,7 @@
               c.restore();
             });
             const lbl = document.createElement('span');
-            lbl.textContent = ac.name;
+            lbl.textContent = pickLang(ac, 'name');
             btn.appendChild(cv);
             btn.appendChild(lbl);
             btn.addEventListener('click', () => {
@@ -8054,7 +8468,7 @@
               }
             });
             const lbl = document.createElement('span');
-            lbl.textContent = pk.name;
+            lbl.textContent = pickLang(pk, 'name');
             btn.appendChild(cv);
             btn.appendChild(lbl);
             btn.addEventListener('click', () => {
@@ -8086,10 +8500,89 @@
       document.getElementById('btn-close-wardrobe').addEventListener('click', () => wardrobeModal.classList.remove('open'));
       document.getElementById('btn-done-wardrobe').addEventListener('click', () => wardrobeModal.classList.remove('open'));
 
+      function applyLanguageUI() {
+        document.documentElement.lang = currentLang;
+        document.title = tr('docTitle');
+
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          el.textContent = tr(el.getAttribute('data-i18n'));
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+          el.placeholder = tr(el.getAttribute('data-i18n-placeholder'));
+        });
+        document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+          el.title = tr(el.getAttribute('data-i18n-title'));
+        });
+
+        const btnLangLobby = document.getElementById('btn-lang-lobby');
+        if (btnLangLobby) btnLangLobby.textContent = currentLang === 'en' ? 'EN / UA' : 'UA / EN';
+        const btnLangToggle = document.getElementById('btn-lang-toggle');
+        if (btnLangToggle) btnLangToggle.textContent = tr('langName');
+
+        const clUk = document.getElementById('changelog-body-uk');
+        const clEn = document.getElementById('changelog-body-en');
+        if (clUk && clEn) {
+          clUk.style.display = currentLang === 'uk' ? 'flex' : 'none';
+          clEn.style.display = currentLang === 'en' ? 'flex' : 'none';
+        }
+
+        if (drawToggleLabel) drawToggleLabel.textContent = lobbyDrawMode ? tr('drawOn') : tr('drawOff');
+        if (netMode === 'solo') {
+          updateNetUI(soloLobbyActive ? tr('soloLobbyWord') : tr('soloWord'), '');
+        }
+        if (nickInput && (nickInput.value === 'Гравець' || nickInput.value === 'Player')) {
+          nickInput.value = tr('defaultNick');
+        }
+
+        // Update current level title & note language live if already loaded
+        if (currentLevel) {
+          if (currentLevel.isLobby) {
+            currentLevel.id = currentLang === 'en' ? 'LOBBY' : 'ЛОБІ';
+          } else if (currentLevel.isTagArena) {
+            currentLevel.title = tr('roundWord') + roundNumber + ' · ' + tr('tagArenaTitle');
+            if (currentLevel.notes && currentLevel.notes[0]) {
+              currentLevel.notes[0].text = tr('tagNoteMain');
+              currentLevel.notes[0].sub = tr('tagNoteSub');
+            }
+          } else {
+            const titleArr = currentLang === 'en' ? SKETCH_TITLES_EN : SKETCH_TITLES_UK;
+            currentLevel.title = tr('roundWord') + roundNumber + ' · ' + titleArr[currentSeed % titleArr.length];
+            if (currentLevel.notes && currentLevel.notes[0]) {
+              const modeObj = GAME_MODES[roomSettings.gameModeIdx || 0] || GAME_MODES[0];
+              const isRing = !!currentLevel.ringMeta;
+              currentLevel.notes[0].text = modeObj.id === 'eraser' ? tr('eraserNoteMain') : (isRing ? tr('ringNoteMain') : tr('raceNoteMain'));
+              currentLevel.notes[0].sub = isRing ? tr('ringNoteSub') : tr('raceNoteSub');
+            }
+          }
+        }
+
+        syncKeybindLabelsUI();
+        renderKeybindsList();
+        syncAudioUI();
+        applyMobileCtrlUI();
+        syncHostPanelUI();
+        updateLeaderboardUI(null);
+        updateLevelScrap();
+        buildTauntWheelSvg();
+        saveAndSyncCosmetics();
+        renderWardrobeGrid();
+      }
+
+      function toggleLanguage() {
+        currentLang = currentLang === 'uk' ? 'en' : 'uk';
+        try { localStorage.setItem('sketch_lang', currentLang); } catch (_) {}
+        applyLanguageUI();
+      }
+
+      const btnLangLobbyEl = document.getElementById('btn-lang-lobby');
+      if (btnLangLobbyEl) btnLangLobbyEl.addEventListener('click', toggleLanguage);
+      const btnLangToggleEl = document.getElementById('btn-lang-toggle');
+      if (btnLangToggleEl) btnLangToggleEl.addEventListener('click', toggleLanguage);
+
       window.onload = () => {
         resizeCanvas();
         loadRound(currentSeed, 1, false);
-        updateLeaderboardUI(null);
+        applyLanguageUI();
         updateLeaderboardIcons();
         requestAnimationFrame(loop);
       };
