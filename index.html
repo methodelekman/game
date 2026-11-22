@@ -2,7 +2,11 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#F4EDE0" />
   <title>На полях — скетчбук-платформер</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -252,6 +256,16 @@
       flex-shrink: 0;
     }
 
+    @keyframes sketchBoil {
+      0%, 100% { border-radius: 7px 4px 9px 5px; }
+      50% { border-radius: 5px 8px 6px 9px; }
+    }
+
+    @keyframes sketchWobble {
+      0%, 100% { transform: rotate(-0.7deg) translateY(0px); }
+      50% { transform: rotate(0.65deg) translateY(-0.5px); }
+    }
+
     .sketch-btn {
       appearance: none;
       position: relative;
@@ -259,22 +273,23 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      background: var(--sheet);
+      background: linear-gradient(180deg, #FFFDF7 0%, #F5ECDC 100%);
       color: var(--ink);
       border: 2px solid var(--ink);
-      border-radius: 6px 3px 8px 4px;
+      border-radius: 7px 4px 9px 5px;
       padding: 4px 12px;
       font-family: inherit;
       font-size: 19px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.25);
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.28), inset 0 -2px 0 rgba(106, 99, 90, 0.14);
+      animation: sketchBoil 0.62s steps(2, end) infinite;
       transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
     }
 
     .sketch-btn:hover {
       transform: translateY(-2px) rotate(-1.5deg);
-      box-shadow: 3px 5px 0 rgba(35, 31, 32, 0.3);
+      box-shadow: 3px 5px 0 rgba(35, 31, 32, 0.34), inset 0 -2px 0 rgba(106, 99, 90, 0.18);
     }
 
     .sketch-btn:hover::after {
@@ -1020,7 +1035,7 @@
       cursor: pointer;
     }
 
-    /* Clickable Pencil Version & Changelog Tag */
+    /* Clickable Pencil Version & Changelog Tag (ONLY shown in Main Menu / Lobby!) */
     #version-tag {
       position: fixed;
       bottom: 10px;
@@ -1029,26 +1044,55 @@
       font-size: 16px;
       font-weight: 700;
       color: var(--ink);
-      background: rgba(251, 247, 238, 0.92);
+      background: rgba(251, 247, 238, 0.94);
       border: 1.8px solid var(--ink);
       border-radius: 5px 8px 4px 7px;
       padding: 2px 10px;
       pointer-events: auto;
       cursor: pointer;
-      z-index: 24;
+      z-index: 35;
       transform: rotate(-1.5deg);
-      box-shadow: 2px 2px 0 rgba(35, 31, 32, 0.2);
+      box-shadow: 2px 2px 0 rgba(35, 31, 32, 0.22);
+      display: none;
+      animation: sketchBoil 0.65s steps(2, end) infinite;
     }
 
-    body.is-touch #version-tag {
-      top: 52px;
-      right: 8px;
+    body.in-main-menu #version-tag {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    /* Hide PC-only UI elements on touch devices */
+    body.is-touch .pc-only-el,
+    body.is-touch #chat-hint {
+      display: none !important;
+    }
+
+    /* Mobile Collapsible HUD Mode */
+    body.hud-collapsed #corner-tabs .hud-collapsible,
+    body.hud-collapsed #leaderboard,
+    body.hud-collapsed #level-scrap {
+      display: none !important;
+    }
+
+    /* Hide chat box over movement pad on mobile unless explicitly toggled open */
+    body.is-touch #chat-box {
+      top: 46px;
       bottom: auto;
-      left: auto;
-      font-size: 12px;
-      padding: 1px 7px;
-      transform: none;
-      z-index: 22;
+      left: 8px;
+      width: min(230px, 56vw);
+      pointer-events: none;
+    }
+    body.is-touch.solo-mode #chat-box {
+      display: none !important;
+    }
+    body.is-touch #chat-box.open {
+      pointer-events: auto;
+      background: rgba(251, 247, 238, 0.94);
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      padding: 6px;
+      box-shadow: 2px 3px 0 rgba(35, 31, 32, 0.22);
     }
 
     /* Paper Note Toast */
@@ -1130,13 +1174,13 @@
     }
 
     .t-btn {
-      width: 56px;
-      height: 56px;
-      border: 2.2px solid var(--ink);
-      border-radius: 14px 9px 15px 10px;
-      background: rgba(251, 247, 238, 0.9);
+      width: 64px;
+      height: 64px;
+      border: 2.4px solid var(--ink);
+      border-radius: 15px 10px 16px 11px;
+      background: linear-gradient(180deg, rgba(255, 253, 247, 0.94) 0%, rgba(244, 234, 216, 0.9) 100%);
       color: var(--ink);
-      box-shadow: 2px 3px 0 var(--ink);
+      box-shadow: 2px 3.5px 0 var(--ink), inset 0 -3px 0 rgba(106, 99, 90, 0.16);
       font-family: inherit;
       font-weight: 700;
       display: flex;
@@ -1146,54 +1190,43 @@
       user-select: none;
       padding: 0;
       cursor: pointer;
+      animation: sketchBoil 0.58s steps(2, end) infinite;
+      transition: transform 0.08s ease, background-color 0.08s ease;
     }
 
     .t-btn svg {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       pointer-events: none;
       stroke: currentColor;
       fill: none;
-      stroke-width: 2.6;
+      stroke-width: 2.7;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
     .t-btn.t-jump {
-      width: 66px;
-      height: 66px;
-      border-radius: 50% 46% 52% 48%;
+      width: 72px;
+      height: 72px;
+      border-radius: 50% 45% 53% 47%;
+      background: linear-gradient(180deg, #FFF7F4 0%, #F9DFD9 100%);
+      color: #8F2218;
+      border-color: var(--ink);
     }
-    .t-btn.t-jump svg { width: 30px; height: 30px; }
+    .t-btn.t-jump svg { width: 32px; height: 32px; }
 
     .t-btn.t-roll {
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
-    }
-
-    .t-btn.t-crouch {
-      width: 48px;
-      height: 44px;
-      border-radius: 10px;
-    }
-    .t-btn.t-crouch svg { width: 22px; height: 22px; }
-
-    .t-btn.t-sprint {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-    }
-    .t-btn.t-sprint svg { width: 20px; height: 20px; }
-    .t-btn.t-sprint.toggle-on {
-      background: #E9C46A;
-      color: var(--ink);
+      width: 60px;
+      height: 60px;
+      border-radius: 17px 12px 18px 13px;
+      background: linear-gradient(180deg, #F4F8FF 0%, #DDE8FA 100%);
+      color: #1A3978;
     }
 
     .t-btn:active, .t-btn.active {
-      background: var(--red);
-      color: var(--sheet);
-      transform: translate(2px, 2px);
+      background: var(--red) !important;
+      color: var(--sheet) !important;
+      transform: translate(2px, 2px) scale(0.95);
       box-shadow: 0 0 0 var(--ink);
     }
 
@@ -1267,48 +1300,70 @@
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px), (max-height: 540px) {
       #level-scrap {
-        top: 8px;
-        left: 8px;
-        font-size: 15px;
-        padding: 2px 9px;
+        top: max(6px, env(safe-area-inset-top));
+        left: max(8px, env(safe-area-inset-left));
+        font-size: 13px;
+        padding: 2px 8px;
+        transform: none;
       }
       #leaderboard {
-        top: 40px;
-        left: 8px;
-        width: 154px;
-        padding: 4px 7px 6px;
+        top: calc(max(6px, env(safe-area-inset-top)) + 28px);
+        left: max(8px, env(safe-area-inset-left));
+        width: 128px;
+        padding: 3px 6px 4px;
+        transform: none;
       }
-      .lb-head { font-size: 12px; margin-bottom: 3px; }
-      .lb-rows { height: 58px; }
-      #leaderboard.solo-compact .lb-rows { height: 28px; }
-      .lb-row { height: 26px; padding: 1px 4px; }
-      .lb-name { font-size: 15px; max-width: 68px; }
-      .lb-score { font-size: 16px; }
-      .lb-icon { width: 18px; height: 18px; }
+      body.is-touch.solo-mode #leaderboard {
+        display: none !important;
+      }
+      .lb-head { font-size: 11px; margin-bottom: 2px; }
+      .lb-rows { height: 48px; }
+      #leaderboard.solo-compact .lb-rows { height: 24px; }
+      .lb-row { height: 22px; padding: 1px 3px; }
+      .lb-name { font-size: 13px; max-width: 58px; }
+      .lb-score { font-size: 14px; }
+      .lb-icon { width: 15px; height: 15px; }
 
       #corner-tabs {
-        top: 8px;
-        right: 8px;
-        gap: 5px;
+        top: max(6px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        gap: 4px;
       }
       #corner-tabs .sketch-btn {
-        font-size: 14px;
-        padding: 3px 7px;
+        font-size: 13px;
+        padding: 4px 7px;
       }
+      #corner-tabs .btn-label-mob-hide {
+        display: none;
+      }
+
+      .notebook-page {
+        max-height: 92vh;
+        overflow-y: auto;
+        padding: 14px 16px !important;
+      }
+      .nb-title { font-size: 26px !important; }
+      .nb-sub { font-size: 14px !important; }
 
       #chat-box {
-        bottom: 78px;
+        top: 42px;
+        bottom: auto;
         left: 8px;
-        width: 210px;
+        width: 195px;
       }
-      .chat-bubble { font-size: 14px; padding: 2px 7px; }
-      #chat-hint { font-size: 12px; }
+      .chat-bubble { font-size: 13px; padding: 2px 6px; }
+      #chat-hint { display: none !important; }
 
       #host-panel {
-        bottom: 78px;
-        gap: 6px;
+        bottom: 84px;
+        gap: 5px;
+      }
+      #touch-controls {
+        left: max(12px, env(safe-area-inset-left));
+        right: max(12px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
       }
       .big-host-btn {
         width: 176px !important;
@@ -1384,13 +1439,15 @@
       </div>
 
       <div id="corner-tabs">
-        <button class="sketch-btn" id="btn-wardrobe" data-i18n-title="wardrobeTip" title="Косметика та образ"><svg class="ico" viewBox="0 0 24 24"><path d="M18.3 2.7a2.1 2.1 0 0 1 3 3L11.5 15.5l-4 1 1-4L18.3 2.7z"/><path d="M7.5 16.5c-1.8 0-3 1.2-3 2.7 0 1.1-.8 1.8-1.5 2.1 1.7.7 4.2.5 5.4-.8.9-.9.8-2.4-.9-4z"/></svg><span data-i18n="wardrobeBtn">Образ</span></button>
-        <button class="sketch-btn mobile-only-btn" id="btn-taunt" data-i18n-title="taunts" title="Таунти"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l2.4 5.2L20 9l-4 3.9 1 5.6L12 15.8 7 18.5l1-5.6L4 9l5.6-.8L12 3z"/></svg></button>
-        <button class="sketch-btn" id="btn-game-settings" data-i18n-title="gameSettings" title="Налаштування гри"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
-        <button class="sketch-btn net-pill" id="btn-lobby">
-          <span class="status-dot" id="net-dot"></span>
-          <span id="net-label">Соло</span>
+        <button class="sketch-btn hud-collapsible" id="btn-wardrobe" data-i18n-title="wardrobeTip" title="Косметика та образ"><svg class="ico" viewBox="0 0 24 24"><path d="M18.3 2.7a2.1 2.1 0 0 1 3 3L11.5 15.5l-4 1 1-4L18.3 2.7z"/><path d="M7.5 16.5c-1.8 0-3 1.2-3 2.7 0 1.1-.8 1.8-1.5 2.1 1.7.7 4.2.5 5.4-.8.9-.9.8-2.4-.9-4z"/></svg><span class="btn-label-mob-hide" data-i18n="wardrobeBtn">Образ</span></button>
+        <button class="sketch-btn hud-collapsible" id="btn-game-settings" data-i18n-title="gameSettings" title="Налаштування гри"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+        <button class="sketch-btn hud-collapsible" id="btn-fullscreen" data-i18n-title="fullscreenTip" title="На весь екран"><svg class="ico" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+        <button class="sketch-btn net-pill hud-collapsible" id="btn-lobby" data-i18n-title="menuTip" title="Меню / Онлайн">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-6h5v6"/></svg>
+          <span class="status-dot" id="net-dot" style="display:none;"></span>
+          <span id="net-label" style="display:none;"></span>
         </button>
+        <button class="sketch-btn mobile-only-btn" id="btn-hud-collapse" data-i18n-title="hideHudTip" title="Сховати / показати меню"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
 
       <div id="lobby-draw-bar">
@@ -1415,9 +1472,6 @@
               <button class="t-btn" data-key="left" aria-label="Вліво">
                 <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
               </button>
-              <button class="t-btn t-crouch" data-key="down" aria-label="Присісти / Підкат">
-                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-              </button>
               <button class="t-btn" data-key="right" aria-label="Вправо">
                 <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
               </button>
@@ -1426,14 +1480,9 @@
         </div>
         <div class="touch-pad" id="touch-right-pad">
           <div class="touch-right-arc">
-            <div class="touch-sub-col">
-              <button class="t-btn t-sprint toggle-on" data-key="sprintToggle" id="touch-sprint-btn" aria-label="Авто-біг">
-                <svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 10-12h-7z"/></svg>
-              </button>
-              <button class="t-btn t-roll" data-key="roll" aria-label="Деш / Перекат">
-                <svg viewBox="0 0 24 24"><path d="M5 17l5-5-5-5M13 17l5-5-5-5"/></svg>
-              </button>
-            </div>
+            <button class="t-btn t-roll" data-key="roll" aria-label="Деш / Підкат">
+              <svg viewBox="0 0 24 24"><path d="M5 17l5-5-5-5M13 17l5-5-5-5"/></svg>
+            </button>
             <button class="t-btn t-jump" data-key="jump" aria-label="Стрибок">
               <svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
             </button>
@@ -1452,6 +1501,7 @@
               <div class="nb-sub" data-i18n="gameSub">паркур олівцем — соло або з другом</div>
             </div>
             <div style="display:flex; gap:6px; align-items:center;">
+              <button class="sketch-btn" id="btn-fs-lobby" style="font-size:15px; padding:3px 8px;" data-i18n-title="fullscreenTip" title="На весь екран"><svg class="ico" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
               <button class="sketch-btn" id="btn-lang-lobby" style="font-size:16px; padding:3px 9px;" title="Switch Language / Змінити мову">UA / EN</button>
               <button class="sketch-btn" id="btn-close-lobby">✕</button>
             </div>
@@ -1582,7 +1632,7 @@
           </div>
           <div class="gs-tabs">
             <button class="sketch-btn gs-tab active" data-gstab="audio"><svg class="ico" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span data-i18n="tabAudio">Звук / Гра</span></button>
-            <button class="sketch-btn gs-tab" data-gstab="keys"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg><span data-i18n="tabKeys">Клавіші ПК</span></button>
+            <button class="sketch-btn gs-tab pc-only-el" data-gstab="keys"><svg class="ico" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg><span data-i18n="tabKeys">Клавіші ПК</span></button>
             <button class="sketch-btn gs-tab" data-gstab="mobile"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></svg><span data-i18n="tabMobile">Мобільне</span></button>
           </div>
 
@@ -1718,8 +1768,8 @@
                 <button class="sketch-btn w-tab active" data-wtab="colors" data-i18n="wColors">Колір (16)</button>
                 <button class="sketch-btn w-tab" data-wtab="shapes" data-i18n="wShapes">Форма (6)</button>
                 <button class="sketch-btn w-tab" data-wtab="faces" data-i18n="wFaces">Лице (15)</button>
-                <button class="sketch-btn w-tab" data-wtab="accs" data-i18n="wAccs1">Косм. 1</button>
-                <button class="sketch-btn w-tab" data-wtab="accs2" data-i18n="wAccs2">Косм. 2</button>
+                <button class="sketch-btn w-tab" data-wtab="accs" data-i18n="wAccs1">На голову</button>
+                <button class="sketch-btn w-tab" data-wtab="accs2" data-i18n="wAccs2">На лице / шию</button>
                 <button class="sketch-btn w-tab" data-wtab="particles" data-i18n="wParticles">Партікли (8)</button>
               </div>
               <div class="w-grid colors" id="wardrobe-grid"></div>
@@ -1741,6 +1791,16 @@
             <button class="sketch-btn" id="btn-close-changelog">✕</button>
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
+            <div>
+              <b>v0.22.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Чітке High-DPI зображення й повноекранний режим:</b> прибрано розмиття на телефонах і моніторах (чіткий рендер до 2.5× DPR + універсальна перспектива для всіх екранів) і додано кнопку <b>На весь екран</b> (⛶).</li>
+                <li><b>Зручний мобільний HUD і керування 2 пальцями:</b> прибрано кнопку «вниз» між стрілками, автобіг і «зірочку» — тепер на телефоні чисті Вліво/Вправо + Стрибок і розумний Деш/Підкат (тап = деш, утримання на землі = підкат), чат більше не налазить на стрілки, PC-підказки й «Клавіші ПК» сховані, а верхнє меню згортається в одну кнопку. Changelog тепер показується лише в головному меню, а всі кнопки «живі» з мальованим boil-ефектом!</li>
+                <li><b>Безшовні блоки + деталізовані платформи:</b> дотичні блоки одного типу зливаються в один суцільний силует без зайвих внутрішніх ліній; деревʼяні підвісні платформи реально хитаються й нахиляються під вагою; ритм-блоки та мости кнопок отримали текстури й живі індикатори; сліди гальмування тепер рухаються разом із рухомими платформами.</li>
+                <li><b>Розвал на уламки (Super Meat Boy / GD):</b> при загибелі персонаж розлітається на чорнильні осколки свого кольору й паку партіклів, що залишають плями на блоках; плавне повернення після наземного дешу; виправлено брови у лиця «Котик» при бігу/деші.</li>
+                <li><b>Косметика без накладань:</b> розділено на «На голову» та «На лице / шию» (додано Шарф, Монокль, Пластир), а бандану перемальовано на справжню повʼязку на голову!</li>
+              </ul>
+            </div>
             <div>
               <b>v0.21.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
@@ -1846,6 +1906,16 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.22.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Razor-Sharp High-DPI &amp; Fullscreen Mode:</b> eliminated blurry mobile scaling (up to 2.5× DPR + aspect-aware framing) and added a native Fullscreen toggle (⛶).</li>
+                <li><b>Ergonomic 2-Thumb Mobile UX &amp; Collapsible HUD:</b> removed awkward Down/Sprint/Star buttons &amp; Solo pill — clean Left/Right + Jump &amp; smart Dash/Slide button, non-overlapping mobile chat, hidden PC hints/keys on touch, collapsible top HUD, main-menu-only Changelog, and living hand-drawn button boil animation!</li>
+                <li><b>Seamless Merged Blocks &amp; Richer Platforms:</b> touching same-type blocks fuse without internal seam lines; wooden hanging platforms physically tilt and rock; beat blocks &amp; switch bridges gained hand-inked textures; scuffs now move with moving platforms.</li>
+                <li><b>Super Meat Boy / GD Shatter Death &amp; Polish:</b> dying shatters your character into colored ink shards &amp; splats; smooth ground-dash rotation recovery; fixed Cat face eyebrows during sprint/dash.</li>
+                <li><b>Non-Overlapping Cosmetics:</b> split into <i>Headwear</i> and <i>Face &amp; Neck</i> (added Scarf, Monocle, Bandage) and redrew Bandana as a real forehead headband!</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.21.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>+9 New Handcrafted Chunks (22 Total!):</b> mixed short rhythm breakers, medium puzzle sections, and epic long multi-mechanic set-pieces — <i>Ice Hurdles</i>, <i>Crumble Sprint</i>, <i>Reverse Conveyor &amp; Jump Barrier</i>, <i>Portal Drop Pit</i>, <i>Wind Slalom</i>, <i>Trampoline Bounce Cascade</i>, <i>Vertical Beat Climb</i>, <i>Weight-to-Switch Vault</i>, and the high-speed <i>Parkour Combo Run (Catapult → Slingshot Ring → Conveyor Slide)</i>!</li>
@@ -1931,7 +2001,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.21.0 · Changelog</button>
+      <button id="version-tag">v0.22.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2026,8 +2096,11 @@
           wColors: 'Колір (16)',
           wShapes: 'Форма (6)',
           wFaces: 'Лице (15)',
-          wAccs1: 'Косм. 1',
-          wAccs2: 'Косм. 2',
+          wAccs1: 'На голову',
+          wAccs2: 'Лице / шия',
+          fullscreenTip: 'На весь екран',
+          menuTip: 'Меню / Онлайн',
+          hideHudTip: 'Сховати / показати меню',
           wParticles: 'Партікли (8)',
           saveLookBtn: 'Зберегти образ',
           onFull: 'Увімкнено',
@@ -2203,8 +2276,11 @@
           wColors: 'Color (16)',
           wShapes: 'Shape (6)',
           wFaces: 'Face (15)',
-          wAccs1: 'Acc. 1',
-          wAccs2: 'Acc. 2',
+          wAccs1: 'Headwear',
+          wAccs2: 'Face & Neck',
+          fullscreenTip: 'Fullscreen',
+          menuTip: 'Menu / Online',
+          hideHudTip: 'Toggle HUD',
           wParticles: 'Particles (8)',
           saveLookBtn: 'Save Look',
           onFull: 'On',
@@ -3232,28 +3308,35 @@
         { id: 'dizzy',   name: 'Спіраль', nameEn: 'Dizzy' }
       ];
 
-      const COSMETIC_ACCS = [
+      const COSMETIC_HATS = [
         { id: 'none',       name: 'Немає',     nameEn: 'None' },
-        { id: 'shades',     name: 'Сонячні',   nameEn: 'Shades' },
-        { id: 'glasses',    name: 'Окуляри',   nameEn: 'Glasses' },
         { id: 'cap',        name: 'Кепка',     nameEn: 'Cap' },
         { id: 'crown',      name: 'Корона',    nameEn: 'Crown' },
-        { id: 'eyepatch',   name: 'Пірат',     nameEn: 'Pirate' },
         { id: 'tophat',     name: 'Циліндр',   nameEn: 'Top Hat' },
         { id: 'beanie',     name: 'Біні',      nameEn: 'Beanie' },
+        { id: 'bandana',    name: 'Бандана',   nameEn: 'Bandana' },
+        { id: 'headband',   name: 'Ніндзя',    nameEn: 'Ninja' },
         { id: 'halo',       name: 'Німб',      nameEn: 'Halo' },
         { id: 'horns',      name: 'Ріжки',     nameEn: 'Horns' },
         { id: 'cat',        name: 'Вушка',     nameEn: 'Cat Ears' },
-        { id: 'headband',   name: 'Ніндзя',    nameEn: 'Ninja' },
         { id: 'wizard',     name: 'Маг',       nameEn: 'Wizard' },
-        { id: 'headphones', name: 'Навушники', nameEn: 'Headset' },
-        { id: 'mustache',   name: 'Вуса',      nameEn: 'Stache' },
-        { id: 'bowtie',     name: 'Метелик',   nameEn: 'Bowtie' },
-        { id: 'sprout',     name: 'Паросток',  nameEn: 'Sprout' },
         { id: 'viking',     name: 'Вікінг',    nameEn: 'Viking' },
-        { id: 'bandana',    name: 'Бандана',   nameEn: 'Bandana' },
+        { id: 'headphones', name: 'Навушники', nameEn: 'Headset' },
+        { id: 'sprout',     name: 'Паросток',  nameEn: 'Sprout' },
         { id: 'party',      name: 'Ковпак',    nameEn: 'Party' }
       ];
+      const COSMETIC_FACE = [
+        { id: 'none',       name: 'Немає',     nameEn: 'None' },
+        { id: 'shades',     name: 'Сонячні',   nameEn: 'Shades' },
+        { id: 'glasses',    name: 'Окуляри',   nameEn: 'Glasses' },
+        { id: 'monocle',    name: 'Монокль',   nameEn: 'Monocle' },
+        { id: 'eyepatch',   name: 'Пірат',     nameEn: 'Pirate' },
+        { id: 'mustache',   name: 'Вуса',      nameEn: 'Stache' },
+        { id: 'blush',      name: 'Пластир',   nameEn: 'Bandage' },
+        { id: 'bowtie',     name: 'Метелик',   nameEn: 'Bowtie' },
+        { id: 'scarf',      name: 'Шарф',      nameEn: 'Scarf' }
+      ];
+      const COSMETIC_ACCS = COSMETIC_HATS.concat(COSMETIC_FACE.filter((x) => x.id !== 'none'));
 
       const PARTICLE_PACKS = [
         { id: 'ink',      name: 'Туш (База)',       nameEn: 'Ink (Base)',   colors: ['#231F20', '#2952A3', '#D49B27'], shapes: ['rect', 'circle'], gravMult: 1.0,  sway: 0,  accent: '#2952A3' },
@@ -3272,12 +3355,16 @@
       try {
         const savedCos = JSON.parse(localStorage.getItem('sketch_cosmetics') || 'null');
         if (savedCos && typeof savedCos.colorIdx === 'number') {
+          const rawAcc1 = savedCos.acc || 'none';
+          const rawAcc2 = savedCos.acc2 || 'none';
+          let hatId = COSMETIC_HATS.some((x) => x.id === rawAcc1) ? rawAcc1 : (COSMETIC_HATS.some((x) => x.id === rawAcc2) ? rawAcc2 : 'none');
+          let faceAccId = COSMETIC_FACE.some((x) => x.id === rawAcc2) ? rawAcc2 : (COSMETIC_FACE.some((x) => x.id === rawAcc1) ? rawAcc1 : 'none');
           localCosmetics = {
             colorIdx: Math.max(0, Math.min(COSMETIC_COLORS.length - 1, savedCos.colorIdx)),
             shape: COSMETIC_SHAPES.some((x) => x.id === savedCos.shape) ? savedCos.shape : 'rect',
             face: COSMETIC_FACES.some((x) => x.id === savedCos.face) ? savedCos.face : 'classic',
-            acc: COSMETIC_ACCS.some((x) => x.id === savedCos.acc) ? savedCos.acc : 'none',
-            acc2: COSMETIC_ACCS.some((x) => x.id === savedCos.acc2) ? savedCos.acc2 : 'none',
+            acc: hatId,
+            acc2: faceAccId,
             particlePack: PARTICLE_PACKS.some((x) => x.id === savedCos.particlePack) ? savedCos.particlePack : 'ink'
           };
         }
@@ -3360,6 +3447,10 @@
           maxDrop: (extra && extra.maxDrop) || 88,
           dy: 0,
           ridden: false,
+          tilt: 0,
+          tiltVel: 0,
+          swayPhase: ((x * 0.037 + y * 0.019) % 6.28),
+          seam: null,
           bState: 'intact',
           bTimer: 0,
           respawnDur: type === 'fragile' ? 2.5 : 3.2,
@@ -4283,6 +4374,7 @@
           sliding: false,
           dashJumpWindow: 0,
           highSpeedTimer: 0,
+          deadTimer: 0,
           wallCoyoteTimer: 0,
           wallCoyoteDir: 0,
           wallCoyoteSurface: 'solid',
@@ -4308,10 +4400,52 @@
       const particles = [];
       const shockwaves = [];
       const scuffs = [];
+      const deathShards = [];
+      const deathSplats = [];
 
-      function spawnScuff(x, y, w = 16, color = 'rgba(35, 31, 32, 0.3)') {
-        scuffs.push({ x, y, w, life: 5.0, maxLife: 5.0, color });
+      function spawnScuff(x, y, w = 16, color = 'rgba(35, 31, 32, 0.3)', moverIdx = -1, platRef = null) {
+        let ox = 0, oy = 0;
+        if (moverIdx >= 0 && activeMovers[moverIdx]) {
+          ox = x - activeMovers[moverIdx].x;
+          oy = y - activeMovers[moverIdx].y;
+        } else if (platRef) {
+          ox = x - platRef.x;
+          oy = y - platRef.y;
+        }
+        scuffs.push({ x, y, w, life: 5.0, maxLife: 5.0, color, moverIdx, platRef, ox, oy });
         if (scuffs.length > 42) scuffs.shift();
+      }
+
+      function spawnDeathShatter(p, cos = localCosmetics) {
+        const bodyCol = (COSMETIC_COLORS[cos.colorIdx] && COSMETIC_COLORS[cos.colorIdx].hex) || '#F29A8E';
+        const pack = getParticlePack(cos.particlePack);
+        const cx = p.x + p.w * 0.5;
+        const cy = p.y + p.h * 0.5;
+        const count = window.innerWidth < 820 ? 14 : 20;
+        for (let i = 0; i < count; i++) {
+          if (deathShards.length >= 60) deathShards.shift();
+          const ang = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
+          const spd = 160 + Math.random() * 340;
+          const usePack = i % 3 === 0;
+          const col = usePack ? pack.colors[i % pack.colors.length] : bodyCol;
+          deathShards.push({
+            x: cx + (Math.random() - 0.5) * p.w * 0.65,
+            y: cy + (Math.random() - 0.5) * p.h * 0.65,
+            vx: Math.cos(ang) * spd + (p.vx || 0) * 0.25,
+            vy: Math.sin(ang) * spd - 150,
+            size: 4 + Math.random() * 7.5,
+            rot: Math.random() * Math.PI * 2,
+            vrot: (Math.random() - 0.5) * 18,
+            color: col,
+            shape: i % 2 === 0 ? 'tri' : 'rect',
+            life: 0.72 + Math.random() * 0.45,
+            maxLife: 1.15,
+            splatted: false
+          });
+        }
+        spawnShockwave(cx, cy, bodyCol, 52);
+        spawnShockwave(cx, cy, pack.accent, 34);
+        spawnPackParticles(cos.particlePack, cx, cy, 14, 280);
       }
 
       // Track PC cursor for dynamic eye/accessory tracking
@@ -4678,11 +4812,47 @@
         updateWheelAngleFromPoint(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
       wheelOverlay.addEventListener('click', () => closeTauntWheel(true));
-      document.getElementById('btn-taunt').addEventListener('click', (e) => {
-        e.currentTarget.blur();
-        if (wheelOpen) closeTauntWheel(false);
-        else openTauntWheel();
-      });
+
+      function toggleFullscreen() {
+        const doc = document;
+        const el = doc.documentElement;
+        const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+        try {
+          if (!isFs) {
+            const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+            if (req) {
+              const pr = req.call(el);
+              if (pr && pr.then) {
+                pr.then(() => {
+                  if (isTouchDevice && screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                  }
+                  setTimeout(resizeCanvas, 90);
+                }).catch(() => {});
+              }
+            }
+          } else {
+            const ex = doc.exitFullscreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+            if (ex) ex.call(doc);
+            setTimeout(resizeCanvas, 90);
+          }
+        } catch (_) {}
+      }
+      const btnFs = document.getElementById('btn-fullscreen');
+      if (btnFs) btnFs.addEventListener('click', (e) => { e.currentTarget.blur(); playSound('click'); toggleFullscreen(); });
+      const btnFsLobby = document.getElementById('btn-fs-lobby');
+      if (btnFsLobby) btnFsLobby.addEventListener('click', (e) => { e.currentTarget.blur(); playSound('click'); toggleFullscreen(); });
+      document.addEventListener('fullscreenchange', () => setTimeout(resizeCanvas, 80));
+      window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 140));
+
+      const btnHudCollapse = document.getElementById('btn-hud-collapse');
+      if (btnHudCollapse) {
+        btnHudCollapse.addEventListener('click', (e) => {
+          e.currentTarget.blur();
+          playSound('click');
+          document.body.classList.toggle('hud-collapsed');
+        });
+      }
 
       window.addEventListener('keydown', (e) => {
         if (rebindingAction) {
@@ -4768,7 +4938,6 @@
       const touchWrap = document.getElementById('touch-controls');
       const touchLeftPad = document.getElementById('touch-left-pad');
       const touchRightPad = document.getElementById('touch-right-pad');
-      const touchSprintBtn = document.getElementById('touch-sprint-btn');
       const touchEditBar = document.getElementById('touch-edit-bar');
       const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       let touchRepositionMode = false;
@@ -4810,7 +4979,6 @@
         touchWrap.style.opacity = String(mobileCtrl.opacity);
         touchLeftPad.style.transform = `translate(${mobileCtrl.leftOffset.x}px, ${mobileCtrl.leftOffset.y}px) scale(${mobileCtrl.scale})`;
         touchRightPad.style.transform = `translate(${mobileCtrl.rightOffset.x}px, ${mobileCtrl.rightOffset.y}px) scale(${mobileCtrl.scale})`;
-        touchSprintBtn.classList.toggle('toggle-on', !!mobileCtrl.autoSprint);
 
         // Update Settings tab controls
         const asb = document.getElementById('mob-autosprint-btn');
@@ -4830,6 +4998,7 @@
       }
 
       const activeTouchKeys = new Map();
+      let mobileRollHoldTimer = null;
       function setTouchActionKey(k, pressed) {
         if (k === 'left') keys.left = pressed;
         else if (k === 'right') keys.right = pressed;
@@ -4837,12 +5006,15 @@
         else if (k === 'jump') {
           if (pressed) triggerJump();
           else if (localPlayer.vy < -180 && localPlayer.rollTimer <= 0) localPlayer.vy *= 0.55;
-        } else if (k === 'roll' && pressed) triggerRoll();
-        else if (k === 'sprintToggle' && pressed) {
-          mobileCtrl.autoSprint = !mobileCtrl.autoSprint;
-          saveMobileCtrl();
-          applyMobileCtrlUI();
-          showToast(mobileCtrl.autoSprint ? tr('toastAutoSprintOn') : tr('toastAutoSprintOff'));
+        } else if (k === 'roll') {
+          if (pressed) {
+            triggerRoll();
+            if (mobileRollHoldTimer) clearTimeout(mobileRollHoldTimer);
+            mobileRollHoldTimer = setTimeout(() => { keys.down = true; }, 160);
+          } else {
+            if (mobileRollHoldTimer) { clearTimeout(mobileRollHoldTimer); mobileRollHoldTimer = null; }
+            keys.down = false;
+          }
         }
       }
 
@@ -4967,7 +5139,7 @@
         const rect = canvas.getBoundingClientRect();
         const w = canvas.clientWidth || rect.width || 1;
         const h = canvas.clientHeight || rect.height || 1;
-        const responsiveScale = w < 820 ? Math.max(0.56, Math.min(0.95, w / 860)) : 1.0;
+        const responsiveScale = getResponsiveScale(w, h);
         const fz = camZoom * responsiveScale * userZoom;
         const sx = clientX - rect.left;
         const sy = clientY - rect.top;
@@ -5302,8 +5474,12 @@
       }
 
       function updateNetUI(statusText, stateClass) {
-        netLabel.textContent = statusText;
+        const isSolo = !stateClass && netMode === 'solo';
+        document.body.classList.toggle('solo-mode', isSolo);
+        netLabel.textContent = isSolo ? '' : statusText;
+        netLabel.style.display = isSolo ? 'none' : '';
         netDot.className = 'status-dot' + (stateClass ? ' ' + stateClass : '');
+        netDot.style.display = isSolo ? 'none' : '';
       }
 
       function cleanupRtc() {
@@ -6072,9 +6248,74 @@
         document.getElementById('level-scrap').textContent = tr('roundWord') + roundNumber + ' · ' + formatTimer(roundElapsed) + bestStr;
       }
 
+      function computeSeamlessEdges(plats) {
+        if (!plats) return;
+        const mergeable = new Set(['solid', 'slime', 'ice', 'conveyor_r', 'conveyor_l']);
+        const subtract = (minV, maxV, cuts) => {
+          if (!cuts.length) return [[minV, maxV]];
+          cuts.sort((a, b) => a[0] - b[0]);
+          const merged = [cuts[0]];
+          for (let i = 1; i < cuts.length; i++) {
+            const last = merged[merged.length - 1];
+            if (cuts[i][0] <= last[1] + 1) last[1] = Math.max(last[1], cuts[i][1]);
+            else merged.push(cuts[i]);
+          }
+          const out = [];
+          let cur = minV;
+          for (const [cs, ce] of merged) {
+            if (cs > cur + 1.5) out.push([cur, Math.min(maxV, cs)]);
+            cur = Math.max(cur, ce);
+          }
+          if (cur < maxV - 1.5) out.push([cur, maxV]);
+          return out;
+        };
+        for (let i = 0; i < plats.length; i++) {
+          const a = plats[i];
+          const ta = a.type || 'solid';
+          if (!mergeable.has(ta)) { a.seam = null; continue; }
+          const cutT = [], cutB = [], cutL = [], cutR = [];
+          for (let j = 0; j < plats.length; j++) {
+            if (i === j) continue;
+            const b = plats[j];
+            if ((b.type || 'solid') !== ta) continue;
+            // Top edge of a covered by b
+            if (b.y <= a.y + 3 && b.y + b.h >= a.y - 3) {
+              const s = Math.max(a.x, b.x), e = Math.min(a.x + a.w, b.x + b.w);
+              if (e > s + 2) cutT.push([s, e]);
+            }
+            // Bottom edge of a covered by b
+            if (b.y <= a.y + a.h + 3 && b.y + b.h >= a.y + a.h - 3) {
+              const s = Math.max(a.x, b.x), e = Math.min(a.x + a.w, b.x + b.w);
+              if (e > s + 2) cutB.push([s, e]);
+            }
+            // Left edge of a covered by b
+            if (b.x <= a.x + 3 && b.x + b.w >= a.x - 3) {
+              const s = Math.max(a.y, b.y), e = Math.min(a.y + a.h, b.y + b.h);
+              if (e > s + 2) cutL.push([s, e]);
+            }
+            // Right edge of a covered by b
+            if (b.x <= a.x + a.w + 3 && b.x + b.w >= a.x + a.w - 3) {
+              const s = Math.max(a.y, b.y), e = Math.min(a.y + a.h, b.y + b.h);
+              if (e > s + 2) cutR.push([s, e]);
+            }
+          }
+          const hasAny = cutT.length > 0 || cutB.length > 0 || cutL.length > 0 || cutR.length > 0;
+          a.seam = hasAny ? {
+            hasAny: true,
+            top: subtract(a.x, a.x + a.w, cutT),
+            bottom: subtract(a.x, a.x + a.w, cutB),
+            left: subtract(a.y, a.y + a.h, cutL),
+            right: subtract(a.y, a.y + a.h, cutR),
+            hasT: cutT.length > 0, hasB: cutB.length > 0, hasL: cutL.length > 0, hasR: cutR.length > 0
+          } : null;
+        }
+      }
+
       function loadRound(seed, rNum, broadcast = false) {
         if (worldTime > 0.4) triggerPageFlip();
         scuffs.length = 0;
+        deathShards.length = 0;
+        deathSplats.length = 0;
         doorSpotlight.active = false;
         if (soloLobbyActive || (netMode === 'solo' && gamePhase === 'lobby')) {
           gamePhase = 'playing';
@@ -6095,6 +6336,7 @@
         currentSeed = seed;
         roundNumber = rNum;
         currentLevel = generateRandomLevel(seed, rNum, roomSettings);
+        computeSeamlessEdges(currentLevel.platforms);
         doorLock = false;
 
         if (currentLevel.isTagArena) {
@@ -6472,12 +6714,15 @@
         windSfxCd = 0;
         if (countDeath) {
           deaths++;
-          screenShake = 9;
-          hitStopTimer = Math.max(hitStopTimer, 0.052);
-          p.hitFlashTimer = 0.18;
+          screenShake = 10;
+          hitStopTimer = Math.max(hitStopTimer, 0.048);
+          p.hitFlashTimer = 0.22;
           playSound('die');
-          spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 14, 240);
+          spawnDeathShatter(p, localCosmetics);
           sendVfxEvent('die', p.x + p.w / 2, p.y + p.h / 2);
+          p.deadTimer = (currentLevel && !currentLevel.isLobby) ? 0.24 : 0;
+        } else {
+          p.deadTimer = 0;
         }
         roundElapsed = 0;
         ghostRecording = [];
@@ -6494,6 +6739,8 @@
               pl.y = pl.baseY != null ? pl.baseY : pl.y;
               pl.dy = 0;
               pl.ridden = false;
+              pl.tilt = 0;
+              pl.tiltVel = 0;
             }
           }
         }
@@ -6632,6 +6879,14 @@
         const lvl = currentLevel;
         updateMovers(worldTime, dt);
         const movers = activeMovers;
+        if (p.deadTimer > 0) {
+          p.deadTimer = Math.max(0, p.deadTimer - dt);
+          if (p.deadTimer <= 0) {
+            p.scaleX = 1.28;
+            p.scaleY = 0.72;
+          }
+          return;
+        }
 
         // Round timer & Speedrun Ghost recording (Race / Eraser modes)
         if (gamePhase === 'playing' && !lvl.isLobby && !lvl.isTagArena) {
@@ -6690,8 +6945,24 @@
             const base = pl.baseY != null ? pl.baseY : pl.y;
             const maxY = base + (pl.maxDrop || 88);
             const prevY = pl.y;
-            if (pl.ridden) pl.y = Math.min(maxY, pl.y + 92 * dt);
-            else pl.y = Math.max(base, pl.y - 125 * dt);
+            if (pl.ridden) {
+              pl.y = Math.min(maxY, pl.y + 84 * dt);
+              // Real rope-swing wobble & balance tilt based on where the player stands on the wooden plank!
+              const pcx = p.x + p.w * 0.5;
+              const plcx = pl.x + pl.w * 0.5;
+              const arm = Math.max(-1, Math.min(1, (pcx - plcx) / Math.max(12, pl.w * 0.5)));
+              const naturalRock = Math.sin(worldTime * 5.2 + (pl.swayPhase || 0)) * 0.55;
+              pl.tiltVel += (arm * 3.1 + naturalRock - (pl.tilt || 0) * 5.8) * dt;
+              pl.tiltVel *= Math.pow(0.24, dt);
+              pl.tilt = Math.max(-0.27, Math.min(0.27, (pl.tilt || 0) + pl.tiltVel * dt));
+              // Gentle gravity slope push along the tilted wooden board so you actively balance!
+              if (p.grounded) p.vx += Math.sin(pl.tilt) * 430 * dt;
+            } else {
+              pl.y = Math.max(base, pl.y - 125 * dt);
+              pl.tiltVel = ((pl.tiltVel || 0) - (pl.tilt || 0) * 14 * dt) * Math.pow(0.12, dt);
+              pl.tilt = (pl.tilt || 0) + pl.tiltVel * dt;
+              if (Math.abs(pl.tilt) < 0.002 && Math.abs(pl.tiltVel) < 0.01) { pl.tilt = 0; pl.tiltVel = 0; }
+            }
             pl.dy = pl.y - prevY;
             if (pl.ridden && pl.dy !== 0 && p.grounded) p.y += pl.dy;
             pl.ridden = false;
@@ -6845,13 +7116,21 @@
 
         if (p.rollTimer > 0) {
           p.rollTimer -= dt;
-          p.rot += p.facing * 18 * dt;
+          p.rot += p.facing * ((Math.PI * 2) / CFG.rollDuration) * dt;
           if (Math.random() < 0.75) {
             p.ghosts.push({ x: p.x, y: p.y, w: p.w, h: p.h, alpha: 0.48 });
           }
-          if (p.rollTimer <= 0) p.rot = 0;
+          if (p.rollTimer <= 0) {
+            // Wrap rotation smoothly into [-PI, PI] so exit eases into upright like jump+dash!
+            const twoPi = Math.PI * 2;
+            p.rot = ((p.rot % twoPi) + twoPi) % twoPi;
+            if (p.rot > Math.PI) p.rot -= twoPi;
+            p.scaleX = 1.18;
+            p.scaleY = 0.84;
+          }
         } else if (p.sliding) {
-          p.rot = 0;
+          p.rot += (0 - p.rot) * Math.min(1, 20 * dt);
+          if (Math.abs(p.rot) < 0.01) p.rot = 0;
           const sFric = surf === 'ice' ? CFG.slideFriction * 0.22 : CFG.slideFriction;
           if (p.vx > 0) p.vx = Math.max(0, p.vx - sFric * dt);
           else if (p.vx < 0) p.vx = Math.min(0, p.vx + sFric * dt);
@@ -6860,10 +7139,11 @@
             spawnParticles(p.x + p.w / 2, p.y + p.h, surf === 'ice' ? '#72CFC9' : '#D49B27', 1, 80);
           }
           if (Math.random() < 0.3) {
-            spawnScuff(p.x + p.w / 2, p.y + p.h, 15, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(139,94,60,0.32)');
+            spawnScuff(p.x + p.w / 2, p.y + p.h, 15, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(139,94,60,0.32)', p.ridingMoverIdx);
           }
         } else {
-          p.rot = 0;
+          p.rot += (0 - p.rot) * Math.min(1, 20 * dt);
+          if (Math.abs(p.rot) < 0.01) p.rot = 0;
           const spdMult = SPEED_MODES[roomSettings.speedIdx].mult;
           let surfSpeedMult = 1.0;
           if (surf === 'ice') surfSpeedMult = 1.18;
@@ -6873,7 +7153,7 @@
           const targetVx = moveDir * maxSpd;
           const turning = moveDir !== 0 && Math.sign(p.vx) !== 0 && Math.sign(p.vx) !== moveDir;
           if (p.grounded && turning && Math.abs(p.vx) > 220 && Math.random() < 0.35) {
-            spawnScuff(p.x + p.w / 2, p.y + p.h, 14, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(35,31,32,0.28)');
+            spawnScuff(p.x + p.w / 2, p.y + p.h, 14, surf === 'ice' ? 'rgba(255,255,255,0.65)' : 'rgba(35,31,32,0.28)', p.ridingMoverIdx);
           }
 
           let accel = p.grounded
@@ -7169,7 +7449,7 @@
                 if (preLandVy > 460) screenShake = Math.max(screenShake, 3.4);
                 p.stamina = Math.min(100, p.stamina + 12);
                 playSound(s.type === 'slime' ? 'slime' : 'land');
-                spawnScuff(p.x + p.w / 2, p.y + p.h, 18, s.type === 'ice' ? 'rgba(255,255,255,0.68)' : (s.type === 'slime' ? 'rgba(45,122,70,0.42)' : 'rgba(35,31,32,0.3)'));
+                spawnScuff(p.x + p.w / 2, p.y + p.h, 18, s.type === 'ice' ? 'rgba(255,255,255,0.68)' : (s.type === 'slime' ? 'rgba(45,122,70,0.42)' : 'rgba(35,31,32,0.3)'), typeof s.idx === 'number' ? s.idx : -1, s.type === 'weight' ? s : null);
                 sendStatePacket(true);
                 spawnParticles(p.x + p.w / 2, p.y + p.h, s.type === 'slime' ? '#84D97B' : (s.type === 'ice' ? '#72CFC9' : '#6A635A'), preLandVy > 460 ? 8 : 5, preLandVy > 460 ? 125 : 95);
                 sendVfxEvent('land', p.x + p.w / 2, p.y + p.h);
@@ -7488,12 +7768,17 @@
       // =========================================================
       const cam = { x: 0, y: 0 };
 
+      function getResponsiveScale(w, h) {
+        if (w >= 960 && h >= 580) return 1.0;
+        return Math.max(0.56, Math.min(1.0, Math.min(w / 960, h / 540)));
+      }
+
       function resizeCanvas() {
         const wrap = document.getElementById('stage-wrap');
-        const isMobile = wrap.clientWidth < 820;
-        const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
-        canvas.width = Math.floor(wrap.clientWidth * dpr);
-        canvas.height = Math.floor(wrap.clientHeight * dpr);
+        const isMobile = wrap.clientWidth < 900 || isTouchDevice;
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 2.25 : 2.5);
+        canvas.width = Math.max(1, Math.floor(wrap.clientWidth * dpr));
+        canvas.height = Math.max(1, Math.floor(wrap.clientHeight * dpr));
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
       window.addEventListener('resize', resizeCanvas);
@@ -7504,8 +7789,63 @@
         return ((n - Math.floor(n)) - 0.5) * 2.2;
       }
 
-      function drawInkedRect(x, y, w, h, seed, fill, hatch = false, castShadow = true) {
+      function drawInkedRect(x, y, w, h, seed, fill, hatch = false, castShadow = true, seam = null) {
         const f = boilFrame;
+        if (seam && seam.hasAny) {
+          // Seamless fused block rendering: bleed 1px across touching internal seams & omit internal dividing lines!
+          const bx0 = x - (seam.hasL ? 1 : 0);
+          const by0 = y - (seam.hasT ? 1 : 0);
+          const bw = w + (seam.hasL ? 1 : 0) + (seam.hasR ? 1 : 0);
+          const bh = h + (seam.hasT ? 1 : 0) + (seam.hasB ? 1 : 0);
+
+          if (castShadow && w > 8 && h > 8) {
+            ctx.fillStyle = 'rgba(35, 31, 32, 0.08)';
+            ctx.fillRect(x + 4, y + 5, w, h);
+          }
+          if (hatch) {
+            if (!hatchPattern) hatchPattern = ctx.createPattern(hatchCanvas, 'repeat');
+            ctx.fillStyle = hatchPattern || fill || '#EAE0CE';
+            ctx.fillRect(bx0, by0, bw, bh);
+          } else if (fill) {
+            ctx.fillStyle = fill;
+            ctx.fillRect(bx0, by0, bw, bh);
+          }
+          if (w > 18 && h >= 14) {
+            if (!seam.hasB) {
+              ctx.fillStyle = 'rgba(35, 31, 32, 0.1)';
+              ctx.fillRect(x + 1, y + h - 4, w - 2, 3);
+            }
+            if (hatch && !seam.hasT) {
+              ctx.fillStyle = 'rgba(35, 31, 32, 0.08)';
+              ctx.fillRect(x + 1, y + 1, w - 2, 3);
+            }
+          }
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          let edgeSeed = seed + 20;
+          for (const [s0, e0] of seam.top) {
+            const j = boilOffset(edgeSeed++, f) * 0.7;
+            ctx.moveTo(s0, y); ctx.quadraticCurveTo((s0 + e0) * 0.5, y + j, e0, y);
+          }
+          for (const [s0, e0] of seam.bottom) {
+            const j = boilOffset(edgeSeed++, f) * 0.7;
+            ctx.moveTo(s0, y + h); ctx.quadraticCurveTo((s0 + e0) * 0.5, y + h + j, e0, y + h);
+          }
+          for (const [s0, e0] of seam.left) {
+            const j = boilOffset(edgeSeed++, f) * 0.7;
+            ctx.moveTo(x, s0); ctx.quadraticCurveTo(x + j, (s0 + e0) * 0.5, x, e0);
+          }
+          for (const [s0, e0] of seam.right) {
+            const j = boilOffset(edgeSeed++, f) * 0.7;
+            ctx.moveTo(x + w, s0); ctx.quadraticCurveTo(x + w + j, (s0 + e0) * 0.5, x + w, e0);
+          }
+          ctx.stroke();
+          return;
+        }
+
         const x1 = x + boilOffset(seed + 1, f);
         const y1 = y + boilOffset(seed + 2, f);
         const x2 = x + w + boilOffset(seed + 3, f);
@@ -7754,7 +8094,16 @@
             c.arc(lx + px * 0.6, py * 0.5, 2.0, 0, Math.PI * 2);
             c.arc(rx + px * 0.6, py * 0.5, 2.0, 0, Math.PI * 2);
             c.fill();
-            if (type === 'angry' || sprinting) {
+            if (type === 'cat') {
+              // Cute cat whiskers — never slap flickering angry eyebrows onto Cat face!
+              c.lineWidth = 1.15;
+              c.beginPath();
+              c.moveTo(lx - 4.2, 2.2); c.lineTo(lx - 7.8, 1.4);
+              c.moveTo(lx - 4.0, 4.1); c.lineTo(lx - 7.6, 4.6);
+              c.moveTo(rx + 4.2, 2.2); c.lineTo(rx + 7.8, 1.4);
+              c.moveTo(rx + 4.0, 4.1); c.lineTo(rx + 7.6, 4.6);
+              c.stroke();
+            } else if (type === 'angry') {
               c.lineWidth = 1.6;
               c.beginPath();
               c.moveTo(lx - 2.3, -3.4); c.lineTo(lx + 2.1, -1.8);
@@ -7932,15 +8281,70 @@
           c.beginPath(); c.moveTo(-vr, hatY); c.quadraticCurveTo(-vr - 7, hatY - 8, -vr - 1.5, hatY - 12); c.lineTo(-vr + 3, hatY - 2); c.closePath(); c.fill(); c.stroke();
           c.beginPath(); c.moveTo(vr, hatY); c.quadraticCurveTo(vr + 7, hatY - 8, vr + 1.5, hatY - 12); c.lineTo(vr - 3, hatY - 2); c.closePath(); c.fill(); c.stroke();
         } else if (acc === 'bandana') {
-          // Properly centered right under the face / neck!
-          const bw = Math.min(neckW, 13);
+          // Real Pirate/Biker Head Bandana wrapped cleanly across the top forehead with paisley dots & fluttering tails!
+          const bw = Math.min(foreheadW + 1, 14);
+          const by = foreheadY - 2.5;
+          const flut = Math.sin(worldTime * 11) * 2.2;
+          // Trailing knotted tails behind head
           c.fillStyle = '#2952A3';
           c.beginPath();
-          c.moveTo(-bw, neckY - 2.5);
-          c.lineTo(bw, neckY - 2.5);
-          c.lineTo(0, neckY + 6.5);
+          c.moveTo(-facing * (bw - 1), by + 1);
+          c.quadraticCurveTo(-facing * (bw + 7), by + 1 + flut * 0.5, -facing * (bw + 11), by + 5.5 + flut);
+          c.lineTo(-facing * (bw + 7.5), by + 8.5 + flut * 0.7);
+          c.lineTo(-facing * (bw - 1), by + 3.5);
+          c.closePath(); c.fill(); c.stroke();
+          // Snug skull-cap bandana wrap on forehead/crown
+          c.beginPath();
+          c.moveTo(-bw, by + 3.5);
+          c.quadraticCurveTo(0, hatY - 4.5, bw, by + 3.5);
+          c.lineTo(bw, by + 6.2);
+          c.quadraticCurveTo(0, by + 4.4, -bw, by + 6.2);
           c.closePath();
           c.fill(); c.stroke();
+          // Knot + crisp white paisley ink dots
+          c.fillStyle = '#FBF7EE';
+          c.beginPath(); c.arc(-bw * 0.38, by + 2.8, 1.2, 0, Math.PI * 2); c.arc(0, by + 2.1, 1.3, 0, Math.PI * 2); c.arc(bw * 0.38, by + 2.8, 1.2, 0, Math.PI * 2); c.fill();
+          c.fillStyle = '#2952A3';
+          c.beginPath(); c.arc(-facing * bw, by + 2.6, 2.5, 0, Math.PI * 2); c.fill(); c.stroke();
+        } else if (acc === 'monocle') {
+          c.save();
+          c.translate(eyeX, eyeY);
+          c.scale(faceScale, faceScale);
+          c.fillStyle = 'rgba(233, 196, 106, 0.25)';
+          c.strokeStyle = '#D49B27';
+          c.lineWidth = 1.9;
+          c.beginPath(); c.arc(4.2, 0, 4.1, 0, Math.PI * 2); c.fill(); c.stroke();
+          c.lineWidth = 1.1;
+          c.beginPath(); c.moveTo(8.1, 1.2); c.quadraticCurveTo(9.5, 6, 7.2, 10.5); c.stroke();
+          c.restore();
+        } else if (acc === 'blush') {
+          // Cool anime cross-bandage on cheek
+          c.save();
+          c.translate(eyeX - facing * 5.2 * faceScale, eyeY + 4.0 * faceScale);
+          c.rotate(-0.22 * facing);
+          c.fillStyle = '#FBF7EE';
+          c.strokeStyle = '#231F20';
+          c.lineWidth = 1.3;
+          c.fillRect(-3.8, -1.6, 7.6, 3.2);
+          c.strokeRect(-3.8, -1.6, 7.6, 3.2);
+          c.fillStyle = '#E06354';
+          c.fillRect(-1.2, -1.1, 2.4, 2.2);
+          c.restore();
+        } else if (acc === 'scarf') {
+          // Warm fluttering red-gold sketchbook scarf around neck
+          const sw = Math.min(neckW + 1, 14);
+          const flut = Math.sin(worldTime * 10) * 2.5;
+          c.fillStyle = '#C83E31';
+          c.beginPath();
+          c.moveTo(-facing * (sw - 2), neckY);
+          c.quadraticCurveTo(-facing * (sw + 7), neckY + 3 + flut * 0.5, -facing * (sw + 11), neckY + 9 + flut);
+          c.lineTo(-facing * (sw + 6), neckY + 12 + flut * 0.7);
+          c.lineTo(-facing * (sw - 4), neckY + 3.5);
+          c.closePath(); c.fill(); c.stroke();
+          c.fillRect(-sw, neckY - 2.6, sw * 2, 5.2);
+          c.strokeRect(-sw, neckY - 2.6, sw * 2, 5.2);
+          c.fillStyle = '#E9C46A';
+          c.fillRect(-sw + 2, neckY - 0.8, sw * 2 - 4, 1.6);
         } else if (acc === 'party') {
           const pw = Math.min(8.5, hw * 0.82);
           c.fillStyle = '#EA8EC2';
@@ -8115,6 +8519,7 @@
       }
 
       function drawSketchPlayer(p, color, label, isLocal) {
+        if (p.deadTimer > 0) return;
         // Inked motion ghosts during roll
         const cos = isLocal ? localCosmetics : remoteCosmetics;
         const packAccent = getParticlePack(cos.particlePack).accent;
@@ -8204,7 +8609,7 @@
         ctx.transform(1, 0, lean, 1, 0, 0);
         if (runTilt || airTilt) ctx.rotate(runTilt + airTilt);
 
-        if (p.rollTimer > 0) {
+        if (p.rollTimer > 0 || Math.abs(p.rot || 0) > 0.008) {
           ctx.translate(0, -p.h / 2);
           ctx.rotate(p.rot);
           ctx.translate(0, p.h / 2);
@@ -8321,7 +8726,7 @@
         const lvl = currentLevel;
 
         // Responsive base zoom so phones & narrow screens see the full level cleanly!
-        const responsiveScale = w < 820 ? Math.max(0.56, Math.min(0.95, w / 860)) : 1.0;
+        const responsiveScale = getResponsiveScale(w, h);
 
         if (lvl.isLobby) {
           const targetCamX = 480 - w * 0.5;
@@ -8620,20 +9025,57 @@
           const t = s.type || 'solid';
 
           if (t === 'bridge') {
+            const bCol = s.bridgeColor || '#C83E31';
             if (!s.bridgeActive) {
               ctx.save();
-              ctx.setLineDash([7, 6]);
-              ctx.strokeStyle = s.bridgeColor || '#C83E31';
-              ctx.globalAlpha = 0.55;
+              ctx.setLineDash([7, 5]);
+              ctx.fillStyle = bCol === '#C83E31' ? 'rgba(200, 62, 49, 0.06)' : 'rgba(41, 82, 163, 0.07)';
+              ctx.fillRect(s.x, s.y, s.w, s.h);
+              ctx.strokeStyle = bCol;
+              ctx.globalAlpha = 0.58;
               ctx.lineWidth = 2;
               ctx.strokeRect(s.x, s.y, s.w, s.h);
+              // Architectural pencil truss diagonals inside inactive bridge
+              ctx.setLineDash([4, 4]);
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              for (let tx = s.x + 12; tx < s.x + s.w - 16; tx += 28) {
+                ctx.moveTo(tx, s.y + s.h - 2); ctx.lineTo(tx + 14, s.y + 2);
+                ctx.lineTo(tx + 28, s.y + s.h - 2);
+              }
+              ctx.stroke();
               ctx.restore();
             } else {
               const sw = lvl.switches && lvl.switches.find((x) => x.id === s.bridgeId);
               const blink = sw && sw.timer < 1.5 && Math.floor(worldTime * 10) % 2 === 0;
               ctx.save();
               if (blink) ctx.globalAlpha = 0.55;
-              drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, s.bridgeColor || '#C83E31', false);
+              drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, bCol, false);
+              // Hand-drawn bridge slats, top sheen, rivets & flowing ink energy dashes
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+              ctx.fillRect(s.x + 3, s.y + 3, s.w - 6, 4);
+              ctx.strokeStyle = 'rgba(35, 31, 32, 0.38)';
+              ctx.lineWidth = 1.4;
+              ctx.beginPath();
+              for (let bx = s.x + 24; bx < s.x + s.w - 10; bx += 24) {
+                ctx.moveTo(bx, s.y + 2); ctx.lineTo(bx, s.y + s.h - 2);
+              }
+              ctx.stroke();
+              // Animated glowing ink pulse along bridge center
+              ctx.strokeStyle = 'rgba(251, 247, 238, 0.72)';
+              ctx.lineWidth = 2;
+              ctx.setLineDash([10, 12]);
+              ctx.lineDashOffset = -worldTime * 42;
+              ctx.beginPath();
+              ctx.moveTo(s.x + 6, s.y + s.h * 0.54);
+              ctx.lineTo(s.x + s.w - 6, s.y + s.h * 0.54);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              // Corner ink rivets
+              ctx.fillStyle = '#FBF7EE';
+              for (const rx of [s.x + 7, s.x + s.w - 7]) {
+                ctx.beginPath(); ctx.arc(rx, s.y + s.h * 0.5, 2.2, 0, Math.PI * 2); ctx.fill();
+              }
               ctx.restore();
             }
             continue;
@@ -8659,7 +9101,7 @@
           }
 
           if (t === 'ice') {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#CFEBF7', false);
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#CFEBF7', false, true, s.seam);
             ctx.save();
             // Frosty white upper glaze
             ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
@@ -8699,7 +9141,7 @@
             }
             ctx.restore();
           } else if (t === 'slime') {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#84D97B', false);
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#84D97B', false, true, s.seam);
             ctx.save();
             // Glossy interior slime bubbles
             ctx.fillStyle = 'rgba(235, 255, 232, 0.65)';
@@ -8797,7 +9239,7 @@
             }
             ctx.restore();
           } else if (t === 'conveyor_r' || t === 'conveyor_l') {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#E8D5A7', false);
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#E8D5A7', false, true, s.seam);
             ctx.save();
             ctx.beginPath();
             ctx.rect(s.x + 2, s.y + 2, s.w - 4, s.h - 4);
@@ -8838,37 +9280,79 @@
               ctx.setLineDash([7, 5]);
               ctx.fillStyle = t === 'beat_a' ? 'rgba(200, 62, 49, 0.08)' : 'rgba(41, 82, 163, 0.09)';
               ctx.fillRect(s.x, s.y, s.w, s.h);
+              // Faint diagonal drafting cross-lines inside ghost beat block
               ctx.strokeStyle = darkCol;
-              ctx.globalAlpha = warnBlink ? 0.85 : 0.48;
+              ctx.globalAlpha = 0.22;
+              ctx.lineWidth = 1.1;
+              ctx.setLineDash([]);
+              ctx.beginPath();
+              for (let gx = s.x + 12; gx < s.x + s.w - 4; gx += 18) {
+                ctx.moveTo(gx, s.y + 3); ctx.lineTo(gx - 8, s.y + s.h - 3);
+              }
+              ctx.stroke();
+              ctx.setLineDash([7, 5]);
+              ctx.globalAlpha = warnBlink ? 0.88 : 0.52;
               ctx.lineWidth = warnBlink ? 2.6 : 1.9;
               ctx.strokeRect(s.x, s.y, s.w, s.h);
               ctx.setLineDash([]);
-              // Faint quarter-note rhythm icon in center
-              ctx.beginPath();
-              ctx.arc(s.x + s.w * 0.5, s.y + s.h * 0.5, 4, 0, Math.PI * 2);
-              ctx.stroke();
+              // Center rhythm dot + stem (quarter note glyph)
+              const ncx = s.x + s.w * 0.5, ncy = s.y + s.h * 0.56;
+              ctx.beginPath(); ctx.ellipse(ncx - 1, ncy, 3.8, 2.8, -0.35, 0, Math.PI * 2); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(ncx + 2.4, ncy); ctx.lineTo(ncx + 2.4, ncy - 9); ctx.stroke();
               ctx.restore();
             } else {
               ctx.save();
               if (warnBlink) ctx.globalAlpha = 0.72;
               drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, mainCol, false);
-              // Beat countdown timer bar along top surface
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+              // Richer inner sketch texture: diagonal shading stripes + inset frame + rivets + pulsing equalizer bars
+              ctx.save();
+              ctx.beginPath(); ctx.rect(s.x + 2, s.y + 2, s.w - 4, s.h - 4); ctx.clip();
+              ctx.strokeStyle = 'rgba(35, 31, 32, 0.14)';
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              for (let sx = s.x - 12; sx < s.x + s.w + 12; sx += 16) {
+                ctx.moveTo(sx, s.y + s.h + 2); ctx.lineTo(sx + 14, s.y - 2);
+              }
+              ctx.stroke();
+              ctx.restore();
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.34)';
+              ctx.lineWidth = 1.3;
+              ctx.strokeRect(s.x + 4, s.y + 4, s.w - 8, s.h - 8);
+              // Beat countdown bar along top lip
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
               const remW = Math.max(0, (s.w - 10) * (1 - beatPhase));
-              ctx.fillRect(s.x + 5, s.y + 4, remW, 3);
+              ctx.fillRect(s.x + 5, s.y + 3.5, remW, 3);
+              // 3 subtle bouncing rhythm equalizer bars in center
+              const mcx = s.x + s.w * 0.5;
+              const pulse = Math.abs(Math.sin(beatPhase * Math.PI * 2));
+              ctx.fillStyle = '#FBF7EE';
+              for (let bi = -1; bi <= 1; bi++) {
+                const bh = 4 + (bi === 0 ? pulse * 7 : (1 - pulse) * 5);
+                ctx.fillRect(mcx + bi * 6 - 1.5, s.y + s.h - 5 - bh, 3, bh);
+              }
               ctx.restore();
             }
           } else if (t === 'weight') {
             const anchorY = (s.baseY != null ? s.baseY : s.y) - 64;
-            // Taut hanging strings & brass ceiling thumbtacks
-            ctx.save();
+            const tilt = s.tilt || 0;
+            const cxW = s.x + s.w * 0.5;
+            const cyW = s.y + s.h * 0.5;
+            const halfSpan = s.w * 0.5 - 14;
+            const cosT = Math.cos(tilt);
+            const sinT = Math.sin(tilt);
+            // Dynamic tilted rope attachment corners
+            const p1x = cxW - halfSpan * cosT;
+            const p1y = cyW - halfSpan * sinT - s.h * 0.42;
+            const p2x = cxW + halfSpan * cosT;
+            const p2y = cyW + halfSpan * sinT - s.h * 0.42;
             const ax1 = s.x + 14;
             const ax2 = s.x + s.w - 14;
+            ctx.save();
             ctx.strokeStyle = '#6A635A';
-            ctx.lineWidth = 1.9;
+            ctx.lineWidth = 2.0;
             ctx.beginPath();
-            ctx.moveTo(ax1, anchorY); ctx.lineTo(ax1, s.y + 2);
-            ctx.moveTo(ax2, anchorY); ctx.lineTo(ax2, s.y + 2);
+            ctx.moveTo(ax1, anchorY); ctx.lineTo(p1x, p1y);
+            ctx.moveTo(ax2, anchorY); ctx.lineTo(p2x, p2y);
             ctx.stroke();
             for (const tx of [ax1, ax2]) {
               ctx.fillStyle = '#D49B27';
@@ -8876,29 +9360,28 @@
               ctx.lineWidth = 1.7;
               ctx.beginPath(); ctx.arc(tx, anchorY, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
             }
-            ctx.restore();
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#D9BC96', false);
-            ctx.save();
-            // Woodgrain strokes & tiny downward weight arrows
-            ctx.strokeStyle = 'rgba(139, 94, 60, 0.36)';
-            ctx.lineWidth = 1.3;
+            // Rotate the wooden hanging board visually with real rope-swing tilt!
+            ctx.translate(cxW, cyW);
+            ctx.rotate(tilt);
+            drawInkedRect(-s.w * 0.5, -s.h * 0.5, s.w, s.h, i * 17 + 1, '#D9BC96', false, false);
+            // Woodgrain planks, rope knots & wobble arrow
+            ctx.strokeStyle = 'rgba(139, 94, 60, 0.42)';
+            ctx.lineWidth = 1.35;
             ctx.beginPath();
-            ctx.moveTo(s.x + 10, s.y + s.h * 0.5);
-            ctx.lineTo(s.x + s.w - 10, s.y + s.h * 0.5);
+            ctx.moveTo(-s.w * 0.5 + 8, -2); ctx.lineTo(s.w * 0.5 - 8, -2);
+            ctx.moveTo(-s.w * 0.5 + 16, 4); ctx.lineTo(s.w * 0.5 - 16, 4);
             ctx.stroke();
             ctx.strokeStyle = '#8C5E3C';
             ctx.lineWidth = 1.8;
             ctx.lineCap = 'round';
-            const wx = s.x + s.w * 0.5;
-            const wy = s.y + s.h * 0.52;
             ctx.beginPath();
-            ctx.moveTo(wx - 4, wy - 3); ctx.lineTo(wx, wy + 3); ctx.lineTo(wx + 4, wy - 3);
+            ctx.moveTo(-5, -2); ctx.lineTo(0, 4); ctx.lineTo(5, -2);
             ctx.stroke();
             ctx.restore();
           } else {
-            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true);
-            // Asymmetric varied-scale pencil grass tufts & margin marks on wide horizontal solid ledges
-            if (s.w >= 95 && s.h <= 160 && !lvl.isLobby) {
+            drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true, true, s.seam);
+            // Asymmetric varied-scale pencil grass tufts & margin marks on wide horizontal solid ledges (only if top isn't covered!)
+            if (s.w >= 95 && s.h <= 160 && !lvl.isLobby && (!s.seam || !s.seam.hasT)) {
               ctx.save();
               ctx.strokeStyle = 'rgba(45, 122, 70, 0.55)';
               ctx.lineWidth = 1.45;
@@ -8919,16 +9402,38 @@
           }
         }
 
-        // Subtle charcoal/chalk scuff marks from landings, slides & hard turns
+        // Persistent Super Meat Boy style ink death splatters stuck onto platforms
+        for (const sp of deathSplats) {
+          const sxp = sp.plat ? (sp.plat.x + sp.ox) : sp.x;
+          const syp = sp.plat ? (sp.plat.y + sp.oy) : sp.y;
+          if (sxp + 20 < visLeft || sxp - 20 > visRight) continue;
+          ctx.save();
+          ctx.globalAlpha = 0.78;
+          ctx.fillStyle = sp.color;
+          ctx.beginPath();
+          ctx.ellipse(sxp, syp, sp.r * 1.35, sp.r * 0.45, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Subtle charcoal/chalk scuff marks (riding smoothly with moving & weight platforms!)
         for (const sc of scuffs) {
+          let scx = sc.x, scy = sc.y;
+          if (sc.moverIdx >= 0 && activeMovers[sc.moverIdx]) {
+            scx = activeMovers[sc.moverIdx].x + sc.ox;
+            scy = activeMovers[sc.moverIdx].y + sc.oy;
+          } else if (sc.platRef) {
+            scx = sc.platRef.x + sc.ox;
+            scy = sc.platRef.y + sc.oy;
+          }
           ctx.save();
           ctx.globalAlpha = Math.max(0, Math.min(1, sc.life / sc.maxLife));
           ctx.strokeStyle = sc.color;
           ctx.lineWidth = 2.4;
           ctx.lineCap = 'round';
           ctx.beginPath();
-          ctx.moveTo(sc.x - sc.w * 0.5, sc.y - 1);
-          ctx.lineTo(sc.x + sc.w * 0.5, sc.y - 1);
+          ctx.moveTo(scx - sc.w * 0.5, scy - 1);
+          ctx.lineTo(scx + sc.w * 0.5, scy - 1);
           ctx.stroke();
           ctx.restore();
         }
@@ -9534,7 +10039,26 @@
 
         // 7b. Speedlines now render directly behind each player's spine inside drawSketchPlayer()
 
-        // 7c. Custom Particle Packs Renderer
+        // 7c. Super Meat Boy / GD Death Shards + Custom Particle Packs Renderer
+        for (const sh of deathShards) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, sh.life / (sh.maxLife * 0.55)));
+          ctx.translate(sh.x, sh.y);
+          ctx.rotate(sh.rot);
+          ctx.fillStyle = sh.color;
+          ctx.strokeStyle = '#231F20';
+          ctx.lineWidth = 1.6;
+          const r = sh.size * 0.65;
+          ctx.beginPath();
+          if (sh.shape === 'tri') {
+            ctx.moveTo(0, -r); ctx.lineTo(r, r); ctx.lineTo(-r, r); ctx.closePath();
+          } else {
+            ctx.rect(-r * 0.85, -r * 0.85, r * 1.7, r * 1.7);
+          }
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
         for (const pt of particles) {
           ctx.save();
           ctx.globalAlpha = Math.max(0, pt.life / pt.maxLife);
@@ -9882,6 +10406,33 @@
           if (scuffs[i].life <= 0) scuffs.splice(i, 1);
         }
 
+        // Super Meat Boy / GD Death Shards physics & surface ink splatters!
+        for (let i = deathShards.length - 1; i >= 0; i--) {
+          const sh = deathShards[i];
+          sh.x += sh.vx * dt;
+          sh.y += sh.vy * dt;
+          sh.vy += 980 * dt;
+          sh.rot += sh.vrot * dt;
+          sh.life -= dt;
+          if (!sh.splatted && currentLevel && currentLevel.platforms) {
+            for (const pl of currentLevel.platforms) {
+              if (pl.erased || pl.bState === 'broken') continue;
+              if (sh.x >= pl.x && sh.x <= pl.x + pl.w && sh.y >= pl.y && sh.y <= pl.y + pl.h) {
+                sh.splatted = true;
+                sh.vy = -Math.abs(sh.vy) * 0.35;
+                sh.vx *= 0.45;
+                if (deathSplats.length >= 48) deathSplats.shift();
+                deathSplats.push({ x: sh.x, y: pl.y + 1, r: sh.size * 0.72, color: sh.color, plat: pl, ox: sh.x - pl.x, oy: 1 });
+                break;
+              }
+            }
+          }
+          if (sh.life <= 0) deathShards.splice(i, 1);
+        }
+
+        // Keep #version-tag (Changelog pill) strictly visible ONLY in Main Menu / Lobby modal!
+        document.body.classList.toggle('in-main-menu', !lobbyModal.classList.contains('hidden'));
+
         for (let i = particles.length - 1; i >= 0; i--) {
           const pt = particles[i];
           const gm = typeof pt.gravMult === 'number' ? pt.gravMult : 1.0;
@@ -9908,7 +10459,7 @@
           if (trackMouse && lastPointerIsMouse && canvas.clientWidth > 0) {
             const w = canvas.clientWidth;
             const h = canvas.clientHeight;
-            const responsiveScale = w < 820 ? Math.max(0.56, Math.min(0.95, w / 860)) : 1.0;
+            const responsiveScale = getResponsiveScale(w, h);
             const finalZoom = camZoom * responsiveScale * userZoom;
             const headWorldX = pl.x + pl.w / 2;
             const headWorldY = pl.y + 10;
@@ -10161,7 +10712,8 @@
           });
         } else if (currentWTab === 'accs' || currentWTab === 'accs2') {
           const slotKey = currentWTab === 'accs2' ? 'acc2' : 'acc';
-          COSMETIC_ACCS.forEach((ac) => {
+          const list = currentWTab === 'accs2' ? COSMETIC_FACE : COSMETIC_HATS;
+          list.forEach((ac) => {
             const btn = document.createElement('button');
             btn.className = 'item-chip' + (localCosmetics[slotKey] === ac.id ? ' selected' : '');
             const cv = createChipCanvas((c) => {
