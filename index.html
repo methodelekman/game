@@ -1742,6 +1742,13 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.20.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Ідеальний відскок між слизовими стінами:</b> додано магнітне захоплення стіни (7px) і «койот-тайм» стіни (0.16с) — тепер можна натискати напрямок у бік іншої стіни раніше за стрибок, подвійний стрибок більше не блокує відскок від стіни, а сама шахта відкрита знизу для інтуїтивного зигзагу Права ↔ Ліва стіна до самого верху.</li>
+                <li><b>Швидкісні Чорнильні Кільця-Катапульти (без зупинки!):</b> замість зупинки для прицілювання кільця миттєво вистрілюють тебе на повній швидкості (800 px/с) за напрямком стрілок у кільці зі збереженням флоу, скиданням стрибків/дешу та бонусним супер-прискоренням під час ролу.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.20.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Чорнильна бульбашка замість крапель:</b> влітаєш у краплю — вона тебе ловить, час ніби завмирає, цілишся в будь-який з 8 напрямків (W/A/S/D) і вистрілюєш стрибком (або автоматично через 0.75с). Повітряний ланцюжок тепер — справжня головоломка на приціл: діагональ → прямо → діагональ.</li>
@@ -1832,6 +1839,13 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.20.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Magnetic Wall-Jump &amp; Open Slime Shaft:</b> added 7px magnetic slime wall grab, 0.16s wall coyote time, automatic jump reset on wall touch, and an open-entry twin slime shaft so zig-zagging Left ↔ Right works effortlessly every time.</li>
+                <li><b>High-Speed Ink Slingshot Rings (Zero Stopping!):</b> replaced stop-and-aim bubbles with instant directional booster rings that slingshot you at 800 px/s along their chevrons in pure non-stop flow.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.20.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Ink Bubbles replace refill drops:</b> fly into a blot and it captures you — aim in any of 8 directions (W/A/S/D) and fire out with Jump (auto-fires after 0.75s). Sky chasms are now real aiming puzzles: diagonal → straight → diagonal.</li>
@@ -1903,7 +1917,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.20.0 · Changelog</button>
+      <button id="version-tag">v0.20.1 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2071,10 +2085,10 @@
           biome_grid: 'Клітинка',
           biome_blueprint: 'Міліметрівка',
           biome_sketchpad: 'Ескізник',
-          orbNote: 'Чорнильна бульбашка!',
-          orbNoteSub: 'Влети · цілься W/A/S/D · стрибок = постріл',
-          slimeNote: 'Шахта: стрибай між стінами',
-          slimeNoteSub: 'від однієї стіни двічі не вийде',
+          orbNote: 'Чорнильні кільця-прискорювачі!',
+          orbNoteSub: 'Влітай на ходу — миттєвий постріл за стрілкою (Shift = турбо)',
+          slimeNote: 'Слизова шахта: зигзаг Права ↔ Ліва',
+          slimeNoteSub: 'стрибай на праву стіну й відштовхуйся між двома вгору',
           toastStopTaunt: 'Зупинись на місці для таунту!',
           toastAutoSprintOn: 'Авто-біг увімкнено',
           toastAutoSprintOff: 'Авто-біг вимкнено',
@@ -2248,10 +2262,10 @@
           biome_grid: 'Graph Grid',
           biome_blueprint: 'Blueprint',
           biome_sketchpad: 'Sketchpad',
-          orbNote: 'Ink Bubble!',
-          orbNoteSub: 'Fly in · aim W/A/S/D · Jump = fire',
-          slimeNote: 'Shaft: zig-zag between walls',
-          slimeNoteSub: 'the same wall twice won\'t lift you',
+          orbNote: 'Ink Slingshot Rings!',
+          orbNoteSub: 'Fly through at full speed — instant boost (Shift = turbo)',
+          slimeNote: 'Slime Shaft: zig-zag Right ↔ Left',
+          slimeNoteSub: 'jump onto the right wall and bounce between both',
           toastStopTaunt: 'Stand still to taunt!',
           toastAutoSprintOn: 'Auto-sprint enabled',
           toastAutoSprintOff: 'Auto-sprint disabled',
@@ -3412,7 +3426,7 @@
         blueprint: ['portal_vault', 'beat_bridge', 'saw_gauntlet', 'conveyor_tunnel', 'chimney', 'switch_bridge'],
         sketchpad: ['sky_chain', 'chimney', 'pinball', 'catapult', 'downhill', 'split_path']
       };
-      const UPWARD_CHUNKS = new Set(['chimney', 'catapult', 'pinball', 'portal_vault']);
+      const UPWARD_CHUNKS = new Set(['chimney', 'catapult', 'pinball', 'portal_vault', 'sky_chain']);
       const DOWNWARD_CHUNKS = new Set(['downhill']);
 
       function generateRandomLevel(seed, roundNum, opts = roomSettings) {
@@ -3551,7 +3565,10 @@
               platforms.push(makePlatform(px, ny, pw, ph, pType, isFinalGoal ? { isGoalPlat: true } : null));
 
               if ((pType === 'beat_a' || pType === 'beat_b' || Math.hypot(nx - prevSubX, ny - prevSubY) > 195) && !isFinalGoal) {
-                orbs.push({ x: Math.round((prevSubX + nx) * 0.5), y: Math.round((prevSubY + ny) * 0.5) - 42, r: 14, cd: 0, pulse: 0 });
+                const odx = nx - prevSubX;
+                const ody = (ny - 42) - prevSubY;
+                const olen = Math.hypot(odx, ody) || 1;
+                orbs.push({ x: Math.round((prevSubX + nx) * 0.5), y: Math.round((prevSubY + ny) * 0.5) - 42, r: 16, dirX: odx / olen, dirY: Math.min(-0.28, ody / olen), cd: 0, pulse: 0 });
               }
 
               if (stepDy < -125 && !isFinalGoal && rng() < 0.55) {
@@ -3673,22 +3690,25 @@
                 curX = wallX + balW;
                 curY = topY;
               } else {
-                // Enclosed Slime Shaft: walk UNDER the left wall into the shaft, then zig-zag wall-jump L<->R to the top.
-                // Same-wall rule makes single-wall climbing impossible, so both walls genuinely matter.
-                const wL = px + entryW;
-                const shaftW = 112;
+                // Open-Entry Twin Slime Shaft: run right onto the Right Slime Wall, then zig-zag Right <-> Left all the way up!
+                // Left wall starts 46px above the floor so you enter freely from the left without bumping your head.
                 if (!slimeTaught) {
                   slimeTaught = true;
-                  notes.push({ x: px - 10, y: py - 120, key: 'slime', text: tr('slimeNote'), sub: tr('slimeNoteSub') });
+                  notes.push({ x: px - 10, y: py - 115, key: 'slime', text: tr('slimeNote'), sub: tr('slimeNoteSub') });
                 }
+                const shaftW = 94;
+                const wL = px + entryW + 14;
                 const wR = wL + 28 + shaftW;
-                // Shaft floor connects seamlessly from the entry deck
-                platforms.push(makePlatform(wL, py, 28 + shaftW + 28, 38, 'solid'));
-                // Left wall hangs from above, leaving a 66px doorway at the bottom to walk/slide in
-                const lTop = topY - 40;
-                platforms.push(makePlatform(wL, lTop, 28, (py - 66) - lTop, 'slime'));
-                // Right wall rises from the floor up to the balcony
-                const balW = 210;
+                // Continuous floor under the shaft so you can walk right up to the Right Slime Wall
+                platforms.push(makePlatform(px + entryW, py, 14 + 28 + shaftW + 28, 38, 'solid'));
+                // Left Slime Wall: starts 78px above floor (plenty of walk-in headroom!) up to topY - 18
+                const lTop = topY - 18;
+                const lBot = py - 78;
+                platforms.push(makePlatform(wL, lTop, 28, lBot - lTop, 'slime'));
+                // Left top cap so you always exit right onto the goal balcony
+                platforms.push(makePlatform(wL - 32, lTop - 26, 60, 26, 'solid'));
+                // Right Slime Wall: from floor all the way up to the upper balcony at topY
+                const balW = 215;
                 platforms.push(makePlatform(wR, topY, 28 + balW, 36, 'solid'));
                 platforms.push(makePlatform(wR, topY + 36, 28, py - (topY + 36), 'slime'));
                 curX = wR + 28 + balW;
@@ -3710,26 +3730,30 @@
               curX = landX + landW;
               curY = landY;
             } else if (chunk === 'sky_chain') {
-              // True 760px Floorless Sky Chasm -> MUST chain 3 generously spaced Ink Refill Orbs!
+              // High-Speed Non-Stop Ink Slingshot Rollercoaster across a 920px chasm & 175px climb (with mid-air barrier!)
               const px = curX + entryGap;
               const py = curY;
-              const entryW = 155;
+              const entryW = 160;
               platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
               const chasmStart = px + entryW;
-              // Ink Bubble aim puzzle: diag-up -> straight-right -> diag-up (each shot must be aimed!)
-              orbs.push({ x: chasmStart + 150, y: py - 110, r: 14, cd: 0, pulse: 0 });
-              orbs.push({ x: chasmStart + 450, y: py - 182, r: 14, cd: 0, pulse: 0 });
-              orbs.push({ x: chasmStart + 700, y: py - 103, r: 14, cd: 0, pulse: 0 });
               if (!orbTaught) {
                 orbTaught = true;
-                notes.push({ x: px - 10, y: py - 150, key: 'orb', text: tr('orbNote'), sub: tr('orbNoteSub') });
+                notes.push({ x: px - 10, y: py - 135, key: 'orb', text: tr('orbNote'), sub: tr('orbNoteSub') });
               }
+              // Mid-air ink barrier block forces the S-curve trajectory through the 3 rings (cannot jump straight over!)
+              platforms.push(makePlatform(chasmStart + 350, py - 270, 52, 165, 'solid'));
 
-              const landX = chasmStart + 900;
-              const landW = 300;
-              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              // Ring 1 (up-right launch) -> Ring 2 (low fast torpedo under the barrier) -> Ring 3 (steep sky-rocket to upper balcony!)
+              orbs.push({ x: chasmStart + 145, y: py - 68, r: 18, dirX: 0.89, dirY: -0.45, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 376, y: py - 52, r: 18, dirX: 0.94, dirY: -0.34, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 625, y: py - 88, r: 18, dirX: 0.78, dirY: -0.62, cd: 0, pulse: 0 });
+
+              const landX = chasmStart + 885;
+              const landY = py - 175;
+              const landW = 240;
+              platforms.push(makePlatform(landX, landY, landW, 38, 'solid'));
               curX = landX + landW;
-              curY = py;
+              curY = landY;
             } else if (chunk === 'beat_bridge') {
               // Clean 835px Rhythm Crossing with 4 Alternating Red/Blue Beat Blocks (zero clutter, unskippable!)
               const px = curX + entryGap;
@@ -3862,7 +3886,7 @@
 
               // Upper fast aerial route
               const upY = py - 115;
-              orbs.push({ x: forkX + 85, y: py - 78, r: 14, cd: 0, pulse: 0 });
+              orbs.push({ x: forkX + 82, y: py - 68, r: 17, dirX: 0.78, dirY: -0.62, cd: 0, pulse: 0 });
               platforms.push(makePlatform(forkX + 160, upY, 330, 24, 'conveyor_r'));
 
               // Lower safe route
@@ -4073,10 +4097,9 @@
           sliding: false,
           dashJumpWindow: 0,
           highSpeedTimer: 0,
-          orbHold: null,
-          orbHoldT: 0,
-          orbAimX: 1,
-          orbAimY: -1,
+          wallCoyoteTimer: 0,
+          wallCoyoteDir: 0,
+          wallCoyoteSurface: 'solid',
           lastWallJumpDir: 0,
           lastWallJumpX: 0,
           stepTimer: 0,
@@ -6307,8 +6330,9 @@
         p.y = sp.y;
         p.vx = 0;
         p.vy = 0;
-        p.orbHold = null;
-        p.orbHoldT = 0;
+        p.wallCoyoteTimer = 0;
+        p.wallCoyoteDir = 0;
+        p.wallCoyoteSurface = 'solid';
         p.lastWallJumpDir = 0;
         p.ridingMoverIdx = -1;
         p.h = CFG.normalH;
@@ -6600,56 +6624,6 @@
         }
         const crouchHeld = keys.down || wantAutoCrouch;
 
-        // Ink Bubble capture: player is held inside the blot, aims with arrows/WASD and fires out with Jump (or auto after 0.75s)
-        if (p.orbHold) {
-          const orb = p.orbHold;
-          p.orbHoldT += dt;
-          p.vx = 0;
-          p.vy = 0;
-          p.rollTimer = 0;
-          p.sliding = false;
-          p.grounded = false;
-          p.x += (orb.x - p.w * 0.5 - p.x) * Math.min(1, 22 * dt);
-          p.y += (orb.y - p.h * 0.5 - p.y) * Math.min(1, 22 * dt);
-          let ax = moveDir;
-          let ay = (keys.up ? -1 : 0) + (keys.down ? 1 : 0);
-          if (ax === 0 && ay === 0) { ax = p.facing || 1; ay = -1; }
-          const al = Math.hypot(ax, ay) || 1;
-          p.orbAimX = ax / al;
-          p.orbAimY = ay / al;
-          p.scaleX = 1 + Math.sin(p.orbHoldT * 30) * 0.08;
-          p.scaleY = 1 - Math.sin(p.orbHoldT * 30) * 0.08;
-          const wantFire = (p.jumpBufferTimer > 0 && p.orbHoldT > 0.07) || p.orbHoldT >= 0.75;
-          if (wantFire) {
-            const LAUNCH = 760;
-            p.vx = p.orbAimX * LAUNCH;
-            p.vy = p.orbAimY * LAUNCH * (p.orbAimY < 0 ? 1.0 : 0.85);
-            if (Math.abs(p.orbAimX) > 0.1) p.facing = Math.sign(p.orbAimX);
-            p.jumpsLeft = CFG.maxJumps;
-            p.airRollUsed = false;
-            p.rollCooldownTimer = 0;
-            p.lastWallJumpDir = 0;
-            p.wallJumpLock = 0.16;
-            p.jumpBufferTimer = 0;
-            p.coyoteTimer = 0;
-            p.highSpeedTimer = 0.35;
-            p.scaleX = Math.abs(p.orbAimX) > 0.5 ? 1.4 : 0.7;
-            p.scaleY = Math.abs(p.orbAimX) > 0.5 ? 0.7 : 1.4;
-            orb.cd = 2.2;
-            orb.pulse = 1.0;
-            p.orbHold = null;
-            hitStopTimer = Math.max(hitStopTimer, 0.045);
-            screenShake = Math.max(screenShake, 5);
-            playSound('catapult');
-            spawnShockwave(orb.x, orb.y, '#2952A3', 46);
-            spawnPackParticles(localCosmetics.particlePack, orb.x, orb.y, 14, 240, '#2952A3');
-            spawnParticles(orb.x, orb.y, '#231F20', 8, 200);
-          } else {
-            if (Math.random() < 0.4) spawnParticles(orb.x + (Math.random() - 0.5) * 30, orb.y + (Math.random() - 0.5) * 30, '#2952A3', 1, 40);
-            return;
-          }
-        }
-
         // Crouch-Slide: pressing crouch while moving fast on ground slides cleanly (great for tunnels & ice!)
         if (crouchHeld && p.grounded && p.rollTimer <= 0 && p.surfaceType !== 'slime') {
           if (!p.sliding && Math.abs(p.vx) >= CFG.slideMinSpeed) {
@@ -6751,13 +6725,53 @@
           p.jumpsLeft = CFG.maxJumps;
           p.airRollUsed = false;
           p.lastWallJumpDir = 0;
+          p.wallCoyoteTimer = 0;
         } else {
           p.coyoteTimer = Math.max(0, p.coyoteTimer - dt);
+          // Magnetic Side Wall Probe: reliably detects walls (7px magnetic margin on slime, 4px on normal walls)
+          // even after double-jumping or when pressing the opposite key right before jumping!
+          let probedDir = 0;
+          let probedSurf = 'solid';
+          for (const s of allSolids) {
+            if (p.y + p.h - 4 <= s.y || p.y + 4 >= s.y + s.h) continue;
+            const margin = s.type === 'slime' ? 7 : 4;
+            const distR = s.x - (p.x + p.w);
+            const distL = p.x - (s.x + s.w);
+            if (distR >= -2 && distR <= margin) {
+              probedDir = 1;
+              probedSurf = s.type || 'solid';
+              if (s.type === 'slime' && distR > 0 && p.vx >= -20 && p.wallJumpLock <= 0) p.x = s.x - p.w;
+              break;
+            } else if (distL >= -2 && distL <= margin) {
+              probedDir = -1;
+              probedSurf = s.type || 'solid';
+              if (s.type === 'slime' && distL > 0 && p.vx <= 20 && p.wallJumpLock <= 0) p.x = s.x + s.w;
+              break;
+            }
+          }
+          if (probedDir !== 0) {
+            p.wallDir = probedDir;
+            p.wallSurface = probedSurf;
+          }
+          if (p.wallDir !== 0) {
+            p.wallCoyoteTimer = 0.16;
+            p.wallCoyoteDir = p.wallDir;
+            p.wallCoyoteSurface = p.wallSurface;
+            // Touching a slime wall or opposite wall refreshes air-dash & ensures you never feel "dead" after a double-jump
+            if (p.wallSurface === 'slime' || p.wallDir !== p.lastWallJumpDir) {
+              p.airRollUsed = false;
+              if (p.wallSurface === 'slime') p.jumpsLeft = Math.max(p.jumpsLeft, 1);
+            }
+          } else {
+            p.wallCoyoteTimer = Math.max(0, p.wallCoyoteTimer - dt);
+          }
         }
 
         if (p.jumpBufferTimer > 0) {
+          const activeWallDir = !p.grounded ? (p.wallDir !== 0 ? p.wallDir : (p.wallCoyoteTimer > 0 ? p.wallCoyoteDir : 0)) : 0;
+          const activeWallSurf = p.wallDir !== 0 ? p.wallSurface : p.wallCoyoteSurface;
           // Fun & situational Dash-Jump: snappy low horizontal torpedo across wide gaps (no stamina lock!)
-          if (p.dashJumpWindow > 0 && (p.coyoteTimer > 0 || p.jumpsLeft > 0)) {
+          if (p.dashJumpWindow > 0 && (p.coyoteTimer > 0 || p.jumpsLeft > 0) && activeWallDir === 0) {
             p.rollTimer = 0;
             p.dashJumpWindow = 0;
             p.rollCooldownTimer = 0.72;
@@ -6795,28 +6809,33 @@
             playSound('jump');
             spawnParticles(p.x + p.w / 2, p.y + p.h, '#231F20', 6, 120);
             sendVfxEvent('jump', p.x + p.w / 2, p.y + p.h);
-          } else if (p.wallDir !== 0 && !p.grounded) {
-            const onSlimeWall = p.wallSurface === 'slime';
-            // Same-wall rule: re-jumping off the SAME wall gives a weak kick (no height gain) -> real climbs need two walls!
-            const sameWall = p.lastWallJumpDir === p.wallDir && Math.abs(p.x - p.lastWallJumpX) < 56;
-            const vyMult = sameWall ? 0.48 : 1.0;
-            p.vx = -p.wallDir * (onSlimeWall ? CFG.wallJumpVx * 1.15 : CFG.wallJumpVx) * (sameWall ? 1.2 : 1.0);
-            p.vy = -(onSlimeWall ? CFG.wallJumpVy * 1.12 : CFG.wallJumpVy) * vyMult;
-            p.lastWallJumpDir = p.wallDir;
-            p.lastWallJumpX = p.x;
+          } else if (activeWallDir !== 0 && !p.grounded) {
+            const onSlimeWall = activeWallSurf === 'slime';
+            // Same-wall rule: re-jumping off the SAME wall kicks you across without climbing -> zig-zagging L<->R climbs effortlessly!
+            const sameWall = p.lastWallJumpDir === activeWallDir && Math.abs(p.x - p.lastWallJumpX) < 42;
             if (sameWall) {
-              spawnParticles(p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.5, '#9E9384', 5, 70);
+              p.vx = -activeWallDir * (onSlimeWall ? 355 : 295);
+              p.vy = -215;
+              spawnParticles(p.x + (activeWallDir > 0 ? p.w : 0), p.y + p.h * 0.5, '#9E9384', 5, 70);
+            } else {
+              p.vx = -activeWallDir * (onSlimeWall ? 395 : CFG.wallJumpVx);
+              p.vy = -(onSlimeWall ? 595 : CFG.wallJumpVy);
+              p.jumpsLeft = Math.max(p.jumpsLeft, 1);
+              p.airRollUsed = false;
             }
-            if (onSlimeWall && !sameWall) p.airRollUsed = false;
-            p.facing = -p.wallDir;
-            p.wallJumpLock = 0.08;
+            p.lastWallJumpDir = activeWallDir;
+            p.lastWallJumpX = p.x;
+            p.wallDir = 0;
+            p.wallCoyoteTimer = 0;
+            p.facing = -activeWallDir;
+            p.wallJumpLock = onSlimeWall ? 0.15 : 0.10;
             p.jumpBufferTimer = 0;
             p.scaleX = 0.78;
             p.scaleY = 1.24;
             playSound(onSlimeWall ? 'slime' : 'jump');
-            spawnShockwave(p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.5, onSlimeWall ? '#57B889' : '#231F20', 26);
-            sendVfxEvent('wjump', p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.5);
-            spawnParticles(p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.5, onSlimeWall ? '#84D97B' : '#6A635A', 8, 150);
+            spawnShockwave(p.x + (activeWallDir > 0 ? p.w : 0), p.y + p.h * 0.5, onSlimeWall ? '#57B889' : '#231F20', 26);
+            sendVfxEvent('wjump', p.x + (activeWallDir > 0 ? p.w : 0), p.y + p.h * 0.5);
+            spawnParticles(p.x + (activeWallDir > 0 ? p.w : 0), p.y + p.h * 0.5, onSlimeWall ? '#84D97B' : '#6A635A', 8, 150);
           } else if (p.jumpsLeft > 0) {
             p.vy = -CFG.doubleJumpVel;
             p.jumpsLeft--;
@@ -6861,10 +6880,12 @@
             }
           }
         }
-        const wallCap = p.wallSurface === 'slime' ? 32 : CFG.wallSlideSpeed;
-        if (p.wallDir !== 0 && !p.grounded && p.vy > wallCap && moveDir === p.wallDir) {
+        const wallCap = p.wallSurface === 'slime' ? 24 : CFG.wallSlideSpeed;
+        // Slime walls naturally grip you even if you aren't holding the key into the wall (unless pressing crouch/down)
+        const clingingWall = p.wallDir !== 0 && !p.grounded && !crouchHeld && (p.wallSurface === 'slime' || moveDir === p.wallDir);
+        if (clingingWall && p.vy > wallCap) {
           p.vy = wallCap;
-          if (Math.random() < 0.25) {
+          if (Math.random() < 0.28) {
             spawnParticles(p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.7, p.wallSurface === 'slime' ? '#84D97B' : '#6A635A', 1, 45);
           }
         }
@@ -6916,6 +6937,16 @@
             if (totalMoveX > 0) { p.x = s.x - p.w; p.wallDir = 1; p.wallSurface = s.type || 'solid'; }
             else if (totalMoveX < 0) { p.x = s.x + s.w; p.wallDir = -1; p.wallSurface = s.type || 'solid'; }
             p.vx = 0;
+          }
+        }
+        if (p.wallDir === 0 && !p.grounded) {
+          for (const s of allSolids) {
+            if (p.y + p.h - 4 <= s.y || p.y + 4 >= s.y + s.h) continue;
+            if (Math.abs((p.x + p.w) - s.x) <= 2.5 && (s.type === 'slime' || moveDir === 1)) {
+              p.wallDir = 1; p.wallSurface = s.type || 'solid'; break;
+            } else if (Math.abs(p.x - (s.x + s.w)) <= 2.5 && (s.type === 'slime' || moveDir === -1)) {
+              p.wallDir = -1; p.wallSurface = s.type || 'solid'; break;
+            }
           }
         }
 
@@ -7000,25 +7031,44 @@
           }
         }
 
-        // Ink Bubbles: fly in -> get captured -> aim -> fire out in any of 8 directions!
-        if (lvl.orbs && !p.orbHold) {
+        // High-Speed Ink Slingshot Rings: ZERO stopping — instant 800+ px/s directional boost along the ring's chevrons!
+        if (lvl.orbs) {
           const pcx = p.x + p.w * 0.5;
           const pcy = p.y + p.h * 0.5;
           for (const orb of lvl.orbs) {
-            if (orb.cd <= 0 && Math.hypot(pcx - orb.x, pcy - orb.y) < (orb.r || 14) + 18) {
-              p.orbHold = orb;
-              p.orbHoldT = 0;
-              p.vx = 0;
-              p.vy = 0;
-              p.rollTimer = 0;
-              p.sliding = false;
-              p.jumpBufferTimer = 0;
+            if (orb.cd <= 0 && Math.hypot(pcx - orb.x, pcy - orb.y) < (orb.r || 17) + 22) {
+              const isTurbo = p.rollTimer > 0 || p.jumpBufferTimer > 0 || keys.sprint;
+              const boostSpd = isTurbo ? 885 : 805;
+              const dx = orb.dirX != null ? orb.dirX : (p.facing || 1) * 0.82;
+              const dy = orb.dirY != null ? orb.dirY : -0.57;
+              const dlen = Math.hypot(dx, dy) || 1;
+              const nx = dx / dlen;
+              const ny = dy / dlen;
+
+              orb.cd = 1.35;
               orb.pulse = 1.0;
-              p.scaleX = 0.8;
-              p.scaleY = 0.8;
-              hitStopTimer = Math.max(hitStopTimer, 0.03);
+              p.x = orb.x - p.w * 0.5 + nx * 8;
+              p.y = orb.y - p.h * 0.5 + ny * 8;
+              p.vx = nx * boostSpd;
+              p.vy = ny * boostSpd;
+              if (Math.abs(nx) > 0.1) p.facing = Math.sign(nx);
+              p.grounded = false;
+              p.sliding = false;
+              p.jumpsLeft = CFG.maxJumps;
+              p.airRollUsed = false;
+              p.rollCooldownTimer = 0;
+              p.lastWallJumpDir = 0;
+              p.wallJumpLock = 0.18;
+              p.highSpeedTimer = 0.45;
+              p.scaleX = 1.44;
+              p.scaleY = 0.64;
+              hitStopTimer = Math.max(hitStopTimer, 0.028);
+              screenShake = Math.max(screenShake, isTurbo ? 5.2 : 4.0);
               playSound('orb');
-              spawnShockwave(orb.x, orb.y, '#2952A3', 28);
+              playSound('catapult');
+              const ringCol = isTurbo ? '#C83E31' : '#2952A3';
+              spawnShockwave(orb.x, orb.y, ringCol, isTurbo ? 48 : 38);
+              spawnPackParticles(localCosmetics.particlePack, orb.x, orb.y, 14, 240, ringCol);
               break;
             }
           }
@@ -8919,15 +8969,18 @@
           }
         }
 
-        // 4b. Mid-Air Ink Refill Orbs
+        // 4b. High-Speed Ink Slingshot Rings (Directional Flow Boosters)
         if (lvl.orbs) {
           for (const orb of lvl.orbs) {
-            if (orb.x + 40 < visLeft || orb.x - 40 > visRight) continue;
-            const r = orb.r || 14;
-            const bobY = Math.sin(worldTime * 4 + orb.x * 0.03) * 4;
+            if (orb.x + 50 < visLeft || orb.x - 50 > visRight) continue;
+            const r = orb.r || 17;
+            const bobY = Math.sin(worldTime * 4.5 + orb.x * 0.03) * 3.5;
+            const dx = orb.dirX != null ? orb.dirX : 0.82;
+            const dy = orb.dirY != null ? orb.dirY : -0.57;
+            const ang = Math.atan2(dy, dx);
             ctx.save();
             if (orb.cd > 0) {
-              const frac = Math.max(0, 1 - orb.cd / 2.2);
+              const frac = Math.max(0, 1 - orb.cd / 1.35);
               ctx.setLineDash([4, 4]);
               ctx.strokeStyle = 'rgba(41, 82, 163, 0.35)';
               ctx.lineWidth = 2;
@@ -8939,78 +8992,56 @@
               ctx.arc(orb.x, orb.y, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
               ctx.stroke();
             } else {
-              const og = ctx.createRadialGradient(orb.x, orb.y + bobY, 2, orb.x, orb.y + bobY, r * 2.2);
-              og.addColorStop(0, 'rgba(62, 123, 217, 0.38)');
+              const cx0 = orb.x;
+              const cy0 = orb.y + bobY;
+              const og = ctx.createRadialGradient(cx0, cy0, 3, cx0, cy0, r * 2.3);
+              og.addColorStop(0, 'rgba(62, 123, 217, 0.36)');
               og.addColorStop(1, 'rgba(62, 123, 217, 0)');
               ctx.fillStyle = og;
-              ctx.beginPath(); ctx.arc(orb.x, orb.y + bobY, r * 2.2, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.arc(cx0, cy0, r * 2.3, 0, Math.PI * 2); ctx.fill();
 
-              // Orbiting ink glint
-              ctx.strokeStyle = '#68A4F1';
-              ctx.lineWidth = 1.6;
+              // Outer rotating dashed energy ring
               ctx.save();
-              ctx.translate(orb.x, orb.y + bobY);
-              ctx.rotate(worldTime * 2.8);
-              ctx.setLineDash([7, 7]);
-              ctx.beginPath(); ctx.arc(0, 0, r + 4, 0, Math.PI * 2); ctx.stroke();
+              ctx.translate(cx0, cy0);
+              ctx.rotate(worldTime * 3.2);
+              ctx.strokeStyle = '#68A4F1';
+              ctx.lineWidth = 1.8;
+              ctx.setLineDash([7, 6]);
+              ctx.beginPath(); ctx.arc(0, 0, r + 5, 0, Math.PI * 2); ctx.stroke();
               ctx.setLineDash([]);
               ctx.restore();
 
-              // Cobalt Ink Teardrop Jewel
-              ctx.fillStyle = '#2952A3';
+              // Main Inked Slingshot Ring + animated directional launch chevrons (>>)
+              ctx.save();
+              ctx.translate(cx0, cy0);
+              ctx.rotate(ang);
+              ctx.fillStyle = 'rgba(251, 247, 238, 0.88)';
               ctx.strokeStyle = '#231F20';
-              ctx.lineWidth = 2.2;
+              ctx.lineWidth = 2.6;
+              ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+              ctx.strokeStyle = '#2952A3';
+              ctx.lineWidth = 2.4;
+              ctx.beginPath(); ctx.arc(0, 0, r - 3.5, 0, Math.PI * 2); ctx.stroke();
+
+              // Animated double launch chevrons sliding forward along firing vector
+              const slide = ((worldTime * 26) % 8) - 4;
+              ctx.strokeStyle = '#C83E31';
+              ctx.lineWidth = 2.6;
+              ctx.lineCap = 'round';
+              ctx.lineJoin = 'round';
               ctx.beginPath();
-              ctx.moveTo(orb.x, orb.y + bobY - r - 2);
-              ctx.bezierCurveTo(orb.x + r, orb.y + bobY - 2, orb.x + r, orb.y + bobY + r, orb.x, orb.y + bobY + r);
-              ctx.bezierCurveTo(orb.x - r, orb.y + bobY + r, orb.x - r, orb.y + bobY - 2, orb.x, orb.y + bobY - r - 2);
-              ctx.closePath();
-              ctx.fill();
+              ctx.moveTo(-6 + slide * 0.4, -6); ctx.lineTo(1 + slide * 0.4, 0); ctx.lineTo(-6 + slide * 0.4, 6);
+              ctx.moveTo(1 + slide * 0.4, -5); ctx.lineTo(7 + slide * 0.4, 0); ctx.lineTo(1 + slide * 0.4, 5);
               ctx.stroke();
 
-              ctx.fillStyle = '#FBF7EE';
+              // Subtle trajectory guide ticks outside the ring exit
+              ctx.strokeStyle = 'rgba(200, 62, 49, 0.55)';
+              ctx.lineWidth = 2;
               ctx.beginPath();
-              ctx.ellipse(orb.x - 3.5, orb.y + bobY - 1, 2.8, 5, -0.35, 0, Math.PI * 2);
-              ctx.fill();
-
-              // Captured: wobbling ink bubble shell + hand-drawn aim arrow + fuse ring
-              if (localPlayer.orbHold === orb) {
-                const ht = localPlayer.orbHoldT || 0;
-                const wob = Math.sin(ht * 28) * 2.5;
-                ctx.strokeStyle = '#2952A3';
-                ctx.lineWidth = 2.4;
-                ctx.globalAlpha = 0.85;
-                ctx.beginPath();
-                ctx.ellipse(orb.x, orb.y, 30 + wob, 30 - wob, 0, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.globalAlpha = 1;
-                // Fuse ring: shrinking time left before auto-fire
-                ctx.strokeStyle = '#C83E31';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(orb.x, orb.y, 36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, 1 - ht / 0.75));
-                ctx.stroke();
-                // Aim arrow
-                const axd = localPlayer.orbAimX, ayd = localPlayer.orbAimY;
-                const ax0 = orb.x + axd * 40, ay0 = orb.y + ayd * 40;
-                const ax1 = orb.x + axd * 70, ay1 = orb.y + ayd * 70;
-                ctx.strokeStyle = '#231F20';
-                ctx.lineWidth = 3;
-                ctx.lineCap = 'round';
-                ctx.setLineDash([6, 5]);
-                ctx.lineDashOffset = -worldTime * 40;
-                ctx.beginPath(); ctx.moveTo(ax0, ay0); ctx.lineTo(ax1, ay1); ctx.stroke();
-                ctx.setLineDash([]);
-                const ang = Math.atan2(ayd, axd);
-                ctx.fillStyle = '#C83E31';
-                ctx.beginPath();
-                ctx.moveTo(ax1 + Math.cos(ang) * 10, ay1 + Math.sin(ang) * 10);
-                ctx.lineTo(ax1 + Math.cos(ang + 2.4) * 9, ay1 + Math.sin(ang + 2.4) * 9);
-                ctx.lineTo(ax1 + Math.cos(ang - 2.4) * 9, ay1 + Math.sin(ang - 2.4) * 9);
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-              }
+              ctx.moveTo(r + 7, 0); ctx.lineTo(r + 16, 0);
+              ctx.moveTo(r + 13, -3.5); ctx.lineTo(r + 17, 0); ctx.lineTo(r + 13, 3.5);
+              ctx.stroke();
+              ctx.restore();
             }
             ctx.restore();
           }
