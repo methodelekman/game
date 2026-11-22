@@ -7763,6 +7763,66 @@
         const cx = p.x + p.w / 2;
         const bottom = p.y + p.h;
         const speedAbs = Math.abs(p.vx || 0);
+        const totalSpd = Math.hypot(p.vx || 0, p.vy || 0);
+
+        // Dynamic speed-blur streaks anchored behind the character's center/spine (zero gap on triangles & all shapes!)
+        if (p.highSpeedTimer > 0 || p.rollTimer > 0 || p.sliding || (p.sprinting && speedAbs > 240) || totalSpd > 430) {
+          const spdNorm = Math.min(1, Math.max(0.28, (Math.max(speedAbs, totalSpd * 0.85) - 220) / 410 + (p.rollTimer > 0 ? 0.35 : 0)));
+          const mvX = Math.abs(p.vx || 0) > 25 ? p.vx : (p.facing * 260);
+          const mvY = (p.vy || 0) * 0.42;
+          const mvLen = Math.hypot(mvX, mvY) || 1;
+          const dx = mvX / mvLen;
+          const dy = mvY / mvLen;
+          const baseLen = 18 + spdNorm * 38;
+          const accentHex = packAccent || '#231F20';
+          const fadeZero = (accentHex.startsWith('#') && accentHex.length === 7) ? (accentHex + '00') : 'rgba(35,31,32,0)';
+
+          ctx.save();
+          ctx.lineCap = 'round';
+          // 1. Soft motion-blur ribbon wash anchored right at the character's center mass
+          const blurX0 = cx - dx * 1.5;
+          const blurY0 = p.y + p.h * 0.56 - dy * 1.5;
+          const blurX1 = blurX0 - dx * (baseLen * 1.15);
+          const blurY1 = blurY0 - dy * (baseLen * 1.15);
+          const blurGrad = ctx.createLinearGradient(blurX0, blurY0, blurX1, blurY1);
+          blurGrad.addColorStop(0, accentHex);
+          blurGrad.addColorStop(1, fadeZero);
+          ctx.globalAlpha = 0.28 * spdNorm;
+          ctx.strokeStyle = blurGrad;
+          ctx.lineWidth = p.h * (0.44 + spdNorm * 0.14);
+          ctx.beginPath();
+          ctx.moveTo(blurX0, blurY0);
+          ctx.lineTo(blurX1, blurY1);
+          ctx.stroke();
+
+          // 2. Animated kinetic speedlines streaming rapidly backward & dissolving with velocity
+          const lineCount = 6;
+          for (let i = 0; i < lineCount; i++) {
+            const fracY = 0.26 + (i / (lineCount - 1)) * 0.58;
+            const phase = (worldTime * (10.5 + spdNorm * 9) + i * 0.31) % 1;
+            const wave = Math.sin(worldTime * 22 + i * 2.3) * 1.9;
+            // Anchor right at the center spine so even narrow triangle tips have zero air gap
+            const startSlide = phase * (3 + spdNorm * 6);
+            const sx0 = cx - dx * (1 + startSlide);
+            const sy0 = p.y + p.h * fracY + wave - dy * (1 + startSlide);
+            const streakLen = baseLen * (0.65 + 0.52 * Math.sin(phase * Math.PI)) * (i % 2 === 0 ? 1.14 : 0.86);
+            const ex1 = sx0 - dx * streakLen;
+            const ey1 = sy0 - dy * streakLen;
+
+            const grad = ctx.createLinearGradient(sx0, sy0, ex1, ey1);
+            grad.addColorStop(0, accentHex);
+            grad.addColorStop(0.5, accentHex);
+            grad.addColorStop(1, fadeZero);
+            ctx.strokeStyle = grad;
+            ctx.globalAlpha = (0.36 + 0.44 * Math.sin(phase * Math.PI)) * (0.55 + spdNorm * 0.45);
+            ctx.lineWidth = (1.6 + spdNorm * 1.6) * (i % 2 === 0 ? 1.1 : 0.85);
+            ctx.beginPath();
+            ctx.moveTo(sx0, sy0);
+            ctx.lineTo(ex1, ey1);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
         const isMovingOnGround = p.grounded && speedAbs > 18 && p.rollTimer <= 0;
         const isIdle = p.grounded && speedAbs <= 18 && p.rollTimer <= 0 && p.tauntTimer <= 0;
         const breath = isIdle ? Math.sin(worldTime * 3.4) * 0.032 : 0;
@@ -9085,26 +9145,7 @@
           ctx.restore();
         }
 
-        // 7b. Sketchbook Speedlines tightly attached right behind fast/dashing/sliding players
-        const drawPlayerSpeedlines = (pl, pkId) => {
-          if (pl.highSpeedTimer <= 0 && pl.rollTimer <= 0 && !pl.sliding) return;
-          ctx.save();
-          ctx.strokeStyle = getParticlePack(pkId).accent;
-          ctx.globalAlpha = 0.55;
-          ctx.lineWidth = 1.7;
-          const backEdge = pl.x + pl.w / 2 - pl.facing * (pl.w * 0.46);
-          for (let i = 0; i < 4; i++) {
-            const ly = pl.y + 5 + i * (pl.h * 0.24) + (Math.random() - 0.5) * 3;
-            const lx = backEdge - pl.facing * (Math.random() * 4);
-            ctx.beginPath();
-            ctx.moveTo(lx, ly);
-            ctx.lineTo(lx - pl.facing * (14 + Math.random() * 14), ly);
-            ctx.stroke();
-          }
-          ctx.restore();
-        };
-        drawPlayerSpeedlines(localPlayer, localCosmetics.particlePack);
-        if (netConnected) drawPlayerSpeedlines(remotePlayer, remoteCosmetics.particlePack);
+        // 7b. Speedlines now render directly behind each player's spine inside drawSketchPlayer()
 
         // 7c. Custom Particle Packs Renderer
         for (const pt of particles) {
