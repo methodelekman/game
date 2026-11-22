@@ -1742,6 +1742,13 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.19.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Генератор 3.0 — логіка рівня без скупченості та скіпів:</b> перероблено геометрію всіх 13 чанків під реальну фізику стрибка — герметичні 340px портальні стіни з козирком, справжні 305px вертикальні шахти вітру/слайму, 760px повітряні прірви з 3 орбами, 45° катапульти на 210px вгору, широкі ритм-мости, окремий коридор пилок-маятників та просторі розвилки без жодних накладань платформ.</li>
+                <li><b>Тематичний ритм рівня:</b> кожен біом тепер добирає узгоджений набір механік із плавним контролем висоти й чистими посадковими майданчиками між секціями.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.19.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>7 нових чорнильних механік:</b> скотч-конвеєри (<code>&gt;&gt;&gt;</code>/<code>&lt;&lt;&lt;</code>), ритм-блоки в такт музиці (червоний/синій), потоки вітру з анімованими стрічками, чорнильні краплі скидання стрибка й дешу в повітрі, циркульні шестерні-пилки на рейках і маятники, підвісні вагові платформи на нитках, діагональні 45° катапульти та дірокольні портали зі збереженням імпульсу!</li>
@@ -1816,6 +1823,13 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.19.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Generator 3.0 — Logical Non-Skippable Chunks &amp; Clean Spacing:</b> rebuilt all 13 chunks around real jump reach so every mechanic is genuinely required and zero platforms overlap — sealed 340px portal vaults with overhang caps, 305px wind/slime vertical shafts, 760px 3-orb sky chasms, 210px-high 45° catapult launches, dedicated pendulum saw bridges, and spacious risk/reward forks.</li>
+                <li><b>Coherent Stage Pacing:</b> each paper biome builds a focused thematic set of mechanics with elevation steering and generous flat landing decks between set-pieces.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.19.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>7 New Sketchbook Mechanics:</b> masking-tape conveyors, music-synced Red/Blue beat blocks, swirling wind updrafts, mid-air Ink Refill Orbs (instant double-jump &amp; air-dash reset), compass gear-saws &amp; pendulums, hanging weight platforms, 45° diagonal catapults, and momentum-preserving hole-punch portals!</li>
@@ -1871,7 +1885,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.19.0 · Changelog</button>
+      <button id="version-tag">v0.19.1 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -3363,15 +3377,17 @@
       }
 
       const ALL_CHUNK_TYPES = [
-        'mover', 'switch_bridge', 'tunnel', 'catapult', 'breakable',
-        'ice_slime', 'split_path', 'chimney', 'downhill', 'pinball',
-        'sky_chain', 'beat_saw', 'portal_vault'
+        'mover', 'switch_bridge', 'conveyor_tunnel', 'catapult', 'weight_bridge',
+        'saw_gauntlet', 'split_path', 'chimney', 'downhill', 'pinball',
+        'sky_chain', 'beat_bridge', 'portal_vault'
       ];
       const BIOME_PREFERRED = {
-        grid: ['split_path', 'mover', 'switch_bridge', 'tunnel', 'catapult', 'downhill', 'beat_saw'],
-        blueprint: ['beat_saw', 'portal_vault', 'switch_bridge', 'tunnel', 'downhill', 'mover', 'split_path'],
-        sketchpad: ['sky_chain', 'pinball', 'chimney', 'catapult', 'breakable', 'split_path', 'portal_vault']
+        grid: ['conveyor_tunnel', 'catapult', 'weight_bridge', 'switch_bridge', 'split_path', 'mover'],
+        blueprint: ['portal_vault', 'beat_bridge', 'saw_gauntlet', 'conveyor_tunnel', 'chimney', 'switch_bridge'],
+        sketchpad: ['sky_chain', 'chimney', 'pinball', 'catapult', 'downhill', 'split_path']
       };
+      const UPWARD_CHUNKS = new Set(['chimney', 'catapult', 'pinball', 'portal_vault']);
+      const DOWNWARD_CHUNKS = new Set(['downhill']);
 
       function generateRandomLevel(seed, roundNum, opts = roomSettings) {
         const modeObj = GAME_MODES[opts.gameModeIdx || 0] || GAME_MODES[0];
@@ -3427,7 +3443,7 @@
             notes.push({ x: sx - 85, y: sy - 95, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : tr('ringNoteMain')), sub: tr('ringNoteSub') });
           }
 
-          const overlapsPlats = (rx0, ry0, rw0, rh0, padX = 12, padY = 16) => {
+          const overlapsPlats = (rx0, ry0, rw0, rh0, padX = 24, padY = 36) => {
             for (const ep of platforms) {
               if (rx0 - padX < ep.x + ep.w && rx0 + rw0 + padX > ep.x &&
                   ry0 - padY < ep.y + ep.h && ry0 + rh0 + padY > ep.y) {
@@ -3530,276 +3546,316 @@
             cy = target.y;
           }
         } else {
-          // Generator 2.0: Non-Repeating Shuffled Chunk Deck across 13 distinct geometric chunk shapes!
-          const minY = Math.round(480 - vertSpan * 0.72);
-          const maxY = Math.round(480 + vertSpan * 0.28);
-          platforms.push(makePlatform(0, 480, 280, 140, 'solid'));
+          // Generator 3.0: Logical Crafted Chunks — Non-Skippable Mechanics, Coherent Biome Palette & Guaranteed Clearance!
+          platforms.push(makePlatform(0, 480, 300, 140, 'solid'));
           if (roundNum === 1) {
             notes.push({ x: 55, y: 340, text: modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : tr('raceNoteMain')), sub: tr('raceNoteSub') });
           }
 
-          const buildChunkDeck = (avoidFirst) => {
-            const pref = BIOME_PREFERRED[biome] || ALL_CHUNK_TYPES;
-            const front = [...pref];
-            const rest = ALL_CHUNK_TYPES.filter((id) => !front.includes(id));
-            const shuffle = (arr) => {
-              for (let j = arr.length - 1; j > 0; j--) {
-                const k = Math.floor(rng() * (j + 1));
-                const tmp = arr[j]; arr[j] = arr[k]; arr[k] = tmp;
-              }
-            };
-            shuffle(front);
-            shuffle(rest);
-            const combined = front.concat(rest);
-            if (avoidFirst && combined[0] === avoidFirst && combined.length > 1) {
-              const tmp = combined[0]; combined[0] = combined[1]; combined[1] = tmp;
+          const shuffle = (arr) => {
+            for (let j = arr.length - 1; j > 0; j--) {
+              const k = Math.floor(rng() * (j + 1));
+              const tmp = arr[j]; arr[j] = arr[k]; arr[k] = tmp;
             }
-            return combined;
+          };
+
+          // Build a focused stage palette: biome's 6 core chunks + 2 surprise wildcards (no chaotic 13-gimmick soup)
+          const core = [...(BIOME_PREFERRED[biome] || ALL_CHUNK_TYPES.slice(0, 6))];
+          const others = ALL_CHUNK_TYPES.filter((id) => !core.includes(id));
+          shuffle(others);
+          const stagePool = core.concat(others.slice(0, 2));
+
+          const buildChunkDeck = (avoidFirst) => {
+            const d = [...stagePool];
+            shuffle(d);
+            if (avoidFirst && d[0] === avoidFirst && d.length > 1) {
+              const tmp = d[0]; d[0] = d[1]; d[1] = tmp;
+            }
+            return d;
           };
 
           let deck = buildChunkDeck(null);
           let lastChunk = null;
-          let curX = 280;
+          let curX = 300;
           let curY = 480;
+          const elevMin = 480 - Math.max(460, vertSpan * 1.15);
+          const elevMax = 480 + Math.max(240, vertSpan * 0.5);
+
+          const pickNextChunk = () => {
+            if (deck.length === 0) deck = buildChunkDeck(lastChunk);
+            // Steer elevation naturally so tall climbs never squish and valleys climb back up
+            if (curY < elevMin + 240) {
+              const idx = deck.findIndex((c) => !UPWARD_CHUNKS.has(c) && c !== lastChunk);
+              if (idx >= 0) return deck.splice(idx, 1)[0];
+            } else if (curY > elevMax - 120) {
+              const idx = deck.findIndex((c) => UPWARD_CHUNKS.has(c) && c !== lastChunk);
+              if (idx >= 0) return deck.splice(idx, 1)[0];
+            }
+            return deck.shift();
+          };
 
           for (let i = 0; i < segments; i++) {
-            if (deck.length === 0) deck = buildChunkDeck(lastChunk);
-            const chunk = deck.shift();
+            const chunk = pickNextChunk();
             lastChunk = chunk;
+            const entryGap = 100 + Math.floor(rng() * 25);
 
-            if (chunk === 'mover') {
-              const gap1 = 65 + Math.floor(rng() * 40);
-              const mw = 115 + Math.floor(rng() * 35);
-              const travelX = rng() < 0.65 ? (115 + Math.floor(rng() * 75)) : 0;
-              const travelY = travelX === 0 ? (90 + Math.floor(rng() * 55)) : (rng() < 0.5 ? -55 : 40);
-              const ax = curX + gap1;
-              const ay = curY - 10;
-              const bx = ax + travelX;
-              const by = Math.max(minY, Math.min(maxY, ay + travelY));
-              movers.push({ x: ax, y: ay, w: mw, h: 26, ax, ay, bx, by, speed: 1.35 + rng() * 0.65 });
+            if (chunk === 'portal_vault') {
+              // Sealed 340px-tall Ink Vault with overhang roof cap -> MUST warp via Blue -> Orange Hole-Punch Portals!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 210;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
 
-              const nextX = bx + mw + 75 + Math.floor(rng() * 40);
-              const nextY = Math.max(minY, Math.min(maxY, by + Math.floor((rng() - 0.5) * 65)));
-              const nextW = 175 + Math.floor(rng() * 80);
-              platforms.push(makePlatform(nextX, nextY, nextW, 36, rng() < 0.35 ? 'ice' : 'solid'));
-              curX = nextX + nextW;
-              curY = nextY;
-            } else if (chunk === 'switch_bridge') {
-              const gap = 70 + Math.floor(rng() * 35);
-              const px = curX + gap;
-              const py = Math.max(minY + 40, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 55)));
-              const pw = 140;
-              platforms.push(makePlatform(px, py, pw, 36, 'solid'));
-              const swId = nextSwitchId++;
-              const swCol = swId % 2 === 1 ? '#C83E31' : '#2952A3';
-              switches.push({ id: swId, x: px + Math.floor(pw * 0.5) - 16, y: py - 12, w: 32, h: 12, color: swCol, active: false, timer: 0, dur: 6.5 });
-              const b1x = px + pw + 48, b1w = 115;
-              const b2x = b1x + b1w + 48, b2w = 115;
-              platforms.push(makePlatform(b1x, py - 8, b1w, 22, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
-              platforms.push(makePlatform(b2x, py - 16, b2w, 22, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
-              const endBx = b2x + b2w + 55;
-              platforms.push(makePlatform(endBx, py, 130, 36, 'solid'));
-              curX = endBx + 130;
-              curY = py;
-            } else if (chunk === 'tunnel') {
-              const gap = 75 + Math.floor(rng() * 45);
-              const px = curX + gap;
-              const py = Math.max(minY + 60, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 65)));
-              const pw = 330 + Math.floor(rng() * 85);
-              const fRoll = rng();
-              const floorType = fRoll < 0.45 ? 'conveyor_r' : (fRoll < 0.7 ? 'ice' : 'solid');
-              platforms.push(makePlatform(px, py, pw, 42, floorType));
-              const beamW = 125 + Math.floor(rng() * 50);
-              const beamX = px + Math.floor((pw - beamW) * 0.5);
-              platforms.push(makePlatform(beamX, py - 80, beamW, 48, 'solid'));
-              curX = px + pw;
-              curY = py;
-            } else if (chunk === 'catapult') {
-              const gap = 70 + Math.floor(rng() * 40);
-              const px = curX + gap;
-              const py = Math.max(minY + 130, Math.min(maxY, curY + 25));
-              const pw = 140 + Math.floor(rng() * 40);
-              const isDiag = rng() < 0.58;
-              platforms.push(makePlatform(px, py, pw, 36, isDiag ? 'solid' : (rng() < 0.5 ? 'trampoline' : 'solid')));
-              if (isDiag) {
-                jumpPads.push({ x: px + Math.floor(pw * 0.58) - 23, y: py - 15, w: 46, h: 15, power: 685, vxPower: 615, dirX: 1, squish: 0 });
-                const landX = px + pw + 185 + Math.floor(rng() * 45);
-                const landY = Math.max(minY, py - (115 + Math.floor(rng() * 45)));
-                platforms.push(makePlatform(landX, landY, 175, 34, 'solid'));
-                curX = landX + 175;
-                curY = landY;
-              } else {
-                jumpPads.push({ x: px + Math.floor(pw / 2) - 22, y: py - 14, w: 44, h: 14, power: 820, squish: 0 });
-                const highX = px + pw + 75 + Math.floor(rng() * 40);
-                const highY = Math.max(minY, py - (130 + Math.floor(rng() * Math.min(130, vertSpan * 0.42))));
-                const highW = 175 + Math.floor(rng() * 65);
-                platforms.push(makePlatform(highX, highY, highW, 34, 'solid'));
-                curX = highX + highW;
-                curY = highY;
-              }
-            } else if (chunk === 'breakable') {
-              let bx = curX + 72;
-              let by = Math.max(minY, Math.min(maxY, curY - 15));
-              const useWeights = rng() < 0.52;
-              const pieces = useWeights ? 2 : (2 + Math.floor(rng() * 2));
-              for (let k = 0; k < pieces; k++) {
-                const bType = useWeights ? 'weight' : (rng() < 0.58 ? 'crumble' : 'fragile');
-                const bw = useWeights ? (115 + Math.floor(rng() * 30)) : (100 + Math.floor(rng() * 40));
-                const bh = bType === 'fragile' ? 20 : (bType === 'weight' ? 22 : 30);
-                platforms.push(makePlatform(bx, by, bw, bh, bType));
-                bx += bw + 65 + Math.floor(rng() * 35);
-                by = Math.max(minY, Math.min(maxY, by + Math.floor((rng() - 0.5) * 50)));
-              }
-              curX = bx - 50;
-              curY = by;
-            } else if (chunk === 'ice_slime') {
-              const gap = 75 + Math.floor(rng() * 45);
-              const px = curX + gap;
-              if (rng() < 0.5) {
-                const py = Math.max(minY, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 50)));
-                const pw = 250 + Math.floor(rng() * 85);
-                platforms.push(makePlatform(px, py, pw, 36, 'ice'));
-                if (rng() < 0.6) hazards.push({ x: px + Math.floor(pw * 0.48), y: py - 14, w: 40, h: 14 });
-                curX = px + pw;
-                curY = py;
-              } else {
-                const py = Math.max(minY + 60, curY - 15);
-                platforms.push(makePlatform(px, py, 145, 36, 'slime'));
-                const wallX = px + 145 + 75;
-                const wallTop = Math.max(minY, py - 155);
-                platforms.push(makePlatform(wallX, wallTop, 32, py - wallTop + 40, 'slime'));
-                const landX = wallX + 32;
-                platforms.push(makePlatform(landX, wallTop, 130, 32, 'solid'));
-                curX = landX + 130;
-                curY = wallTop;
-              }
-            } else if (chunk === 'split_path') {
-              // Risk-Reward Fork: Fast aerial upper path vs Reliable lower road!
-              const startX = curX + 75;
-              const midY = Math.max(minY + 115, Math.min(maxY - 55, curY));
-              platforms.push(makePlatform(startX, midY, 125, 34, 'solid'));
-              orbs.push({ x: startX + 135, y: midY - 62, r: 14, cd: 0, pulse: 0 });
-              // Upper risky fast route
-              const upY = midY - 102;
-              platforms.push(makePlatform(startX + 185, upY, 145, 22, rng() < 0.5 ? 'conveyor_r' : 'fragile'));
-              orbs.push({ x: startX + 375, y: upY - 22, r: 14, cd: 0, pulse: 0 });
-              // Lower safe route
-              const lowY = midY + 46;
-              platforms.push(makePlatform(startX + 150, lowY, 290, 36, rng() < 0.4 ? 'conveyor_r' : 'solid'));
-              hazards.push({ x: startX + 275, y: lowY - 14, w: 36, h: 14 });
-              // Rejoin landing platform
-              const endX = startX + 475;
-              platforms.push(makePlatform(endX, midY, 145, 36, 'solid'));
-              curX = endX + 145;
-              curY = midY;
-            } else if (chunk === 'chimney') {
-              // Vertical Climb Shaft: Wind Updraft OR Opposing Slime Wall-Jump Tower
-              const startX = curX + 70;
-              const botY = Math.max(minY + 195, Math.min(maxY, curY + 25));
-              platforms.push(makePlatform(startX, botY, 135, 36, 'solid'));
-              const topY = Math.max(minY, botY - 190);
-              if (rng() < 0.6) {
-                winds.push({ x: startX + 145, y: topY - 45, w: 88, h: (botY - topY) + 70, vx: 0, vy: -2250 });
-                platforms.push(makePlatform(startX + 245, topY, 155, 34, 'solid'));
-                curX = startX + 245 + 155;
-                curY = topY;
-              } else {
-                const wL = startX + 145;
-                const wR = wL + 130;
-                platforms.push(makePlatform(wL, topY + 25, 28, botY - topY, 'slime'));
-                platforms.push(makePlatform(wR, topY, 28, botY - topY - 25, 'slime'));
-                platforms.push(makePlatform(wR + 28, topY, 135, 34, 'solid'));
-                curX = wR + 28 + 135;
-                curY = topY;
-              }
-            } else if (chunk === 'downhill') {
-              // High-speed cascading downhill conveyor + ice slide!
-              let dx = curX + 70;
-              let dy = Math.max(minY, Math.min(maxY - 90, curY - 40));
-              platforms.push(makePlatform(dx, dy, 175, 34, 'conveyor_r'));
-              dx += 175 + 52;
-              dy = Math.min(maxY + 40, dy + 65);
-              platforms.push(makePlatform(dx, dy, 225, 34, 'ice'));
-              platforms.push(makePlatform(dx + 65, dy - 80, 95, 48, 'solid')); // low slide beam!
-              dx += 225 + 55;
-              dy = Math.min(maxY + 95, dy + 60);
-              platforms.push(makePlatform(dx, dy, 185, 34, 'conveyor_r'));
-              if (rng() < 0.65) hazards.push({ x: dx + 82, y: dy - 14, w: 34, h: 14 });
-              curX = dx + 185;
-              curY = dy;
-            } else if (chunk === 'pinball') {
-              // Trampoline Bounce Box!
-              const startX = curX + 70;
-              const midY = Math.max(minY + 125, Math.min(maxY - 60, curY));
-              platforms.push(makePlatform(startX, midY, 110, 34, 'solid'));
-              const boxX = startX + 135;
-              const botY = midY + 72;
-              platforms.push(makePlatform(boxX, botY, 220, 30, 'trampoline'));
-              platforms.push(makePlatform(boxX - 24, botY - 125, 24, 125, 'trampoline'));
-              platforms.push(makePlatform(boxX + 220, botY - 115, 24, 115, 'trampoline'));
-              orbs.push({ x: boxX + 150, y: midY - 78, r: 14, cd: 0, pulse: 0 });
-              const outX = boxX + 255;
-              const outY = Math.max(minY, midY - 88);
-              platforms.push(makePlatform(outX, outY, 150, 34, 'solid'));
-              curX = outX + 150;
-              curY = outY;
-            } else if (chunk === 'sky_chain') {
-              // Floorless Aerial Chasm with Ink Refill Orbs + Mid-gap Wind Lift!
-              const startX = curX + 70;
-              const py = Math.max(minY + 60, Math.min(maxY, curY));
-              platforms.push(makePlatform(startX, py, 115, 34, 'solid'));
-              orbs.push({ x: startX + 210, y: py - 38, r: 14, cd: 0, pulse: 0 });
-              winds.push({ x: startX + 245, y: py - 155, w: 62, h: 210, vx: 0, vy: -1900 });
-              orbs.push({ x: startX + 345, y: py - 62, r: 14, cd: 0, pulse: 0 });
-              const landX = startX + 445;
-              const landY = Math.max(minY, Math.min(maxY, py - 15));
-              platforms.push(makePlatform(landX, landY, 145, 36, 'solid'));
-              curX = landX + 145;
-              curY = landY;
-            } else if (chunk === 'beat_saw') {
-              // Music-Synced Red/Blue Beat Blocks + Rotating Compass Gear-Saw or Pendulum!
-              const startX = curX + 68;
-              const py = Math.max(minY + 70, Math.min(maxY - 20, curY));
-              platforms.push(makePlatform(startX, py, 115, 34, 'solid'));
-              const b1x = startX + 165, b2x = b1x + 160, b3x = b2x + 160;
-              platforms.push(makePlatform(b1x, py - 10, 110, 26, 'beat_a'));
-              platforms.push(makePlatform(b2x, py - 24, 110, 26, 'beat_b'));
-              platforms.push(makePlatform(b3x, py - 12, 110, 26, 'beat_a'));
-              orbs.push({ x: b2x + 55, y: py - 78, r: 14, cd: 0, pulse: 0 });
-              if (rng() < 0.5) {
-                saws.push({ kind: 'pendulum', pivotX: b2x + 55, pivotY: py - 145, len: 92, maxAng: 0.72, speed: 2.35, phase: rng() * 6, r: 17 });
-              } else {
-                saws.push({ kind: 'rail', ax: b1x + 25, ay: py - 72, bx: b3x + 85, by: py - 72, speed: 1.75, phase: rng() * 6, r: 16 });
-              }
-              const landX = b3x + 165;
-              platforms.push(makePlatform(landX, py, 150, 36, 'solid'));
-              curX = landX + 150;
-              curY = py;
-            } else {
-              // 'portal_vault': Tall Ink Vault Wall bypassed via Hole-Punch Portals (Blue -> Orange)!
-              const startX = curX + 70;
-              const py = Math.max(minY + 95, Math.min(maxY - 20, curY));
-              platforms.push(makePlatform(startX, py, 165, 34, rng() < 0.45 ? 'weight' : 'solid'));
-              const wallX = startX + 205;
-              const topY = Math.max(minY, py - 120);
-              platforms.push(makePlatform(wallX, topY - 40, 36, py - topY + 120, 'solid'));
+              const wallX = px + entryW;
+              const wallW = 44;
+              const wallTop = py - 340;
+              platforms.push(makePlatform(wallX, wallTop, wallW, 440, 'solid'));
+              // Overhang cap sits cleanly on top of the wall (zero overlap) and prevents wall-jumping over
+              platforms.push(makePlatform(wallX - 64, wallTop - 28, 108, 28, 'solid'));
+
+              const exitY = curY < 300 ? (py + 70) : (py - 85);
+              const exitX = wallX + wallW + 58;
+              const exitW = 235;
+              platforms.push(makePlatform(exitX, exitY, exitW, 38, 'solid'));
+
               portals.push({
-                ax: wallX - 38, ay: py - 34,
-                bx: wallX + 95, by: topY - 24,
+                ax: wallX - 48, ay: py - 42,
+                bx: exitX + 64, by: exitY - 46,
                 r: 20, cd: 0
               });
-              const landX = wallX + 115;
-              platforms.push(makePlatform(landX, topY + 25, 175, 36, 'solid'));
-              curX = landX + 175;
-              curY = topY + 25;
+              curX = exitX + exitW;
+              curY = exitY;
+            } else if (chunk === 'chimney') {
+              // True 305px Vertical Climb Shaft (unreachable by 205px double-jump!) -> Wind Updraft OR Slime Wall-Jump!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 165;
+              const topY = py - 305;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+
+              if (rng() < 0.58) {
+                const windX = px + entryW + 16;
+                const windW = 104;
+                winds.push({ x: windX, y: topY - 48, w: windW, h: 385, vx: 0, vy: -2450 });
+                // Right vertical cliff face cleanly tucked under upper balcony (zero corner overlap!)
+                const wallX = windX + windW;
+                const balW = 215;
+                platforms.push(makePlatform(wallX, topY, balW, 36, 'solid'));
+                platforms.push(makePlatform(wallX, topY + 36, 34, 309, 'solid'));
+                curX = wallX + balW;
+                curY = topY;
+              } else {
+                const wL = px + entryW + 20;
+                const wR = wL + 132; // 104px clean interior shaft width
+                platforms.push(makePlatform(wL, topY - 15, 28, 325, 'slime'));
+                platforms.push(makePlatform(wR, topY, 28, 340, 'slime'));
+                const balW = 210;
+                platforms.push(makePlatform(wR + 28, topY, balW, 36, 'solid'));
+                curX = wR + 28 + balW;
+                curY = topY;
+              }
+            } else if (chunk === 'catapult') {
+              // True 45-degree Canyon Launch: 350px across & 210px up (higher than 205px double-jump -> MUST hit catapult!)
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 185;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const jpX = px + 115;
+              jumpPads.push({ x: jpX, y: py - 15, w: 46, h: 15, power: 830, vxPower: 635, dirX: 1, squish: 0 });
+
+              const landX = jpX + 355;
+              const landY = py - 210;
+              const landW = 225;
+              platforms.push(makePlatform(landX, landY, landW, 36, 'solid'));
+              curX = landX + landW;
+              curY = landY;
+            } else if (chunk === 'sky_chain') {
+              // True 760px Floorless Sky Chasm -> MUST chain 3 generously spaced Ink Refill Orbs!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 155;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const chasmStart = px + entryW;
+              orbs.push({ x: chasmStart + 185, y: py - 48, r: 14, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 380, y: py - 78, r: 14, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 575, y: py - 48, r: 14, cd: 0, pulse: 0 });
+
+              const landX = chasmStart + 760;
+              const landW = 215;
+              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              curX = landX + landW;
+              curY = py;
+            } else if (chunk === 'beat_bridge') {
+              // Clean 835px Rhythm Crossing with 4 Alternating Red/Blue Beat Blocks (zero clutter, unskippable!)
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 155;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const bx0 = px + entryW + 75;
+              platforms.push(makePlatform(bx0, py - 8, 115, 28, 'beat_a'));
+              platforms.push(makePlatform(bx0 + 190, py - 24, 115, 28, 'beat_b'));
+              platforms.push(makePlatform(bx0 + 380, py - 24, 115, 28, 'beat_a'));
+              platforms.push(makePlatform(bx0 + 570, py - 8, 115, 28, 'beat_b'));
+
+              const landX = bx0 + 760;
+              const landW = 210;
+              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              curX = landX + landW;
+              curY = py;
+            } else if (chunk === 'saw_gauntlet') {
+              // Dedicated Saw Timing Corridor (cleanly separated from beat blocks!)
+              const px = curX + entryGap;
+              const py = curY;
+              if (rng() < 0.55) {
+                // Wide 560px bridge with 2 counter-phased swinging Pendulums
+                const bw = 560;
+                platforms.push(makePlatform(px, py, bw, 38, 'solid'));
+                saws.push({ kind: 'pendulum', pivotX: px + 185, pivotY: py - 195, len: 136, maxAng: 0.68, speed: 2.25, phase: 0, r: 17 });
+                saws.push({ kind: 'pendulum', pivotX: px + 385, pivotY: py - 195, len: 136, maxAng: 0.68, speed: 2.25, phase: Math.PI, r: 17 });
+                curX = px + bw;
+                curY = py;
+              } else {
+                // Stepping islands guarded by horizontal Rail Saws
+                platforms.push(makePlatform(px, py, 160, 38, 'solid'));
+                platforms.push(makePlatform(px + 255, py - 24, 175, 34, 'solid'));
+                platforms.push(makePlatform(px + 525, py, 200, 38, 'solid'));
+                saws.push({ kind: 'rail', ax: px + 185, ay: py - 68, bx: px + 495, by: py - 68, speed: 1.7, phase: rng() * 6, r: 17 });
+                curX = px + 725;
+                curY = py;
+              }
+            } else if (chunk === 'conveyor_tunnel') {
+              // Masking-Tape Conveyor Runway -> Forced Low Slide Tunnel (30px clearance!) -> Wide Speed Exit Gap!
+              const px = curX + entryGap;
+              const py = curY;
+              const convW = 420;
+              platforms.push(makePlatform(px, py, convW, 36, 'conveyor_r'));
+              // Bottom of beam at py - 30 (standing height 40px -> MUST crouch-slide or dash-roll!)
+              platforms.push(makePlatform(px + 135, py - 110, 160, 80, 'solid'));
+              const landX = px + convW + 235;
+              const landW = 210;
+              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              curX = landX + landW;
+              curY = py;
+            } else if (chunk === 'weight_bridge') {
+              // Wide 770px Canyon crossed by 3 Hanging Weight Platforms (open sky above strings, unskippable!)
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 145;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const wx = px + entryW + 95;
+              platforms.push(makePlatform(wx, py, 130, 22, 'weight', { maxDrop: 92 }));
+              platforms.push(makePlatform(wx + 225, py - 12, 130, 22, 'weight', { maxDrop: 92 }));
+              platforms.push(makePlatform(wx + 450, py, 130, 22, 'weight', { maxDrop: 92 }));
+              const landX = wx + 675;
+              const landW = 210;
+              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              curX = landX + landW;
+              curY = py;
+            } else if (chunk === 'switch_bridge') {
+              // Unskippable 735px Chasm -> MUST press Ink Switch to materialize 3 dashed bridge segments!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 165;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const swId = nextSwitchId++;
+              const swCol = swId % 2 === 1 ? '#C83E31' : '#2952A3';
+              switches.push({ id: swId, x: px + Math.floor(entryW * 0.55) - 16, y: py - 12, w: 32, h: 12, color: swCol, active: false, timer: 0, dur: 7.5 });
+
+              const b0 = px + entryW + 75;
+              platforms.push(makePlatform(b0, py - 6, 145, 24, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
+              platforms.push(makePlatform(b0 + 220, py - 14, 145, 24, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
+              platforms.push(makePlatform(b0 + 440, py - 6, 145, 24, 'bridge', { bridgeId: swId, bridgeColor: swCol }));
+
+              const landX = b0 + 660;
+              const landW = 210;
+              platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
+              curX = landX + landW;
+              curY = py;
+            } else if (chunk === 'pinball') {
+              // Deep Trampoline Well -> Drop 105px in, bounce 265px straight up onto high exit cliff!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 145;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+
+              const pitX = px + entryW + 32;
+              const pitY = py + 105;
+              const pitW = 240;
+              platforms.push(makePlatform(pitX, pitY, pitW, 30, 'trampoline'));
+
+              const cliffX = pitX + pitW + 18;
+              const exitY = pitY - 265;
+              const exitW = 220;
+              platforms.push(makePlatform(cliffX, exitY, exitW, 36, 'solid'));
+              platforms.push(makePlatform(cliffX, exitY + 36, 36, 259, 'solid'));
+              curX = cliffX + exitW;
+              curY = exitY;
+            } else if (chunk === 'downhill') {
+              // High-Speed Cascading Conveyor + Ice Slide Descent (brings elevation down smoothly!)
+              const px = curX + entryGap;
+              const py = curY;
+              platforms.push(makePlatform(px, py, 225, 34, 'conveyor_r'));
+
+              const dx2 = px + 225 + 90;
+              const dy2 = py + 85;
+              platforms.push(makePlatform(dx2, dy2, 290, 34, 'ice'));
+              platforms.push(makePlatform(dx2 + 90, dy2 - 110, 120, 80, 'solid')); // forced low slide beam!
+
+              const dx3 = dx2 + 290 + 95;
+              const dy3 = dy2 + 80;
+              const landW = 225;
+              platforms.push(makePlatform(dx3, dy3, landW, 38, 'solid'));
+              curX = dx3 + landW;
+              curY = dy3;
+            } else if (chunk === 'split_path') {
+              // Spacious Risk-Reward Fork (136px vertical separation between upper expressway & lower road!)
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 155;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const forkX = px + entryW;
+
+              // Upper fast aerial route
+              const upY = py - 115;
+              orbs.push({ x: forkX + 85, y: py - 78, r: 14, cd: 0, pulse: 0 });
+              platforms.push(makePlatform(forkX + 160, upY, 330, 24, 'conveyor_r'));
+
+              // Lower safe route
+              const lowY = py + 45;
+              platforms.push(makePlatform(forkX + 115, lowY, 405, 36, 'solid'));
+              hazards.push({ x: forkX + 285, y: lowY - 14, w: 38, h: 14 });
+              jumpPads.push({ x: forkX + 455, y: lowY - 14, w: 44, h: 14, power: 680, squish: 0 });
+
+              // Rejoin landing deck
+              const endX = forkX + 590;
+              const endW = 210;
+              platforms.push(makePlatform(endX, py, endW, 38, 'solid'));
+              curX = endX + endW;
+              curY = py;
+            } else {
+              // 'mover': Classic Moving Platform across a wide 560px Chasm!
+              const px = curX + entryGap;
+              const py = curY;
+              const entryW = 145;
+              platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
+              const ax = px + entryW + 65;
+              const bx = px + entryW + 360;
+              const by = py + (rng() < 0.5 ? -35 : 25);
+              movers.push({ x: ax, y: py - 6, w: 135, h: 26, ax, ay: py - 6, bx, by, speed: 1.55 });
+
+              const landX = px + entryW + 560;
+              const landW = 210;
+              platforms.push(makePlatform(landX, by, landW, 38, rng() < 0.35 ? 'ice' : 'solid'));
+              curX = landX + landW;
+              curY = by;
             }
           }
 
-          const endGap = 85 + Math.floor(rng() * 45);
+          const endGap = 105 + Math.floor(rng() * 35);
           const endX = curX + endGap;
-          const endY = Math.max(minY, Math.min(maxY, curY + Math.floor((rng() - 0.5) * 60)));
-          platforms.push(makePlatform(endX, endY, 240, 240, 'solid', { isGoalPlat: true }));
-          goalRect = { x: endX + 130, y: endY - 62, w: 40, h: 62 };
+          const endY = curY;
+          platforms.push(makePlatform(endX, endY, 260, 240, 'solid', { isGoalPlat: true }));
+          goalRect = { x: endX + 145, y: endY - 62, w: 40, h: 62 };
         }
 
         let maxBot = 560;
