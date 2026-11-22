@@ -1742,6 +1742,14 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.18.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Адаптивна музика з барабанами (у стилі PvZ «Watery Graves»):</b> замість різких перемикань від бігу музика тепер плавно наростає по стадіях рівня й напруги (спокійний старт → вступають живі барабани з том-філами → дзвіночки й фанк-бас → кульмінаційний лід біля фінішу/в останні секунди) з чистими входами на початку такту.</li>
+                <li><b>Game Feel &amp; Juice:</b> асиметрична гравітація падіння (різкіші, приємніші стрибки), білий спалах при ударі/квачі (hit flash), легка тряска камери при високих приземленнях, пил з-під ніг та тихий затишний ембієнт паперу на фоні.</li>
+                <li><b>3-шаровий паралакс, світіння й асиметрія:</b> далекі олівцеві пагорби й хмаринки, середній шар із паперовими літачками й помітками, асиметричні пучки трави на платформах та тепле світіння (bloom) навколо дверей, джамп-падів і кнопок.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.17.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Адаптивна музика по контексту й швидкості:</b> окремі саундтреки для Гонки, Тікай від гумки (напружений ритм, що прискорюється), Салочок (фанковий грув) та Лобі; коли швидко біжиш, дешиш чи летиш у повітрі — плавно додаються нові інструменти (ударні, дзвіночки-арпеджіо й мелодійний лід).</li>
@@ -1800,6 +1808,14 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.18.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>PvZ "Watery Graves"-Style Stage Music &amp; Drums:</b> replaced jumpy speed-toggling with smooth, bar-synced stage progression (calm groove at start → bouncy drums &amp; tom fills mid-run → bells &amp; doubled bass → full climax lead near the door / final seconds).</li>
+                <li><b>Game Feel &amp; Juice:</b> asymmetric falling gravity (1.52× snappier falls), white hit-flash on tags/hits, heavy-landing camera shake, footstep dust puffs, and a gentle warm sketchbook ambient bed.</li>
+                <li><b>3-Layer Parallax, Soft Glow &amp; Asymmetric Props:</b> distant pencil hills &amp; clouds, mid-layer paper planes &amp; margin drafts, asymmetric grass tufts on platforms, and soft warm bloom around doors, jump pads, and active switches.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.17.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Dynamic Context &amp; Speed-Adaptive Music:</b> distinct soundtracks for Race, Eraser Chase (urgent accelerating rhythm), Tag Arena (funky groove), and Lobby; flying fast, dashing, or launching smoothly layers in percussion, shimmering bells, and a soaring lead.</li>
@@ -1839,7 +1855,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.17.0 · Changelog</button>
+      <button id="version-tag">v0.18.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2234,6 +2250,47 @@
       let musicVolume = 1.0;
       let activeVortexAudio = null;
       let vortexSuctionStarted = false;
+      let ambientGainNode = null;
+      let ambientStarted = false;
+
+      function updateAmbientGain() {
+        if (!ambientGainNode || !audioCtx) return;
+        const target = (muted || !musicEnabled || musicVolume <= 0.005) ? 0.0001 : (0.015 * musicVolume);
+        try {
+          ambientGainNode.gain.setTargetAtTime(target, audioCtx.currentTime, 0.25);
+        } catch (_) {}
+      }
+
+      function ensureAmbient(ctx) {
+        if (ambientStarted || !ctx) return;
+        ambientStarted = true;
+        try {
+          const len = ctx.sampleRate * 3;
+          const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0;
+          for (let i = 0; i < len; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.997 * b0 + white * 0.029;
+            b1 = 0.985 * b1 + white * 0.032;
+            b2 = 0.950 * b2 + white * 0.048;
+            data[i] = (b0 + b1 + b2) * 0.55;
+          }
+          const src = ctx.createBufferSource();
+          src.buffer = buf;
+          src.loop = true;
+          const lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass';
+          lp.frequency.value = 420;
+          const g = ctx.createGain();
+          g.gain.value = (muted || !musicEnabled) ? 0.0001 : (0.015 * musicVolume);
+          src.connect(lp);
+          lp.connect(g);
+          g.connect(ctx.destination);
+          src.start();
+          ambientGainNode = g;
+        } catch (_) {}
+      }
 
       try {
         const savedAudio = JSON.parse(localStorage.getItem('sketch_audio') || 'null');
@@ -2260,6 +2317,7 @@
         if (audioCtx && audioCtx.state === 'suspended') {
           audioCtx.resume().catch(() => {});
         }
+        if (audioCtx) ensureAmbient(audioCtx);
         return audioCtx;
       }
 
@@ -2616,14 +2674,16 @@
         }
       }
 
-      // Dynamic Context-Aware & Speed-Adaptive Sketchbook Music Sequencer
+      // Dynamic PvZ "Watery Graves"-Style Stage-Based Adaptive Music with Live Drum Kit
       let musicStep = 0;
       let musicAccum = 0;
-      let musicIntensity = 0;
+      let musicStage = 0;         // 0: Calm, 1: Drums/Groove, 2: Bells & Funk Bass, 3: Climax Wave
+      let targetMusicStage = 0;
+      const stemMix = [1, 0, 0, 0];
 
       function playBell(ctx, freq, time, dur, vol) {
         const sc = musicVolume;
-        if (sc <= 0.005) return;
+        if (sc <= 0.005 || vol <= 0.0005) return;
         const osc = ctx.createOscillator();
         const osc2 = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -2635,7 +2695,7 @@
         gain.gain.linearRampToValueAtTime(vol * sc, time + 0.008);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
         const g2 = ctx.createGain();
-        g2.gain.value = 0.25;
+        g2.gain.value = 0.22;
         osc.connect(gain);
         osc2.connect(g2); g2.connect(gain);
         gain.connect(ctx.destination);
@@ -2645,17 +2705,17 @@
 
       function playLead(ctx, freq, time, dur, vol) {
         const sc = musicVolume;
-        if (sc <= 0.005) return;
+        if (sc <= 0.005 || vol <= 0.0005) return;
         const osc = ctx.createOscillator();
         const filter = ctx.createBiquadFilter();
         const gain = ctx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(freq, time);
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(Math.min(2800, freq * 3.2), time);
-        filter.frequency.exponentialRampToValueAtTime(Math.max(450, freq * 1.4), time + dur);
+        filter.frequency.setValueAtTime(Math.min(2600, freq * 3.0), time);
+        filter.frequency.exponentialRampToValueAtTime(Math.max(420, freq * 1.35), time + dur);
         gain.gain.setValueAtTime(0.0001, time);
-        gain.gain.linearRampToValueAtTime(vol * sc, time + 0.025);
+        gain.gain.linearRampToValueAtTime(vol * sc, time + 0.028);
         gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
         osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
         osc.start(time); osc.stop(time + dur + 0.03);
@@ -2663,22 +2723,36 @@
 
       function playDrum(ctx, kind, time, vol) {
         const sc = musicVolume;
-        if (sc <= 0.005) return;
+        if (sc <= 0.005 || vol <= 0.0005) return;
         if (kind === 'kick') {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(118, time);
-          osc.frequency.exponentialRampToValueAtTime(44, time + 0.09);
+          osc.frequency.setValueAtTime(126, time);
+          osc.frequency.exponentialRampToValueAtTime(42, time + 0.095);
           gain.gain.setValueAtTime(vol * sc, time);
-          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.115);
           osc.connect(gain); gain.connect(ctx.destination);
-          osc.start(time); osc.stop(time + 0.12);
+          osc.start(time); osc.stop(time + 0.125);
         } else if (kind === 'snare') {
-          playNoiseBurst(0.065, 1950, vol * 0.85, true);
-          playPluck(ctx, 185, time, 0.045, vol * 0.55, true);
+          playNoiseBurst(0.068, 2050, vol * 0.9, true);
+          playPluck(ctx, 195, time, 0.045, vol * 0.6, true);
+        } else if (kind === 'tom_hi' || kind === 'tom_lo') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          const f0 = kind === 'tom_hi' ? 205 : 145;
+          const f1 = kind === 'tom_hi' ? 118 : 82;
+          osc.frequency.setValueAtTime(f0, time);
+          osc.frequency.exponentialRampToValueAtTime(f1, time + 0.11);
+          gain.gain.setValueAtTime(vol * sc, time);
+          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.125);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(time); osc.stop(time + 0.13);
+        } else if (kind === 'openhat') {
+          playNoiseBurst(0.095, 5200, vol * 0.52, true);
         } else {
-          playNoiseBurst(0.02, 4200, vol * 0.65, true);
+          playNoiseBurst(0.022, 4300, vol * 0.65, true);
         }
       }
 
@@ -2691,12 +2765,13 @@
         [261.63, 392.0, 493.88, 329.63, 220.0, 349.23, 440.0, 329.63, 196.0, 329.63, 392.0, 293.66, 174.61, 261.63, 329.63, 392.0]
       ];
 
+      // Groovy PvZ "Watery Graves"-inspired Race / Duel variations (walking bass + bouncy melody + counter-harmonies)
       const GAME_VARIATIONS = [
-        // 0: Classic upbeat bouncy indie-platformer groove
+        // 0: Iconic groovy minor-to-bright bounce
         {
-          mel:  [329.63, 0, 392.0, 440.0, 523.25, 0, 440.0, 392.0, 293.66, 0, 349.23, 392.0, 440.0, 392.0, 329.63, 0],
-          bass: [130.81, 0, 130.81, 0, 110.0, 0, 110.0, 0, 87.31, 0, 87.31, 0, 98.0, 0, 110.0, 0],
-          harm: [0, 0, 0, 0, 659.25, 0, 0, 0, 0, 0, 0, 0, 523.25, 0, 0, 0]
+          mel:  [329.63, 0, 392.0, 440.0, 523.25, 0, 493.88, 440.0, 392.0, 0, 349.23, 392.0, 440.0, 0, 392.0, 329.63],
+          bass: [110.0, 0, 164.81, 110.0, 130.81, 0, 164.81, 130.81, 146.83, 0, 174.61, 146.83, 164.81, 0, 146.83, 130.81],
+          harm: [0, 0, 659.25, 0, 0, 0, 587.33, 0, 0, 0, 523.25, 0, 659.25, 0, 0, 0]
         },
         // 1: Playful pizzicato hop
         {
@@ -2746,36 +2821,78 @@
         }
       ];
 
+      function computeMusicStage() {
+        const inMenuOrLobby = !lobbyModal.classList.contains('hidden') || gamePhase === 'lobby';
+        if (inMenuOrLobby || !currentLevel) return 0;
+
+        if (typeof tagState !== 'undefined' && tagState.active) {
+          if (tagState.timeLeft <= 12) return 3;
+          if (tagState.timeLeft <= 26 || tagState.itWho === 'local') return 2;
+          if (tagState.timeLeft <= 42) return 1;
+          return 0;
+        }
+
+        if (typeof eraserState !== 'undefined' && eraserState.active && typeof localPlayer !== 'undefined') {
+          let dist = 999;
+          if (eraserState.dir === 'right') dist = localPlayer.x - (eraserState.x + eraserState.w);
+          else if (eraserState.dir === 'left') dist = eraserState.x - (localPlayer.x + localPlayer.w);
+          else dist = eraserState.y - (localPlayer.y + localPlayer.h);
+          if (dist < 185) return 3;
+          if (dist < 340) return 2;
+          return 1;
+        }
+
+        // Race / Door Duel: smooth progression by distance from spawn to goal (plus late-round hype!)
+        if (currentLevel.goal && currentLevel.spawn && typeof localPlayer !== 'undefined') {
+          const sx = currentLevel.spawn.x, sy = currentLevel.spawn.y;
+          const gx = currentLevel.goal.x, gy = currentLevel.goal.y;
+          const totalDist = Math.max(240, Math.hypot(gx - sx, gy - sy));
+          const remDist = Math.hypot(gx - localPlayer.x, gy - localPlayer.y);
+          const progress = Math.max(0, Math.min(1, 1 - remDist / totalDist));
+
+          // Calm at start; drums enter at 20%, bells/funk at 55%, climax wave in final 20% or < 340px!
+          let st = 0;
+          if (progress >= 0.80 || remDist < 340) st = 3;
+          else if (progress >= 0.52) st = 2;
+          else if (progress >= 0.18 || roundElapsed > 5.0) st = 1;
+          else st = 0;
+
+          // Close Co-op neck-and-neck rivalry bumps excitement by +1!
+          if (netConnected && typeof remotePlayer !== 'undefined' && st < 3) {
+            const pDist = Math.hypot(localPlayer.x - remotePlayer.x, localPlayer.y - remotePlayer.y);
+            if (pDist < 170 && progress > 0.25) st = Math.min(3, st + 1);
+          }
+          return st;
+        }
+        return 1;
+      }
+
       function updateMusic(dt) {
+        updateAmbientGain();
         if (muted || !musicEnabled || musicVolume <= 0.005 || !audioCtx || audioCtx.state !== 'running') return;
-        if (gamePhase === 'launching' || gamePhase === 'door_spotlight') return; // let spotlight & vortex breathe
+        if (gamePhase === 'launching' || gamePhase === 'door_spotlight') return;
 
         const inMenuOrLobby = !lobbyModal.classList.contains('hidden') || gamePhase === 'lobby';
         const isEraser = !inMenuOrLobby && typeof eraserState !== 'undefined' && eraserState.active;
         const isTag = !inMenuOrLobby && typeof tagState !== 'undefined' && tagState.active;
 
-        // Smooth speed/flight/tension intensity (0..1) that dynamically layers in extra instruments!
-        let targetInt = 0.08;
-        if (!inMenuOrLobby && typeof localPlayer !== 'undefined') {
-          const spd = Math.hypot(localPlayer.vx || 0, localPlayer.vy || 0);
-          if (spd > 520 || (!localPlayer.grounded && spd > 410) || localPlayer.highSpeedTimer > 0) targetInt = 1.0;
-          else if (spd > 350 || localPlayer.sprinting) targetInt = 0.68;
-          else if (spd > 150) targetInt = 0.36;
-          else targetInt = 0.14;
-          if (isEraser) targetInt = Math.min(1.0, targetInt + 0.25);
-          if (isTag && tagState.timeLeft < 12) targetInt = Math.min(1.0, targetInt + 0.3);
+        targetMusicStage = computeMusicStage();
+
+        // Smoothly crossfade stem volumes toward current latched musicStage (no abrupt cuts!)
+        for (let s = 0; s < 4; s++) {
+          const tgt = s <= musicStage ? 1 : 0;
+          const spd = tgt > stemMix[s] ? 1.45 : 0.85;
+          stemMix[s] += (tgt - stemMix[s]) * Math.min(1, spd * dt);
         }
-        const rate = targetInt > musicIntensity ? 3.8 : 1.3;
-        musicIntensity += (targetInt - musicIntensity) * Math.min(1, rate * dt);
 
         const barNum = Math.floor(musicStep / 16);
-        let stepDur = inMenuOrLobby ? 0.34 : 0.202;
+        let stepDur = inMenuOrLobby ? 0.34 : 0.20;
         if (isEraser) {
-          stepDur = 0.184 - musicIntensity * 0.022;
+          stepDur = musicStage >= 3 ? 0.165 : (musicStage >= 2 ? 0.175 : 0.186);
         } else if (isTag) {
-          stepDur = (tagState.timeLeft < 12 ? 0.165 : 0.188);
+          stepDur = musicStage >= 3 ? 0.166 : 0.188;
         } else if (!inMenuOrLobby) {
-          stepDur = 0.205 - musicIntensity * 0.016;
+          stepDur = musicStage >= 3 ? 0.186 : 0.198;
         }
 
         musicAccum += dt;
@@ -2786,7 +2903,13 @@
         const idx = musicStep % 16;
         musicStep++;
 
+        // Latch stage changes cleanly on bar downbeat (idx === 0) or half-bar (idx === 8) so drums enter on the beat!
+        if (idx === 0 || (idx === 8 && targetMusicStage > musicStage)) {
+          musicStage = targetMusicStage;
+        }
+
         if (inMenuOrLobby) {
+          musicStage = 0;
           const arp = LOBBY_VARIATIONS[Math.floor(barNum / 2) % LOBBY_VARIATIONS.length];
           const note = arp[idx];
           if (note) playPluck(audioCtx, note, now, 0.44, 0.032, true);
@@ -2800,44 +2923,41 @@
           const bass = pat.bass[idx];
           const harm = pat.harm[idx];
 
-          // Base layer: melody pluck, bass, light brush hi-hat
-          if (mel) playPluck(audioCtx, mel, now, 0.22, 0.034, true);
-          if (bass) playPluck(audioCtx, bass, now, 0.24, 0.042, true);
-          if (harm) playPluck(audioCtx, harm, now, 0.26, 0.018, true);
-          if (idx % 4 === 2) playNoiseBurst(0.026, 2200, 0.016, true);
+          // Stage 0 (Calm Base): groovy Watery Graves-style bass + melody pluck + light hat
+          if (mel) playPluck(audioCtx, mel, now, 0.23, 0.034, true);
+          if (bass) playPluck(audioCtx, bass, now, 0.25, 0.042, true);
+          if (idx % 4 === 2) playDrum(audioCtx, 'hat', now, 0.018);
 
-          // Layer 1 (moving): driving kick + crisp paper-brush snare groove
-          if (musicIntensity > 0.26 || isEraser || isTag) {
-            if (idx === 0 || idx === 8 || (musicIntensity > 0.55 && idx === 10)) {
-              playDrum(audioCtx, 'kick', now, 0.052);
-            }
-            if (idx === 4 || idx === 12) {
-              playDrum(audioCtx, 'snare', now, 0.034);
+          // Stage 1 (Drums / Барабани): punchy kick, snappy snare, and bouncy tom fills on bar ends!
+          const m1 = stemMix[1];
+          if (m1 > 0.04) {
+            if (idx === 0 || idx === 6 || idx === 8) playDrum(audioCtx, 'kick', now, 0.062 * m1);
+            if (idx === 4 || idx === 12) playDrum(audioCtx, 'snare', now, 0.044 * m1);
+            // Iconic PvZ-style rolling tom-tom fill at end of every 2nd bar!
+            if (barNum % 2 === 1) {
+              if (idx === 13) playDrum(audioCtx, 'tom_hi', now, 0.042 * m1);
+              if (idx === 14) playDrum(audioCtx, 'tom_lo', now, 0.046 * m1);
+              if (idx === 15) playDrum(audioCtx, 'snare', now, 0.038 * m1);
             }
           }
 
-          // Layer 2 (sprinting / fast): shimmering high octave bell-arp + 16th shaker hat
-          if (musicIntensity > 0.52) {
-            const bellScale = Math.min(1, (musicIntensity - 0.52) / 0.35);
-            if (mel && idx % 2 === 0) {
-              playBell(audioCtx, mel * 2, now, 0.16, 0.022 * bellScale);
-            }
-            if (idx % 2 === 1) {
-              playDrum(audioCtx, 'hat', now, 0.02 * bellScale);
-            }
+          // Stage 2 (Mid-Late Wave): shimmering bells + doubled syncopated funk bass + offbeat hats
+          const m2 = stemMix[2];
+          if (m2 > 0.04) {
+            if (harm) playBell(audioCtx, harm, now, 0.24, 0.025 * m2);
+            else if (mel && idx % 4 === 2) playBell(audioCtx, mel * 2, now, 0.16, 0.017 * m2);
+            if (idx % 2 === 1) playDrum(audioCtx, 'hat', now, 0.02 * m2);
+            if (idx === 14) playDrum(audioCtx, 'openhat', now, 0.028 * m2);
+            if (bass && (idx === 2 || idx === 10)) playPluck(audioCtx, bass * 2, now, 0.14, 0.022 * m2, true);
           }
 
-          // Layer 3 (flying fast / dash-jump / trampoline launch): soaring warm lead + sub-bass punch
-          if (musicIntensity > 0.76) {
-            const leadScale = Math.min(1, (musicIntensity - 0.76) / 0.24);
-            if (harm) {
-              playLead(audioCtx, harm, now, 0.34, 0.026 * leadScale);
-            } else if (mel && (idx === 0 || idx === 6 || idx === 12)) {
-              playLead(audioCtx, mel * 1.5, now, 0.26, 0.02 * leadScale);
-            }
-            if (idx === 0 && bass) {
-              playPluck(audioCtx, bass * 0.5, now, 0.28, 0.03 * leadScale, true);
-            }
+          // Stage 3 (Final Push / Climax Wave): soaring warm lead + extra kick drive + deep sub-bass!
+          const m3 = stemMix[3];
+          if (m3 > 0.04) {
+            if (harm) playLead(audioCtx, harm, now, 0.34, 0.026 * m3);
+            else if (mel && (idx === 0 || idx === 6 || idx === 12)) playLead(audioCtx, mel * 1.5, now, 0.28, 0.02 * m3);
+            if (idx === 10 || idx === 14) playDrum(audioCtx, 'kick', now, 0.05 * m3);
+            if (idx === 0 && bass) playPluck(audioCtx, bass * 0.5, now, 0.3, 0.032 * m3, true);
           }
         }
       }
@@ -3470,6 +3590,7 @@
       // =========================================================
       const CFG = {
         gravity: 1460,
+        fallGravityMult: 1.52,
         apexGravityMult: 0.62,
         apexVelThreshold: 115,
         maxFallSpeed: 760,
@@ -3606,6 +3727,7 @@
           dashJumpWindow: 0,
           highSpeedTimer: 0,
           stepTimer: 0,
+          hitFlashTimer: 0,
           tauntId: '',
           tauntTimer: 0,
           idleTimer: 0,
@@ -5786,6 +5908,7 @@
           deaths++;
           screenShake = 9;
           hitStopTimer = Math.max(hitStopTimer, 0.052);
+          p.hitFlashTimer = 0.18;
           playSound('die');
           spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#C83E31', 14, 240);
           sendVfxEvent('die', p.x + p.w / 2, p.y + p.h / 2);
@@ -6242,11 +6365,12 @@
           }
         }
 
-        // Apex hang-time + gentle max fall speed + wall slide (extra sticky on Slime!)
+        // Asymmetric falling gravity (snappy falls, airy apex!) + wall slide (extra sticky on Slime!)
         let grav = CFG.gravity * GRAV_MODES[roomSettings.gravIdx].mult;
         if (p.rollTimer > 0) grav *= 0.35;
-        else if (crouchHeld && !p.grounded) grav *= 1.45;
+        else if (crouchHeld && !p.grounded) grav *= 1.65;
         else if (!p.grounded && Math.abs(p.vy) < CFG.apexVelThreshold) grav *= CFG.apexGravityMult;
+        else if (!p.grounded && p.vy > CFG.apexVelThreshold) grav *= CFG.fallGravityMult;
 
         p.vy = Math.min(CFG.maxFallSpeed, p.vy + grav * dt);
         const wallCap = p.wallSurface === 'slime' ? 32 : CFG.wallSlideSpeed;
@@ -6331,13 +6455,14 @@
                 continue;
               }
               if (!wasGrounded && preLandVy > 220) {
-                p.scaleX = 1.32;
-                p.scaleY = 0.7;
+                p.scaleX = preLandVy > 460 ? 1.42 : 1.32;
+                p.scaleY = preLandVy > 460 ? 0.62 : 0.7;
+                if (preLandVy > 460) screenShake = Math.max(screenShake, 3.4);
                 p.stamina = Math.min(100, p.stamina + 12);
                 playSound(s.type === 'slime' ? 'slime' : 'land');
                 spawnScuff(p.x + p.w / 2, p.y + p.h, 18, s.type === 'ice' ? 'rgba(255,255,255,0.68)' : (s.type === 'slime' ? 'rgba(45,122,70,0.42)' : 'rgba(35,31,32,0.3)'));
                 sendStatePacket(true);
-                spawnParticles(p.x + p.w / 2, p.y + p.h, s.type === 'slime' ? '#84D97B' : (s.type === 'ice' ? '#72CFC9' : '#6A635A'), 5, 95);
+                spawnParticles(p.x + p.w / 2, p.y + p.h, s.type === 'slime' ? '#84D97B' : (s.type === 'ice' ? '#72CFC9' : '#6A635A'), preLandVy > 460 ? 8 : 5, preLandVy > 460 ? 125 : 95);
                 sendVfxEvent('land', p.x + p.w / 2, p.y + p.h);
               }
               p.vy = 0;
@@ -6382,6 +6507,7 @@
           if (p.stepTimer <= 0) {
             p.stepTimer = p.sprinting ? 0.155 : 0.225;
             playSound('step_' + (p.surfaceType || 'solid'));
+            spawnParticles(p.x + p.w / 2, p.y + p.h, p.surfaceType === 'ice' ? '#CFEBF7' : (p.surfaceType === 'slime' ? '#84D97B' : '#9E9384'), 2, 55);
           }
         } else {
           p.stepTimer = 0.04;
@@ -6496,6 +6622,8 @@
             if (!netConnected || netMode === 'host') {
               tagState.itWho = (tagState.itWho === 'local') ? 'remote' : 'local';
               tagState.cooldown = 1.35;
+              p.hitFlashTimer = 0.16;
+              opp.hitFlashTimer = 0.16;
               playSound('tag');
               hitStopTimer = Math.max(hitStopTimer, 0.048);
               screenShake = 8;
@@ -7232,7 +7360,9 @@
         const jx = boilOffset(101, boilFrame) * 0.6;
         const jy = boilOffset(102, boilFrame) * 0.6;
 
-        const bodyColor = COSMETIC_COLORS[cos.colorIdx] ? COSMETIC_COLORS[cos.colorIdx].hex : color;
+        const bodyColor = (p.hitFlashTimer > 0)
+          ? '#FFFFFF'
+          : (COSMETIC_COLORS[cos.colorIdx] ? COSMETIC_COLORS[cos.colorIdx].hex : color);
         const fState = {
           lookX: p.lookX || (p.facing * 1.3),
           lookY: p.lookY || 0,
@@ -7354,8 +7484,95 @@
           ctx.restore();
         }
 
-        // Faint pencil notebook rules, red margin line & parallax sketchbook doodles
+        // 3-Layer Asymmetric Sketchbook Parallax Background
         ctx.save();
+        // Layer 1 (Far 0.07x): Faint pencil distant rolling hills & soft sketchbook clouds
+        ctx.strokeStyle = 'rgba(106, 99, 90, 0.10)';
+        ctx.fillStyle = 'rgba(229, 218, 198, 0.32)';
+        ctx.lineWidth = 1.4;
+        const hillSpan = 460;
+        const hillOff = ((-cam.x * 0.07) % hillSpan + hillSpan) % hillSpan;
+        ctx.beginPath();
+        ctx.moveTo(-hillSpan, h + 10);
+        for (let hx0 = hillOff - hillSpan; hx0 < w + hillSpan; hx0 += hillSpan) {
+          ctx.quadraticCurveTo(hx0 + 115, h - 118, hx0 + 245, h - 62);
+          ctx.quadraticCurveTo(hx0 + 355, h - 18, hx0 + hillSpan, h - 78);
+        }
+        ctx.lineTo(w + hillSpan, h + 10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Asymmetric faint pencil clouds in upper sky (0.09x)
+        ctx.strokeStyle = 'rgba(106, 99, 90, 0.11)';
+        ctx.lineWidth = 1.2;
+        for (let ci = 0; ci < 4; ci++) {
+          const cx0 = (((ci * 410 + 110) - cam.x * 0.09) % (w + 380) + (w + 380)) % (w + 380) - 140;
+          const cy0 = 72 + (ci * 53) % 115;
+          const cs = 0.78 + (ci % 3) * 0.22;
+          ctx.save();
+          ctx.translate(cx0, cy0);
+          ctx.scale(cs, cs);
+          ctx.beginPath();
+          ctx.moveTo(-32, 8);
+          ctx.quadraticCurveTo(-36, -6, -18, -8);
+          ctx.quadraticCurveTo(-8, -22, 10, -14);
+          ctx.quadraticCurveTo(28, -16, 30, -2);
+          ctx.quadraticCurveTo(38, 8, 22, 10);
+          ctx.lineTo(-26, 10);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Layer 2 (Mid 0.18x): Red notebook margin line, coffee cup ring & asymmetric margin drafts
+        const marginX = ((-cam.x * 0.18 + 78) % (w + 420) + (w + 420)) % (w + 420) - 60;
+        ctx.strokeStyle = 'rgba(200, 62, 49, 0.16)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(marginX, 0);
+        ctx.lineTo(marginX, h);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(139, 94, 60, 0.08)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(140 - (cam.x * 0.08) % 240, h - 95, 58, 0.2, Math.PI * 1.85);
+        ctx.stroke();
+
+        // Asymmetric parallax pencil margin doodles (stars, spirals & paper airplanes at varied scales)
+        ctx.strokeStyle = 'rgba(106, 99, 90, 0.15)';
+        ctx.lineWidth = 1.35;
+        for (let di = 0; di < 7; di++) {
+          const dx = (((di * 295 + 145) - cam.x * 0.21) % (w + 290) + (w + 290)) % (w + 290) - 90;
+          const dy = 96 + (di * 149) % Math.max(220, h - 190) + Math.sin(worldTime * 0.85 + di * 1.3) * 4;
+          const ds = 0.75 + (di % 3) * 0.24;
+          ctx.save();
+          ctx.translate(dx, dy);
+          ctx.rotate(di * 0.65 - 0.3);
+          ctx.scale(ds, ds);
+          ctx.beginPath();
+          if (di % 3 === 0) {
+            ctx.moveTo(0, -10); ctx.lineTo(0, 10);
+            ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
+            ctx.moveTo(-5, -5); ctx.lineTo(5, 5);
+          } else if (di % 3 === 1) {
+            for (let a = 0; a < 14; a++) {
+              const r = a * 0.85;
+              const px = Math.cos(a * 0.75) * r;
+              const py = Math.sin(a * 0.75) * r;
+              if (a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+          } else {
+            // Little sketched paper airplane!
+            ctx.moveTo(-14, 4); ctx.lineTo(15, -4); ctx.lineTo(-8, 10); ctx.closePath();
+            ctx.moveTo(-14, 4); ctx.lineTo(15, -4); ctx.lineTo(-4, 4);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Layer 3 (Near 0.45x): Notebook grid rules & subtle floating dust motes
         ctx.strokeStyle = 'rgba(106, 99, 90, 0.12)';
         ctx.lineWidth = 1;
         const step = 48;
@@ -7369,50 +7586,6 @@
           ctx.moveTo(0, gy); ctx.lineTo(w, gy);
         }
         ctx.stroke();
-
-        // Subtle red school-notebook margin line
-        const marginX = ((-cam.x * 0.18 + 78) % (w + 420) + (w + 420)) % (w + 420) - 60;
-        ctx.strokeStyle = 'rgba(200, 62, 49, 0.16)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(marginX, 0);
-        ctx.lineTo(marginX, h);
-        ctx.stroke();
-
-        // Faint coffee cup ring stain in bottom-left parallax
-        ctx.strokeStyle = 'rgba(139, 94, 60, 0.08)';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(140 - (cam.x * 0.08) % 240, h - 95, 58, 0.2, Math.PI * 1.85);
-        ctx.stroke();
-
-        // Subtle parallax pencil margin doodles (stars & spirals)
-        ctx.strokeStyle = 'rgba(106, 99, 90, 0.15)';
-        ctx.lineWidth = 1.4;
-        for (let di = 0; di < 6; di++) {
-          const dx = (((di * 310 + 180) - cam.x * 0.22) % (w + 260) + (w + 260)) % (w + 260) - 80;
-          const dy = 110 + (di * 137) % Math.max(220, h - 200) + Math.sin(worldTime * 0.9 + di) * 4;
-          ctx.save();
-          ctx.translate(dx, dy);
-          ctx.rotate(di * 0.7);
-          ctx.beginPath();
-          if (di % 2 === 0) {
-            // Little hand-drawn 4-point star
-            ctx.moveTo(0, -10); ctx.lineTo(0, 10);
-            ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
-            ctx.moveTo(-5, -5); ctx.lineTo(5, 5);
-          } else {
-            // Tiny pencil spiral
-            for (let a = 0; a < 14; a++) {
-              const r = a * 0.85;
-              const px = Math.cos(a * 0.75) * r;
-              const py = Math.sin(a * 0.75) * r;
-              if (a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-            }
-          }
-          ctx.stroke();
-          ctx.restore();
-        }
         ctx.restore();
 
         // Dynamic Camera Zoom: gently zooms in on START hover, intensely zooms during launch, snaps fast back on cancel!
@@ -7663,6 +7836,25 @@
             ctx.restore();
           } else {
             drawInkedRect(s.x, s.y, s.w, s.h, i * 17 + 1, '#EAE0CE', true);
+            // Asymmetric varied-scale pencil grass tufts & margin marks on wide horizontal solid ledges
+            if (s.w >= 95 && s.h <= 160 && !lvl.isLobby) {
+              ctx.save();
+              ctx.strokeStyle = 'rgba(45, 122, 70, 0.55)';
+              ctx.lineWidth = 1.45;
+              ctx.lineCap = 'round';
+              const tuftCount = Math.min(4, Math.floor(s.w / 72));
+              for (let ti = 0; ti < tuftCount; ti++) {
+                const hash = Math.abs(Math.sin((i + 1) * 31.7 + ti * 17.3));
+                const tx = s.x + 14 + hash * (s.w - 28);
+                const ts = 0.72 + ((i + ti) % 3) * 0.25;
+                ctx.beginPath();
+                ctx.moveTo(tx, s.y); ctx.lineTo(tx - 3.5 * ts, s.y - 6.5 * ts);
+                ctx.moveTo(tx, s.y); ctx.lineTo(tx + 1 * ts, s.y - 8 * ts);
+                ctx.moveTo(tx, s.y); ctx.lineTo(tx + 4.5 * ts, s.y - 5.5 * ts);
+                ctx.stroke();
+              }
+              ctx.restore();
+            }
           }
         }
 
@@ -7895,9 +8087,17 @@
           ctx.restore();
         }
 
-        // 5. Hand-drawn Goal Door with floating sparkles
+        // 5. Hand-drawn Goal Door with soft warm bloom & floating sparkles
         if (lvl.goal) {
           const g = lvl.goal;
+          ctx.save();
+          const gCx = g.x + g.w / 2, gCy = g.y + g.h * 0.5;
+          const bloom = ctx.createRadialGradient(gCx, gCy, 8, gCx, gCy, 76);
+          bloom.addColorStop(0, 'rgba(233, 196, 106, 0.36)');
+          bloom.addColorStop(1, 'rgba(233, 196, 106, 0)');
+          ctx.fillStyle = bloom;
+          ctx.beginPath(); ctx.arc(gCx, gCy, 76, 0, Math.PI * 2); ctx.fill();
+          ctx.restore();
           drawInkedRect(g.x, g.y, g.w, g.h, 900, '#E9C46A', false, false);
           ctx.strokeStyle = '#231F20';
           ctx.lineWidth = 2;
@@ -8276,6 +8476,9 @@
 
         if (screenShake > 0) screenShake = Math.max(0, screenShake - 28 * dt);
         if (pageFlipTimer > 0) pageFlipTimer = Math.max(0, pageFlipTimer - dt);
+        if (localPlayer.hitFlashTimer > 0) localPlayer.hitFlashTimer = Math.max(0, localPlayer.hitFlashTimer - dt);
+        if (remotePlayer.hitFlashTimer > 0) remotePlayer.hitFlashTimer = Math.max(0, remotePlayer.hitFlashTimer - dt);
+        if (tagState.bot && tagState.bot.hitFlashTimer > 0) tagState.bot.hitFlashTimer = Math.max(0, tagState.bot.hitFlashTimer - dt);
 
         if (hitStopTimer > 0 && gamePhase !== 'launching' && gamePhase !== 'round_intro') {
           hitStopTimer = Math.max(0, hitStopTimer - dt);
