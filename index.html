@@ -1742,6 +1742,15 @@
           </div>
           <div id="changelog-body-uk" style="text-align:left; font-size:18px; line-height:1.35; display:flex; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.20.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Чорнильна бульбашка замість крапель:</b> влітаєш у краплю — вона тебе ловить, час ніби завмирає, цілишся в будь-який з 8 напрямків (W/A/S/D) і вистрілюєш стрибком (або автоматично через 0.75с). Повітряний ланцюжок тепер — справжня головоломка на приціл: діагональ → прямо → діагональ.</li>
+                <li><b>Правило однієї стіни:</b> повторний стрибок від тієї ж стіни дає слабкий відскок без набору висоти — тепер лізти вгору можна тільки зигзагом між двома стінами.</li>
+                <li><b>Нова слизова шахта:</b> заходиш знизу під ліву стіну в закриту шахту й піднімаєшся відскоками між обома стінами — обидві стіни реально потрібні.</li>
+                <li><b>Ноги на стіні:</b> при ковзанні по стіні обидві ступні впираються в неї з зігнутими колінами.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.19.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Генератор 3.0 — логіка рівня без скупченості та скіпів:</b> перероблено геометрію всіх 13 чанків під реальну фізику стрибка — герметичні 340px портальні стіни з козирком, справжні 305px вертикальні шахти вітру/слайму, 760px повітряні прірви з 3 орбами, 45° катапульти на 210px вгору, широкі ритм-мости, окремий коридор пилок-маятників та просторі розвилки без жодних накладань платформ.</li>
@@ -1823,6 +1832,15 @@
           </div>
           <div id="changelog-body-en" style="text-align:left; font-size:18px; line-height:1.35; display:none; flex-direction:column; gap:10px;">
             <div>
+              <b>v0.20.0</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
+              <ul style="padding-left:20px; margin-top:2px;">
+                <li><b>Ink Bubbles replace refill drops:</b> fly into a blot and it captures you — aim in any of 8 directions (W/A/S/D) and fire out with Jump (auto-fires after 0.75s). Sky chasms are now real aiming puzzles: diagonal → straight → diagonal.</li>
+                <li><b>One-Wall Rule:</b> re-jumping off the same wall gives only a weak kick with no height gain — climbing now requires zig-zagging between two walls.</li>
+                <li><b>New Slime Shaft:</b> walk under the left wall into an enclosed shaft and climb by bouncing between both walls — each wall now matters.</li>
+                <li><b>Wall-Slide Legs:</b> both soles now brace flat against the wall with bent knees.</li>
+              </ul>
+            </div>
+            <div>
               <b>v0.19.1</b> <span style="color:var(--pencil); font-size:15px;">— 22.11.2026</span>
               <ul style="padding-left:20px; margin-top:2px;">
                 <li><b>Generator 3.0 — Logical Non-Skippable Chunks &amp; Clean Spacing:</b> rebuilt all 13 chunks around real jump reach so every mechanic is genuinely required and zero platforms overlap — sealed 340px portal vaults with overhang caps, 305px wind/slime vertical shafts, 760px 3-orb sky chasms, 210px-high 45° catapult launches, dedicated pendulum saw bridges, and spacious risk/reward forks.</li>
@@ -1885,7 +1903,7 @@
         </div>
       </div>
 
-      <button id="version-tag">v0.19.1 · Changelog</button>
+      <button id="version-tag">v0.20.0 · Changelog</button>
       <div id="toast">Скопійовано!</div>
     </div>
   </div>
@@ -2053,6 +2071,10 @@
           biome_grid: 'Клітинка',
           biome_blueprint: 'Міліметрівка',
           biome_sketchpad: 'Ескізник',
+          orbNote: 'Чорнильна бульбашка!',
+          orbNoteSub: 'Влети · цілься W/A/S/D · стрибок = постріл',
+          slimeNote: 'Шахта: стрибай між стінами',
+          slimeNoteSub: 'від однієї стіни двічі не вийде',
           toastStopTaunt: 'Зупинись на місці для таунту!',
           toastAutoSprintOn: 'Авто-біг увімкнено',
           toastAutoSprintOff: 'Авто-біг вимкнено',
@@ -2226,6 +2248,10 @@
           biome_grid: 'Graph Grid',
           biome_blueprint: 'Blueprint',
           biome_sketchpad: 'Sketchpad',
+          orbNote: 'Ink Bubble!',
+          orbNoteSub: 'Fly in · aim W/A/S/D · Jump = fire',
+          slimeNote: 'Shaft: zig-zag between walls',
+          slimeNoteSub: 'the same wall twice won\'t lift you',
           toastStopTaunt: 'Stand still to taunt!',
           toastAutoSprintOn: 'Auto-sprint enabled',
           toastAutoSprintOff: 'Auto-sprint disabled',
@@ -3575,6 +3601,8 @@
           };
 
           let deck = buildChunkDeck(null);
+          let orbTaught = false;
+          let slimeTaught = false;
           let lastChunk = null;
           let curX = 300;
           let curY = 480;
@@ -3645,12 +3673,24 @@
                 curX = wallX + balW;
                 curY = topY;
               } else {
-                const wL = px + entryW + 20;
-                const wR = wL + 132; // 104px clean interior shaft width
-                platforms.push(makePlatform(wL, topY - 15, 28, 325, 'slime'));
-                platforms.push(makePlatform(wR, topY, 28, 340, 'slime'));
+                // Enclosed Slime Shaft: walk UNDER the left wall into the shaft, then zig-zag wall-jump L<->R to the top.
+                // Same-wall rule makes single-wall climbing impossible, so both walls genuinely matter.
+                const wL = px + entryW;
+                const shaftW = 112;
+                if (!slimeTaught) {
+                  slimeTaught = true;
+                  notes.push({ x: px - 10, y: py - 120, key: 'slime', text: tr('slimeNote'), sub: tr('slimeNoteSub') });
+                }
+                const wR = wL + 28 + shaftW;
+                // Shaft floor connects seamlessly from the entry deck
+                platforms.push(makePlatform(wL, py, 28 + shaftW + 28, 38, 'solid'));
+                // Left wall hangs from above, leaving a 66px doorway at the bottom to walk/slide in
+                const lTop = topY - 40;
+                platforms.push(makePlatform(wL, lTop, 28, (py - 66) - lTop, 'slime'));
+                // Right wall rises from the floor up to the balcony
                 const balW = 210;
-                platforms.push(makePlatform(wR + 28, topY, balW, 36, 'solid'));
+                platforms.push(makePlatform(wR, topY, 28 + balW, 36, 'solid'));
+                platforms.push(makePlatform(wR, topY + 36, 28, py - (topY + 36), 'slime'));
                 curX = wR + 28 + balW;
                 curY = topY;
               }
@@ -3676,12 +3716,17 @@
               const entryW = 155;
               platforms.push(makePlatform(px, py, entryW, 38, 'solid'));
               const chasmStart = px + entryW;
-              orbs.push({ x: chasmStart + 185, y: py - 48, r: 14, cd: 0, pulse: 0 });
-              orbs.push({ x: chasmStart + 380, y: py - 78, r: 14, cd: 0, pulse: 0 });
-              orbs.push({ x: chasmStart + 575, y: py - 48, r: 14, cd: 0, pulse: 0 });
+              // Ink Bubble aim puzzle: diag-up -> straight-right -> diag-up (each shot must be aimed!)
+              orbs.push({ x: chasmStart + 150, y: py - 110, r: 14, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 450, y: py - 182, r: 14, cd: 0, pulse: 0 });
+              orbs.push({ x: chasmStart + 700, y: py - 103, r: 14, cd: 0, pulse: 0 });
+              if (!orbTaught) {
+                orbTaught = true;
+                notes.push({ x: px - 10, y: py - 150, key: 'orb', text: tr('orbNote'), sub: tr('orbNoteSub') });
+              }
 
-              const landX = chasmStart + 760;
-              const landW = 215;
+              const landX = chasmStart + 900;
+              const landW = 300;
               platforms.push(makePlatform(landX, py, landW, 38, 'solid'));
               curX = landX + landW;
               curY = py;
@@ -4028,6 +4073,12 @@
           sliding: false,
           dashJumpWindow: 0,
           highSpeedTimer: 0,
+          orbHold: null,
+          orbHoldT: 0,
+          orbAimX: 1,
+          orbAimY: -1,
+          lastWallJumpDir: 0,
+          lastWallJumpX: 0,
           stepTimer: 0,
           hitFlashTimer: 0,
           tauntId: '',
@@ -6256,6 +6307,9 @@
         p.y = sp.y;
         p.vx = 0;
         p.vy = 0;
+        p.orbHold = null;
+        p.orbHoldT = 0;
+        p.lastWallJumpDir = 0;
         p.ridingMoverIdx = -1;
         p.h = CFG.normalH;
         p.jumpsLeft = CFG.maxJumps;
@@ -6546,6 +6600,56 @@
         }
         const crouchHeld = keys.down || wantAutoCrouch;
 
+        // Ink Bubble capture: player is held inside the blot, aims with arrows/WASD and fires out with Jump (or auto after 0.75s)
+        if (p.orbHold) {
+          const orb = p.orbHold;
+          p.orbHoldT += dt;
+          p.vx = 0;
+          p.vy = 0;
+          p.rollTimer = 0;
+          p.sliding = false;
+          p.grounded = false;
+          p.x += (orb.x - p.w * 0.5 - p.x) * Math.min(1, 22 * dt);
+          p.y += (orb.y - p.h * 0.5 - p.y) * Math.min(1, 22 * dt);
+          let ax = moveDir;
+          let ay = (keys.up ? -1 : 0) + (keys.down ? 1 : 0);
+          if (ax === 0 && ay === 0) { ax = p.facing || 1; ay = -1; }
+          const al = Math.hypot(ax, ay) || 1;
+          p.orbAimX = ax / al;
+          p.orbAimY = ay / al;
+          p.scaleX = 1 + Math.sin(p.orbHoldT * 30) * 0.08;
+          p.scaleY = 1 - Math.sin(p.orbHoldT * 30) * 0.08;
+          const wantFire = (p.jumpBufferTimer > 0 && p.orbHoldT > 0.07) || p.orbHoldT >= 0.75;
+          if (wantFire) {
+            const LAUNCH = 760;
+            p.vx = p.orbAimX * LAUNCH;
+            p.vy = p.orbAimY * LAUNCH * (p.orbAimY < 0 ? 1.0 : 0.85);
+            if (Math.abs(p.orbAimX) > 0.1) p.facing = Math.sign(p.orbAimX);
+            p.jumpsLeft = CFG.maxJumps;
+            p.airRollUsed = false;
+            p.rollCooldownTimer = 0;
+            p.lastWallJumpDir = 0;
+            p.wallJumpLock = 0.16;
+            p.jumpBufferTimer = 0;
+            p.coyoteTimer = 0;
+            p.highSpeedTimer = 0.35;
+            p.scaleX = Math.abs(p.orbAimX) > 0.5 ? 1.4 : 0.7;
+            p.scaleY = Math.abs(p.orbAimX) > 0.5 ? 0.7 : 1.4;
+            orb.cd = 2.2;
+            orb.pulse = 1.0;
+            p.orbHold = null;
+            hitStopTimer = Math.max(hitStopTimer, 0.045);
+            screenShake = Math.max(screenShake, 5);
+            playSound('catapult');
+            spawnShockwave(orb.x, orb.y, '#2952A3', 46);
+            spawnPackParticles(localCosmetics.particlePack, orb.x, orb.y, 14, 240, '#2952A3');
+            spawnParticles(orb.x, orb.y, '#231F20', 8, 200);
+          } else {
+            if (Math.random() < 0.4) spawnParticles(orb.x + (Math.random() - 0.5) * 30, orb.y + (Math.random() - 0.5) * 30, '#2952A3', 1, 40);
+            return;
+          }
+        }
+
         // Crouch-Slide: pressing crouch while moving fast on ground slides cleanly (great for tunnels & ice!)
         if (crouchHeld && p.grounded && p.rollTimer <= 0 && p.surfaceType !== 'slime') {
           if (!p.sliding && Math.abs(p.vx) >= CFG.slideMinSpeed) {
@@ -6646,6 +6750,7 @@
           p.coyoteTimer = CFG.coyoteTime;
           p.jumpsLeft = CFG.maxJumps;
           p.airRollUsed = false;
+          p.lastWallJumpDir = 0;
         } else {
           p.coyoteTimer = Math.max(0, p.coyoteTimer - dt);
         }
@@ -6692,9 +6797,17 @@
             sendVfxEvent('jump', p.x + p.w / 2, p.y + p.h);
           } else if (p.wallDir !== 0 && !p.grounded) {
             const onSlimeWall = p.wallSurface === 'slime';
-            p.vx = -p.wallDir * (onSlimeWall ? CFG.wallJumpVx * 1.15 : CFG.wallJumpVx);
-            p.vy = -(onSlimeWall ? CFG.wallJumpVy * 1.12 : CFG.wallJumpVy);
-            if (onSlimeWall) p.airRollUsed = false;
+            // Same-wall rule: re-jumping off the SAME wall gives a weak kick (no height gain) -> real climbs need two walls!
+            const sameWall = p.lastWallJumpDir === p.wallDir && Math.abs(p.x - p.lastWallJumpX) < 56;
+            const vyMult = sameWall ? 0.48 : 1.0;
+            p.vx = -p.wallDir * (onSlimeWall ? CFG.wallJumpVx * 1.15 : CFG.wallJumpVx) * (sameWall ? 1.2 : 1.0);
+            p.vy = -(onSlimeWall ? CFG.wallJumpVy * 1.12 : CFG.wallJumpVy) * vyMult;
+            p.lastWallJumpDir = p.wallDir;
+            p.lastWallJumpX = p.x;
+            if (sameWall) {
+              spawnParticles(p.x + (p.wallDir > 0 ? p.w : 0), p.y + p.h * 0.5, '#9E9384', 5, 70);
+            }
+            if (onSlimeWall && !sameWall) p.airRollUsed = false;
             p.facing = -p.wallDir;
             p.wallJumpLock = 0.08;
             p.jumpBufferTimer = 0;
@@ -6887,24 +7000,26 @@
           }
         }
 
-        // Mid-air Ink Refill Orbs!
-        if (lvl.orbs) {
+        // Ink Bubbles: fly in -> get captured -> aim -> fire out in any of 8 directions!
+        if (lvl.orbs && !p.orbHold) {
           const pcx = p.x + p.w * 0.5;
           const pcy = p.y + p.h * 0.5;
           for (const orb of lvl.orbs) {
             if (orb.cd <= 0 && Math.hypot(pcx - orb.x, pcy - orb.y) < (orb.r || 14) + 18) {
-              orb.cd = 3.2;
+              p.orbHold = orb;
+              p.orbHoldT = 0;
+              p.vx = 0;
+              p.vy = 0;
+              p.rollTimer = 0;
+              p.sliding = false;
+              p.jumpBufferTimer = 0;
               orb.pulse = 1.0;
-              p.jumpsLeft = CFG.maxJumps;
-              p.airRollUsed = false;
-              p.rollCooldownTimer = 0;
-              p.vy = Math.min(p.vy, -210);
-              p.scaleX = 1.24;
+              p.scaleX = 0.8;
               p.scaleY = 0.8;
-              hitStopTimer = Math.max(hitStopTimer, 0.022);
+              hitStopTimer = Math.max(hitStopTimer, 0.03);
               playSound('orb');
-              spawnShockwave(orb.x, orb.y, '#2952A3', 34);
-              spawnPackParticles(localCosmetics.particlePack, orb.x, orb.y, 10, 180, '#2952A3');
+              spawnShockwave(orb.x, orb.y, '#2952A3', 28);
+              break;
             }
           }
         }
@@ -7618,6 +7733,7 @@
 
         let lx = -5, ly = 0, rx = 5, ry = 0;
         let lFoot = facing * 3.5, rFoot = facing * 3.5;
+        let wallPose = 0;
 
         if (ls.running) {
           const dir = ls.moveDir || facing || 1;
@@ -7635,9 +7751,7 @@
           rFoot = dir * 3.5;
         } else if (ls.grounded === false) {
           if (ls.wallDir) {
-            lx = ls.wallDir * 5; rx = ls.wallDir * 5;
-            ly = -2.5; ry = 0;
-            lFoot = -ls.wallDir * 3; rFoot = -ls.wallDir * 3;
+            wallPose = ls.wallDir;
           } else if ((ls.vy || 0) < -30) {
             // Rising jump tuck
             lx = -5 - facing * 2.5; rx = 5 - facing * 1.5;
@@ -7653,8 +7767,25 @@
         }
 
         c.beginPath();
-        c.moveTo(-4.5, hipY); c.lineTo(lx, ly); c.lineTo(lx + lFoot, ly);
-        c.moveTo(4.5, hipY); c.lineTo(rx, ry); c.lineTo(rx + rFoot, ry);
+        if (wallPose) {
+          // Wall-slide brace: both soles planted flat against the wall, knees bent, slight scrape jitter
+          const wd = wallPose;
+          const wallX = wd * 14.5;
+          const scr = Math.sin(worldTime * 38) * 0.7;
+          // lower leg
+          c.moveTo(-wd * 3, hipY);
+          c.lineTo(wd * 7, 1 + scr);
+          c.lineTo(wallX, -1 + scr);
+          c.moveTo(wallX, 3 + scr); c.lineTo(wallX, -4.5 + scr);
+          // upper leg (knee tucked up)
+          c.moveTo(wd * 3, hipY);
+          c.lineTo(wd * 9, -9 - scr);
+          c.lineTo(wallX, -8 - scr);
+          c.moveTo(wallX, -4.5 - scr); c.lineTo(wallX, -11.5 - scr);
+        } else {
+          c.moveTo(-4.5, hipY); c.lineTo(lx, ly); c.lineTo(lx + lFoot, ly);
+          c.moveTo(4.5, hipY); c.lineTo(rx, ry); c.lineTo(rx + rFoot, ry);
+        }
         c.stroke();
         c.restore();
       }
@@ -8796,7 +8927,7 @@
             const bobY = Math.sin(worldTime * 4 + orb.x * 0.03) * 4;
             ctx.save();
             if (orb.cd > 0) {
-              const frac = Math.max(0, 1 - orb.cd / 3.2);
+              const frac = Math.max(0, 1 - orb.cd / 2.2);
               ctx.setLineDash([4, 4]);
               ctx.strokeStyle = 'rgba(41, 82, 163, 0.35)';
               ctx.lineWidth = 2;
@@ -8841,6 +8972,45 @@
               ctx.beginPath();
               ctx.ellipse(orb.x - 3.5, orb.y + bobY - 1, 2.8, 5, -0.35, 0, Math.PI * 2);
               ctx.fill();
+
+              // Captured: wobbling ink bubble shell + hand-drawn aim arrow + fuse ring
+              if (localPlayer.orbHold === orb) {
+                const ht = localPlayer.orbHoldT || 0;
+                const wob = Math.sin(ht * 28) * 2.5;
+                ctx.strokeStyle = '#2952A3';
+                ctx.lineWidth = 2.4;
+                ctx.globalAlpha = 0.85;
+                ctx.beginPath();
+                ctx.ellipse(orb.x, orb.y, 30 + wob, 30 - wob, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                // Fuse ring: shrinking time left before auto-fire
+                ctx.strokeStyle = '#C83E31';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(orb.x, orb.y, 36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, 1 - ht / 0.75));
+                ctx.stroke();
+                // Aim arrow
+                const axd = localPlayer.orbAimX, ayd = localPlayer.orbAimY;
+                const ax0 = orb.x + axd * 40, ay0 = orb.y + ayd * 40;
+                const ax1 = orb.x + axd * 70, ay1 = orb.y + ayd * 70;
+                ctx.strokeStyle = '#231F20';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.setLineDash([6, 5]);
+                ctx.lineDashOffset = -worldTime * 40;
+                ctx.beginPath(); ctx.moveTo(ax0, ay0); ctx.lineTo(ax1, ay1); ctx.stroke();
+                ctx.setLineDash([]);
+                const ang = Math.atan2(ayd, axd);
+                ctx.fillStyle = '#C83E31';
+                ctx.beginPath();
+                ctx.moveTo(ax1 + Math.cos(ang) * 10, ay1 + Math.sin(ang) * 10);
+                ctx.lineTo(ax1 + Math.cos(ang + 2.4) * 9, ay1 + Math.sin(ang + 2.4) * 9);
+                ctx.lineTo(ax1 + Math.cos(ang - 2.4) * 9, ay1 + Math.sin(ang - 2.4) * 9);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+              }
             }
             ctx.restore();
           }
@@ -9921,11 +10091,16 @@
           } else {
             const titleArr = currentLang === 'en' ? SKETCH_TITLES_EN : SKETCH_TITLES_UK;
             currentLevel.title = tr('roundWord') + roundNumber + ' · ' + titleArr[currentSeed % titleArr.length] + (currentLevel.biome ? (' [' + tr('biome_' + currentLevel.biome) + ']') : '');
-            if (currentLevel.notes && currentLevel.notes[0]) {
+            if (currentLevel.notes && currentLevel.notes[0] && !currentLevel.notes[0].key) {
               const modeObj = GAME_MODES[roomSettings.gameModeIdx || 0] || GAME_MODES[0];
               const isRing = !!currentLevel.ringMeta;
               currentLevel.notes[0].text = modeObj.id === 'eraser' ? tr('eraserNoteMain') : (modeObj.id === 'duel' ? tr('duelNoteMain') : (isRing ? tr('ringNoteMain') : tr('raceNoteMain')));
               currentLevel.notes[0].sub = isRing ? tr('ringNoteSub') : tr('raceNoteSub');
+            }
+            if (currentLevel.notes) {
+              for (const n of currentLevel.notes) {
+                if (n.key) { n.text = tr(n.key + 'Note'); n.sub = tr(n.key + 'NoteSub'); }
+              }
             }
           }
         }
